@@ -1,0 +1,373 @@
+/* =========================================================================
+   THE HOLLOW — RECIPE DATA
+   =========================================================================
+   This is the ONLY file you edit to change the menu.
+   Add, remove, or edit drinks in the COCKTAILS list below, then save and
+   re-open index.html in your browser. Nothing else to touch.
+
+   ---- HOW TO ADD A DRINK -------------------------------------------------
+   Copy the template block below, paste it inside the [ ... ] list (after any
+   existing drink's closing "}," ), and fill it in. Keep the comma after "}".
+
+   {
+     name:     "Drink Name",          // shown as the card title
+     spirit:   "Gin",                 // groups the card into a section + the Spirit filter
+     base:     "Gin",                 // small label above the name (often same as spirit)
+     tags:     ["Sour/Tart","Citrus"],// flavor chips (Flavor filter, must match ALL selected)
+     build:    "Shaken",              // Stirred | Shaken | Built | Muddled
+     glass:    "Coupe",               // e.g. Rocks, Coupe, Highball, Collins, Mug...
+     occasion: "Anytime",             // Aperitif | Anytime | Brunch | Nightcap | Digestif
+     summary:  "One-line description shown on the card.",
+     spec:[                           // each line is [amount, ingredient]
+       ["2 oz","Some spirit"],
+       ["¾ oz","lemon juice"],
+       ["¾ oz","simple syrup"]
+     ],
+     steps:[                          // numbered method steps
+       "Shake with ice.",
+       "Strain into a chilled coupe."
+     ],
+     garnish: "Lemon twist",
+     history: "A sentence on where it comes from.",
+     note:    "Any spec caveat or source note (shown as 'Source note —')."
+   },
+
+   ---- RECOMMENDED VALUES (so the filters stay tidy) -----------------------
+   Using a NEW value is fine — it still shows up and gets its own filter chip.
+   These are just the existing ones, listed in the order they appear:
+
+     spirit:   Gin, Bourbon, Rye, Tequila, Rum, Vodka, Cognac, Aperitivo
+     tags:     Spirit-forward, Bitter, Sour/Tart, Sweet, Herbal, Floral,
+               Citrus, Fruity, Refreshing/Long, Creamy/Rich
+     build:    Stirred, Shaken, Built, Muddled
+     glass:    Rocks, Coupe, Highball, Collins, Copper mug, Mug,
+               Julep cup, Wine glass
+     occasion: Aperitif, Anytime, Brunch, Nightcap, Digestif
+
+   Tip: to change section/filter ordering, edit the GROUPS list inside the
+   HTML file. To remove a drink, delete its whole { ... }, block.
+
+   Fraction glyphs you can copy: ½ ⅓ ⅔ ¼ ¾ ⅛ ⅙
+   ========================================================================= */
+
+const COCKTAILS = [
+  {name:"Negroni", spirit:"Gin", base:"Gin", tags:["Bitter","Spirit-forward","Herbal"], build:"Stirred", glass:"Rocks", occasion:"Aperitif",
+   summary:`Equal parts gin, Campari, and sweet vermouth — the benchmark bitter aperitivo.`,
+   spec:[["1 oz","Hendrick's gin"],["1 oz","Campari"],["1 oz","Carpano Antica sweet vermouth"]],
+   steps:[`Stir with ice until well-chilled.`,`Strain over a large cube.`],
+   garnish:`Expressed orange peel`,
+   history:`Florence, c. 1919 — Count Camillo Negroni asked for his Americano stiffened with gin instead of soda.`,
+   note:`Universal 1:1:1; some modern bars push gin to 1½ oz for a drier, spirit-forward build.`},
+
+  {name:"Dry Martini", spirit:"Gin", base:"Gin", tags:["Spirit-forward"], build:"Stirred", glass:"Coupe", occasion:"Aperitif",
+   summary:`Cold, clean, and bracing — gin and dry vermouth, stirred to a whisper.`,
+   spec:[["2½ oz","Hendrick's gin"],["½ oz","Dolin Dry vermouth"],["1 dash","orange bitters (optional)"]],
+   steps:[`Stir with ice until very cold.`,`Strain into a chilled coupe.`],
+   garnish:`Lemon twist or a Castelvetrano olive`,
+   history:`Evolved from the 1800s Martinez; the dry style took hold in the early 1900s as French vermouth grew fashionable.`,
+   note:`Gin-to-vermouth ratio is the canon's most contested — IBA runs 6:1, Difford's ~5:1, older "wet" Martinis as low as 2:1.`},
+
+  {name:"Aviation", spirit:"Gin", base:"Gin", tags:["Floral","Sour/Tart","Fruity"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`A pale-violet gin sour perfumed with maraschino and crème de violette.`,
+   spec:[["2 oz","Hendrick's gin"],["¾ oz","lemon juice"],["½ oz","Luxardo Maraschino"],["¼ oz","crème de violette"]],
+   steps:[`Shake with ice.`,`Double-strain into a chilled coupe.`],
+   garnish:`Luxardo cherry`,
+   history:`Hugo Ensslin, Hotel Wallick NYC, c. 1916; the violette was dropped in Craddock's 1930 Savoy and restored in the modern revival.`,
+   note:`Keep violette ≤ ¼ oz or it turns soapy and over-purple; the 1930 Savoy omits it entirely.`},
+
+  {name:"Last Word", spirit:"Gin", base:"Gin", tags:["Herbal","Sour/Tart","Fruity"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`Equal parts gin, Chartreuse, maraschino, and lime — herbal, bright, perfectly balanced.`,
+   spec:[["¾ oz","Hendrick's gin"],["¾ oz","Green Chartreuse"],["¾ oz","Luxardo Maraschino"],["¾ oz","lime juice"]],
+   steps:[`Shake with ice.`,`Double-strain into a chilled coupe.`],
+   garnish:`Luxardo cherry`,
+   history:`Detroit Athletic Club, on the menu by 1916; revived in 2003 by Murray Stenson at Seattle's Zig Zag Café.`,
+   note:`Strict 1:1:1:1 is canon; some bars nudge the gin up slightly for balance.`},
+
+  {name:"Corpse Reviver No. 2", spirit:"Gin", base:"Gin", tags:["Citrus","Sour/Tart","Herbal"], build:"Shaken", glass:"Coupe", occasion:"Brunch",
+   summary:`A citrus-bright equal-parts restorative served in an absinthe-rinsed glass.`,
+   spec:[["¾ oz","Hendrick's gin"],["¾ oz","Cointreau"],["¾ oz","Lillet Blanc"],["¾ oz","lemon juice"],["rinse","absinthe"]],
+   steps:[`Rinse a chilled coupe with absinthe and discard the excess.`,`Shake the rest with ice and fine-strain in.`],
+   garnish:`Expressed lemon (or orange) twist`,
+   history:`Harry Craddock's 1930 Savoy Cocktail Book — "Four taken in swift succession will unrevive the corpse again."`,
+   note:`Original Kina Lillet is discontinued; Lillet Blanc is the standard sub (Cocchi Americano runs closer to the bitter original). Absinthe as a rinse is the modern default; the Savoy shakes in a dash.`},
+
+  {name:"Tom Collins", spirit:"Gin", base:"Gin", tags:["Refreshing/Long","Citrus","Sour/Tart"], build:"Built", glass:"Collins", occasion:"Anytime",
+   summary:`A tall gin sour lengthened with soda — the original highball cooler.`,
+   spec:[["2 oz","Hendrick's gin"],["1 oz","lemon juice"],["¾ oz","simple syrup"],["top","club soda"]],
+   steps:[`Shake gin, lemon, and syrup with ice.`,`Strain into an ice-filled Collins glass; top with soda.`],
+   garnish:`Lemon wheel and a Luxardo cherry`,
+   history:`Born from 19th-century London gin punch and the 1874 "Tom Collins" hoax.`,
+   note:`Classically an Old Tom gin; Hendrick's stands in as a London-style substitute.`},
+
+  {name:"Gimlet", spirit:"Gin", base:"Gin", tags:["Sour/Tart","Citrus"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`Gin and lime, sharp and spare.`,
+   spec:[["2 oz","Hendrick's gin"],["¾ oz","lime juice"],["¾ oz","simple syrup"]],
+   steps:[`Shake with ice.`,`Strain into a chilled coupe.`],
+   garnish:`Lime wheel`,
+   history:`Royal Navy origin — gin cut with lime against scurvy; first printed in 1922.`,
+   note:`Difford's holds it's not a Gimlet without Rose's lime cordial; with no cordial stocked, the fresh-lime build (Death & Co's "Fresh Gimlet") is the card spec.`},
+
+  {name:"Southside", spirit:"Gin", base:"Gin", tags:["Herbal","Sour/Tart","Citrus"], build:"Muddled", glass:"Coupe", occasion:"Anytime",
+   summary:`A minted gin sour — like a Mojito served up.`,
+   spec:[["2 oz","Hendrick's gin"],["¾ oz","lemon juice"],["¾ oz","simple syrup"],["6–8","mint leaves"]],
+   steps:[`Lightly muddle the mint with the syrup.`,`Add the rest, shake with ice, and double-strain into a chilled coupe.`],
+   garnish:`Mint leaf`,
+   history:`An early-20th-century minted gin sour, claimed by both NYC's 21 Club and Chicago's South Side.`,
+   note:`Lemon vs. lime divides the sources; Death & Co adds a dash of Angostura.`},
+
+  {name:"White Lady", spirit:"Gin", base:"Gin", tags:["Citrus","Sour/Tart","Creamy/Rich"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`A silky gin-and-Cointreau sour with a meringue-soft head.`,
+   spec:[["1½ oz","Hendrick's gin"],["1 oz","Cointreau"],["¾ oz","lemon juice"],["½ oz","egg white"]],
+   steps:[`Dry-shake without ice to build the foam.`,`Shake again with ice; double-strain into a chilled coupe.`],
+   garnish:`Lemon twist`,
+   history:`Harry Craddock, the Savoy, 1920s.`,
+   note:`Difford's treats egg white as standard; IBA omits it. Aquafaba works as a vegan stand-in.`},
+
+  {name:"Gin & Tonic", spirit:"Gin", base:"Gin", tags:["Refreshing/Long","Bitter"], build:"Built", glass:"Highball", occasion:"Anytime",
+   summary:`Gin lengthened with quinine tonic — the eternal highball.`,
+   spec:[["2 oz","Hendrick's gin"],["4 oz","tonic water"]],
+   steps:[`Build over plenty of ice.`,`Stir once.`],
+   garnish:`Lime wedge (cucumber flatters Hendrick's)`,
+   history:`British colonial India, where gin made antimalarial quinine tonic palatable.`,
+   note:`No real disagreement; the ratio runs 1:2 to 1:3 to taste.`},
+
+  {name:"Manhattan", spirit:"Rye", base:"Rye", tags:["Spirit-forward"], build:"Stirred", glass:"Coupe", occasion:"Nightcap",
+   summary:`Rye and sweet vermouth bound by aromatic bitters — the archetype.`,
+   spec:[["2 oz","Sagamore Double Oak rye"],["1 oz","Carpano Antica sweet vermouth"],["2 dashes","Angostura"]],
+   steps:[`Stir with ice until cold.`,`Strain into a chilled coupe.`],
+   garnish:`Luxardo cherry`,
+   history:`New York's Manhattan Club lineage, 1870s–80s.`,
+   note:`2:1 with Angostura is consensus; dropping to 2:¾ or adding orange bitters is preference.`},
+
+  {name:"Sazerac", spirit:"Rye", base:"Rye", tags:["Spirit-forward","Herbal"], build:"Stirred", glass:"Rocks", occasion:"Nightcap",
+   summary:`Rye, Peychaud's, and sugar served neat in an absinthe-rinsed glass.`,
+   spec:[["2 oz","Sagamore Double Oak rye"],["¼ oz","demerara (rich) syrup"],["3–4 dashes","Peychaud's bitters"],["rinse","absinthe"]],
+   steps:[`Rinse a chilled rocks glass with absinthe and discard.`,`Stir the rest with ice and strain in — no ice.`],
+   garnish:`Expressed lemon peel (oils only; discard the twist)`,
+   history:`New Orleans, mid-1800s; switched from cognac to rye after phylloxera.`,
+   note:`Absinthe is a rinse, never poured in. Death & Co's split base (1½ oz rye + ½ oz cognac) is a fine variation — VSOP is on the shelf for it.`},
+
+  {name:"Improved Whiskey Cocktail", spirit:"Rye", base:"Rye", tags:["Spirit-forward","Herbal"], build:"Stirred", glass:"Rocks", occasion:"Nightcap",
+   summary:`An Old Fashioned "improved" with maraschino and a whisper of absinthe.`,
+   spec:[["2 oz","Sagamore Double Oak rye"],["¼ oz","Luxardo Maraschino"],["¼ oz","Liber & Co. gum syrup"],["1 dash","Angostura"],["1 dash","Peychaud's"],["1 dash","absinthe"]],
+   steps:[`Stir all with ice.`,`Strain over a large cube.`],
+   garnish:`Expressed lemon twist`,
+   history:`Jerry Thomas, 1876 — the bridge between the Old Fashioned and the Sazerac; revived at PDT.`,
+   note:`Absinthe goes into the build here (not a rinse); gum syrup is the period-correct sweetener.`},
+
+  {name:"Old Fashioned", spirit:"Bourbon", base:"Bourbon", tags:["Spirit-forward","Bitter"], build:"Built", glass:"Rocks", occasion:"Nightcap",
+   summary:`Bourbon, sugar, and bitters — the original cocktail template.`,
+   spec:[["2 oz","Woodford Reserve bourbon"],["¼ oz","demerara (rich) syrup"],["2–3 dashes","Angostura"]],
+   steps:[`Stir syrup, bitters, and bourbon with ice until cold.`,`Strain over a large cube.`],
+   garnish:`Expressed orange peel`,
+   history:`The original "cock-tail" (spirit + sugar + water + bitters), named to order it the old-fashioned way.`,
+   note:`Sugar-cube-muddle is the classic; the syrup build is the modern standard. Most modern specs reject DeGroff's muddled fruit.`},
+
+  {name:"Boulevardier", spirit:"Bourbon", base:"Bourbon", tags:["Bitter","Spirit-forward"], build:"Stirred", glass:"Rocks", occasion:"Aperitif",
+   summary:`A whiskey Negroni — bourbon, Campari, sweet vermouth.`,
+   spec:[["1½ oz","Woodford Reserve bourbon"],["¾ oz","Campari"],["¾ oz","Carpano Antica sweet vermouth"]],
+   steps:[`Stir with ice until cold.`,`Strain over a large cube or into a chilled coupe.`],
+   garnish:`Orange twist`,
+   history:`Erskine Gwynne's drink in Harry MacElhone's 1927 Barflies and Cocktails.`,
+   note:`The original is equal parts; the modern standard bumps whiskey to 1½ oz to distinguish it from the Negroni.`},
+
+  {name:"Whiskey Sour", spirit:"Bourbon", base:"Bourbon", tags:["Sour/Tart","Citrus"], build:"Shaken", glass:"Rocks", occasion:"Anytime",
+   summary:`Bourbon, lemon, and sugar — the foundational sour.`,
+   spec:[["2 oz","Woodford Reserve bourbon"],["¾ oz","lemon juice"],["¾ oz","simple syrup"],["½ oz","egg white (optional)"]],
+   steps:[`Dry-shake first if using egg white, then shake with ice.`,`Strain over fresh ice.`],
+   garnish:`Orange half-wheel and a Luxardo cherry`,
+   history:`Documented since the 1860s (Jerry Thomas, 1862).`,
+   note:`IBA lists egg white as optional; Death & Co treats it as the house default for texture.`},
+
+  {name:"Mint Julep", spirit:"Bourbon", base:"Bourbon", tags:["Spirit-forward","Herbal"], build:"Built", glass:"Julep cup", occasion:"Anytime",
+   summary:`Bourbon and mint over a mountain of crushed ice.`,
+   spec:[["2½ oz","Woodford Reserve bourbon"],["⅓ oz","demerara (rich) syrup"],["8–12","mint leaves"]],
+   steps:[`Gently bruise the mint with the syrup in the cup.`,`Add bourbon, pack with crushed ice, and swizzle until frosted.`],
+   garnish:`Mint bouquet, dusted with sugar`,
+   history:`Early-1800s American South; the Kentucky Derby's signature since 1938.`,
+   note:`Built and swizzled, never shaken; sub a rocks glass with crushed ice if you've no julep cup.`},
+
+  {name:"Gold Rush", spirit:"Bourbon", base:"Bourbon", tags:["Sour/Tart","Citrus","Sweet"], build:"Shaken", glass:"Rocks", occasion:"Anytime",
+   summary:`A modern honey whiskey sour — here built on rich demerara.`,
+   spec:[["2 oz","Woodford Reserve bourbon"],["¾ oz","demerara (rich) syrup"],["¾ oz","lemon juice"]],
+   steps:[`Shake with ice.`,`Strain over a large cube.`],
+   garnish:`Lemon twist`,
+   history:`T.J. Siegal at Sasha Petraske's Milk & Honey, c. 2001 — a whiskey sour sweetened with honey.`,
+   note:`Honey isn't stocked; demerara rich syrup is the closest sub for body (agave is the floral alternative). Strictly this is a "Demerara Whiskey Sour" — a flagged deviation.`},
+
+  {name:"Whiskey Smash", spirit:"Bourbon", base:"Bourbon", tags:["Sour/Tart","Herbal","Citrus"], build:"Muddled", glass:"Rocks", occasion:"Anytime",
+   summary:`A citrus-forward julep — bourbon, lemon, and mint.`,
+   spec:[["2 oz","Woodford Reserve bourbon"],["¾ oz","lemon juice"],["¾ oz","simple syrup"],["6–8","mint leaves"]],
+   steps:[`Muddle the mint with lemon and syrup.`,`Add bourbon, shake with ice, and strain over crushed ice.`],
+   garnish:`Mint sprig and a lemon wheel`,
+   history:`Dale DeGroff, Rainbow Room — a less-sweet, citrus-driven take on the julep.`,
+   note:`DeGroff muddles quartered lemon rather than measured juice; the balance is the same.`},
+
+  {name:"Hot Toddy", spirit:"Bourbon", base:"Bourbon", tags:["Sweet","Citrus","Herbal"], build:"Built", glass:"Mug", occasion:"Nightcap",
+   summary:`Bourbon, sweetener, lemon, and hot water — the warm cure.`,
+   spec:[["1½ oz","Woodford Reserve bourbon"],["½ oz","blue agave nectar (or honey)"],["½ oz","lemon juice"],["4–6 oz","hot water"]],
+   steps:[`Build in a warmed mug.`,`Stir to dissolve.`],
+   garnish:`Lemon wheel; cinnamon stick if you have one`,
+   history:`18th–19th-century British and Scottish hot spirit-and-water; bourbon is the American take.`,
+   note:`Honey is the classic sweetener; agave subs cleanly. A category more than a fixed recipe — adjust to taste.`},
+
+  {name:"Old Pal", spirit:"Rye", base:"Rye", tags:["Bitter","Spirit-forward"], build:"Stirred", glass:"Coupe", occasion:"Aperitif",
+   summary:`Rye's dry, bitter cousin to the Boulevardier — Campari and dry vermouth.`,
+   spec:[["2 oz","Sagamore Double Oak rye"],["¾ oz","Campari"],["¾ oz","Dolin Dry vermouth"]],
+   steps:[`Stir with ice until cold.`,`Strain into a chilled coupe.`],
+   garnish:`Lemon twist`,
+   history:`Harry MacElhone's 1927 Barflies and Cocktails — the dry-vermouth, rye relative of the Negroni family.`,
+   note:`The original is equal parts (1:1:1); this boozier 2:¾:¾ is the modern standard. Dry vermouth is essential — sweet would make it a Boulevardier.`},
+
+  {name:"Margarita", spirit:"Tequila", base:"Tequila", tags:["Sour/Tart","Citrus"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`Tequila, orange liqueur, and lime — the tequila sour benchmark.`,
+   spec:[["1½ oz","Cazcanes Blanco tequila"],["1 oz","Cointreau"],["¾ oz","lime juice"]],
+   steps:[`Shake with ice.`,`Strain into a coupe (salt the rim if you like).`],
+   garnish:`Lime wheel; optional half salt rim`,
+   history:`Disputed 1930s–40s border origin; most often credited to Carlos "Danny" Herrera, c. 1938.`,
+   note:`IBA runs lighter on lime (≈ ½ oz); Cointreau's own spec is a sweeter 2:1:1.`},
+
+  {name:"Tommy's Margarita", spirit:"Tequila", base:"Tequila", tags:["Sour/Tart","Citrus"], build:"Shaken", glass:"Rocks", occasion:"Anytime",
+   summary:`A Margarita stripped to tequila, lime, and agave — pure agave focus.`,
+   spec:[["2 oz","Cazcanes Blanco tequila"],["1 oz","lime juice"],["½ oz","blue agave nectar"]],
+   steps:[`Thin the agave 1:1 with warm water for easy mixing.`,`Shake with ice; strain over fresh ice.`],
+   garnish:`Lime wheel`,
+   history:`Julio Bermejo, Tommy's Mexican Restaurant, San Francisco, c. 1990.`,
+   note:`No orange liqueur and no salt — the agave-and-tequila purity is the whole point. Classically reposado; blanco is fine.`},
+
+  {name:"Tequila Sour", spirit:"Tequila", base:"Tequila", tags:["Sour/Tart","Citrus","Creamy/Rich"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`A silky agave sour with a soft, bittered foam.`,
+   spec:[["2 oz","Cazcanes Blanco tequila"],["1 oz","lime juice"],["½ oz","blue agave nectar"],["½ oz","egg white"],["2 dashes","Angostura"]],
+   steps:[`Dry-shake, then shake with ice.`,`Double-strain into a coupe; dot the foam with Angostura.`],
+   garnish:`Angostura dots; lime twist`,
+   history:`The tequila-base variant of the 19th-century sour template.`,
+   note:`Difford's builds it with lime and agave; a generic sour would use lemon and simple syrup.`},
+
+  {name:"Tequila Negroni", spirit:"Tequila", base:"Tequila", tags:["Bitter","Spirit-forward","Herbal"], build:"Stirred", glass:"Rocks", occasion:"Aperitif",
+   summary:`The Negroni rebuilt on blanco tequila — a perfect inventory match.`,
+   spec:[["1 oz","Cazcanes Blanco tequila"],["1 oz","Campari"],["1 oz","Carpano Antica sweet vermouth"]],
+   steps:[`Stir with ice until cold.`,`Strain over a large cube.`],
+   garnish:`Orange peel`,
+   history:`A modern equal-parts Negroni riff; its named ancestor is the 1970s Rosita.`,
+   note:`Distinct from the Rosita, which adds dry vermouth and Angostura.`},
+
+  {name:"Tequila Old Fashioned", spirit:"Tequila", base:"Tequila", tags:["Spirit-forward","Bitter"], build:"Built", glass:"Rocks", occasion:"Nightcap",
+   summary:`Agave spirit, agave nectar, and bitters — the Old Fashioned, gone south.`,
+   spec:[["2 oz","Cazcanes Blanco tequila"],["¼ oz","blue agave nectar"],["2 dashes","Angostura"]],
+   steps:[`Stir with ice until cold.`,`Strain over a large cube.`],
+   garnish:`Orange peel`,
+   history:`A modern agave adaptation of the Old Fashioned template.`,
+   note:`Traditionally reposado or añejo; blanco works but reads less classic.`},
+
+  {name:"Daiquiri", spirit:"Rum", base:"Rum", tags:["Sour/Tart","Citrus"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`Rum, lime, and sugar — three things in perfect tension.`,
+   spec:[["2 oz","Planteray XO rum"],["¾ oz","lime juice"],["¾ oz","demerara (rich) syrup"]],
+   steps:[`Shake hard with ice.`,`Double-strain into a chilled coupe.`],
+   garnish:`Lime wheel`,
+   history:`Created c. 1898 by engineer Jennings Cox near the Daiquirí mines, Santiago de Cuba.`,
+   note:`Classically a light white rum; aged Planteray XO reads richer and less crisp than the canonical build.`},
+
+  {name:"Mojito", spirit:"Rum", base:"Rum", tags:["Refreshing/Long","Herbal","Citrus"], build:"Muddled", glass:"Highball", occasion:"Anytime",
+   summary:`Rum, lime, mint, and soda — Havana in a tall glass.`,
+   spec:[["2 oz","Planteray XO rum"],["1 oz","lime juice"],["¾ oz","simple syrup"],["6–8","mint leaves"],["top","club soda"]],
+   steps:[`Lightly muddle the mint with lime and syrup.`,`Add rum and ice; top with soda and stir up.`],
+   garnish:`Mint sprig`,
+   history:`A Cuban highball with 19th-century Havana roots, descended from the Draque.`,
+   note:`Classically white rum; the aged Planteray deviates from the bright Cuban style.`},
+
+  {name:"Rum Old Fashioned", spirit:"Rum", base:"Rum", tags:["Spirit-forward","Bitter"], build:"Stirred", glass:"Rocks", occasion:"Nightcap",
+   summary:`Aged rum and demerara, stirred down — molasses meets molasses.`,
+   spec:[["2 oz","Planteray XO rum"],["¼ oz","demerara (rich) syrup"],["2 dashes","Angostura"]],
+   steps:[`Stir with ice until cold.`,`Strain over a large cube.`],
+   garnish:`Orange twist`,
+   history:`The Old Fashioned template built on aged rum.`,
+   note:`Demerara pairs naturally with the rum's molasses; Planteray XO is ideal here.`},
+
+  {name:"Floridita Daiquiri", spirit:"Rum", base:"Rum", tags:["Sour/Tart","Citrus","Fruity"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`A Daiquiri laced with maraschino — El Floridita's signature touch.`,
+   spec:[["2 oz","Planteray XO rum"],["¾ oz","lime juice"],["½ oz","demerara (rich) syrup"],["1 tsp","Luxardo Maraschino"]],
+   steps:[`Shake hard with ice.`,`Double-strain into a chilled coupe.`],
+   garnish:`Lime wheel`,
+   history:`The maraschino-kissed house style of El Floridita, Havana, where Constantino Ribalaigua's numbered Daiquiris were born.`,
+   note:`The related Daiquiri No. 3 / Hemingway adds grapefruit juice — omitted here, as none is stocked.`},
+
+  {name:"Dark 'n' Stormy", spirit:"Rum", base:"Rum", tags:["Refreshing/Long","Citrus","Fruity"], build:"Built", glass:"Highball", occasion:"Anytime",
+   summary:`Dark rum floated over spicy ginger beer.`,
+   spec:[["2 oz","Planteray XO rum"],["4 oz","ginger beer"],["½ oz","lime juice (optional)"]],
+   steps:[`Build ginger beer over ice.`,`Float the rum on top.`],
+   garnish:`Lime wedge`,
+   history:`Bermudian — Royal Navy sailors mixed local ginger beer with dark rum.`,
+   note:`The name is Gosling's trademark and strictly requires Black Seal rum; with Planteray XO this is, properly, a "dark rum and ginger beer."`},
+
+  {name:"Moscow Mule", spirit:"Vodka", base:"Vodka", tags:["Refreshing/Long","Citrus"], build:"Built", glass:"Copper mug", occasion:"Anytime",
+   summary:`Vodka, lime, and ginger beer — the original Buck.`,
+   spec:[["2 oz","Belvedere vodka"],["½ oz","lime juice"],["4–6 oz","ginger beer"]],
+   steps:[`Build over ice in a copper mug.`,`Stir once.`],
+   garnish:`Lime wedge`,
+   history:`Created in 1941 at the Cock 'n' Bull, Los Angeles — a marketing union of vodka and ginger beer.`,
+   note:`No meaningful disagreement.`},
+
+  {name:"Black Russian", spirit:"Vodka", base:"Vodka", tags:["Spirit-forward","Sweet","Creamy/Rich"], build:"Built", glass:"Rocks", occasion:"Digestif",
+   summary:`Just vodka and coffee liqueur, over ice.`,
+   spec:[["1¾ oz","Belvedere vodka"],["¾ oz","coffee liqueur"]],
+   steps:[`Build over ice.`,`Stir gently.`],
+   garnish:`None`,
+   history:`Created c. 1949 by Gustave Tops at the Hotel Metropole, Brussels.`,
+   note:`IBA runs 5:2; many bars pour a sweeter 2:1.`},
+
+  {name:"Espresso Martini", spirit:"Vodka", base:"Vodka", tags:["Sweet","Creamy/Rich"], build:"Shaken", glass:"Coupe", occasion:"Digestif",
+   summary:`Vodka and coffee, shaken to a frothed crown.`,
+   spec:[["1¾ oz","Belvedere vodka"],["1 oz","fresh espresso"],["½ oz","coffee liqueur"],["¼ oz","demerara (rich) syrup"]],
+   steps:[`Shake hard with ice.`,`Double-strain into a chilled coupe.`],
+   garnish:`Three coffee beans`,
+   history:`Dick Bradsell's "Vodka Espresso," Soho, London, c. 1983.`,
+   note:`Needs fresh-pulled espresso. The coffee-liqueur amount and vodka:espresso ratio vary widely between Bradsell's original and modern equal-parts builds.`},
+
+  {name:"Vesper", spirit:"Vodka", base:"Vodka", tags:["Spirit-forward","Floral"], build:"Shaken", glass:"Coupe", occasion:"Aperitif",
+   summary:`Gin and vodka bound by Lillet — Bond's own invention.`,
+   spec:[["3 oz","Hendrick's gin"],["1 oz","Belvedere vodka"],["½ oz","Lillet Blanc"]],
+   steps:[`Shake until ice-cold.`,`Strain into a chilled coupe.`],
+   garnish:`Large, thin lemon peel`,
+   history:`Invented and named by James Bond in Ian Fleming's Casino Royale (1953).`,
+   note:`The original Kina Lillet is gone; Lillet Blanc is the modern stand-in (Cocchi Americano runs closer).`},
+
+  {name:"Sidecar", spirit:"Cognac", base:"Cognac", tags:["Sour/Tart","Citrus"], build:"Shaken", glass:"Coupe", occasion:"Digestif",
+   summary:`Cognac, Cointreau, and lemon — elegance in three parts.`,
+   spec:[["2 oz","Cognac / VSOP"],["¾ oz","Cointreau"],["¾ oz","lemon juice"]],
+   steps:[`Shake with ice.`,`Strain into a chilled coupe.`],
+   garnish:`Optional sugar rim; lemon twist`,
+   history:`End of WWI, with Paris and London both claiming it, early 1920s.`,
+   note:`The textbook ratio split — French school 1:1:1, English/Savoy 2:1:1, Difford's 3:2:2.`},
+
+  {name:"Champs-Élysées", spirit:"Cognac", base:"Cognac", tags:["Herbal","Sour/Tart","Citrus"], build:"Shaken", glass:"Coupe", occasion:"Anytime",
+   summary:`A cognac sour seasoned with Green Chartreuse.`,
+   spec:[["1½ oz","Cognac / VSOP"],["¾ oz","lemon juice"],["¼ oz","demerara (rich) syrup"],["¼ oz","Green Chartreuse"],["2 dashes","Angostura"]],
+   steps:[`Shake with ice.`,`Double-strain into a chilled coupe.`],
+   garnish:`Lemon twist`,
+   history:`A Chartreuse-spiked Sidecar from Craddock's 1930 Savoy Cocktail Book.`,
+   note:`Chartreuse stays a ¼–½ oz seasoning, or it buries the cognac.`},
+
+  {name:"Brandy Crusta", spirit:"Cognac", base:"Cognac", tags:["Sour/Tart","Citrus","Fruity"], build:"Shaken", glass:"Wine glass", occasion:"Digestif",
+   summary:`The proto-Sidecar, sugar-crusted and lined with a single lemon peel.`,
+   spec:[["1⅔ oz","Cognac / VSOP"],["⅓ oz","Cointreau"],["¼ oz","Luxardo Maraschino"],["½ oz","lemon juice"],["⅙ oz","Liber & Co. gum syrup"],["2 dashes","Angostura"]],
+   steps:[`Sugar-crust the rim and line the glass with a long lemon-peel spiral.`,`Shake the rest with ice and fine-strain in.`],
+   garnish:`Sugar rim and a lemon-peel "crust"`,
+   history:`Joseph Santini, 1850s New Orleans; first published by Jerry Thomas in 1862 — grandfather of the Sidecar.`,
+   note:`Cointreau stands in for dry curaçao; the original is dasher-based, with the sugar rim and lemon crust as its signature.`},
+
+  {name:"Americano", spirit:"Aperitivo", base:"Campari", tags:["Bitter","Refreshing/Long"], build:"Built", glass:"Rocks", occasion:"Aperitif",
+   summary:`Campari and sweet vermouth, lengthened with soda — the Negroni's gentle ancestor.`,
+   spec:[["1 oz","Campari"],["1 oz","Carpano Antica sweet vermouth"],["top","club soda"]],
+   steps:[`Build over ice.`,`Top with soda and stir once.`],
+   garnish:`Orange half-wheel; lemon zest`,
+   history:`Milan, late 1800s, at Gaspare Campari's bar — the Milano-Torino, renamed for its American fans.`,
+   note:`Equal parts Campari and vermouth is consensus.`},
+
+  {name:"Campari Soda", spirit:"Aperitivo", base:"Campari", tags:["Bitter","Refreshing/Long"], build:"Built", glass:"Highball", occasion:"Aperitif",
+   summary:`Campari and soda — the no-frills Italian aperitivo.`,
+   spec:[["1½ oz","Campari"],["top","club soda (≈ 1:3)"]],
+   steps:[`Build over ice.`,`Top with soda.`],
+   garnish:`Orange slice`,
+   history:`Milan's original aperitivo, bottled pre-mixed since 1932.`,
+   note:`Dilution is to taste; Campari's own line runs about 1:3.`},
+];

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Hollow — Hernandez House Bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* paper-warm base, sage + oak from V2, deeper forest accent, birch hairline */
+    --bg:#F7F4ED;
+    --bg-2:#EFEADF;
+    --card:#FBF9F3;
+    --ink:#262420;
+    --ink-soft:#5C584D;
+    --ink-faint:#8A8474;
+    --sage:#7E9070;
+    --sage-deep:#4F6243;
+    --sage-pale:#E6EADC;
+    --sage-line:#B9C6AC;
+    --forest:#2F3D2C;          /* deep hunter-green accent — used sparingly */
+    --oak:#AD7C44;
+    --oak-soft:#C79A60;
+    --birch:#E8E4DC;           /* whisper of birch-gray for hairlines + bands */
+    --line:#DDD6C7;
+    --shadow:0 1px 2px rgba(40,36,28,.05), 0 8px 24px rgba(40,36,28,.06);
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    /* very faint linen grain over the paper-warm ground — restrained */
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(135deg, rgba(47,61,44,.014) 0 1px, transparent 1px 7px),
+      repeating-linear-gradient(45deg,  rgba(47,61,44,.010) 0 1px, transparent 1px 7px);
+  }
+
+  /* ---------- Header / masthead ---------- */
+  header.site{
+    max-width:1160px;
+    margin:0 auto;
+    padding:46px 24px 14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:0;
+  }
+  .botmark{
+    color:var(--sage-deep);
+    line-height:0;
+    margin-bottom:14px;
+  }
+  .botmark svg{width:40px;height:auto;display:block;}
+  .wordmark{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:500;
+    font-size:clamp(40px,8.5vw,82px);
+    line-height:.98;
+    margin:0;
+    letter-spacing:.18em;
+    /* letterspacing pushes text right; nudge back so it stays optically centered */
+    text-indent:.18em;
+    color:var(--forest);
+  }
+  .tagline{
+    margin:14px 0 0;
+    font-size:11.5px;
+    letter-spacing:.34em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--oak);
+    text-indent:.34em;
+  }
+  /* short botanical rule echoing the section dividers */
+  .masthead-rule{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    width:min(280px,72vw);
+    margin:18px 0 0;
+    color:var(--sage);
+  }
+  .masthead-rule .line{
+    flex:1;height:1px;
+    background:linear-gradient(90deg,transparent,var(--sage-line));
+  }
+  .masthead-rule .line.r{background:linear-gradient(90deg,var(--sage-line),transparent);}
+  .masthead-rule svg{width:42px;height:16px;flex:none;}
+  p.lede{
+    margin:18px auto 0;
+    max-width:52ch;
+    color:var(--ink-soft);
+    font-size:15px;
+  }
+  .head-actions{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    margin-top:22px;
+    flex-wrap:wrap;
+  }
+  button.print-btn{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:.02em;
+    color:#F7F4EB;
+    background:var(--forest);
+    border:none;
+    border-radius:999px;
+    padding:11px 20px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:background .16s ease, transform .08s ease;
+    box-shadow:var(--shadow);
+  }
+  button.print-btn:hover{background:#243019;}
+  button.print-btn:active{transform:translateY(1px);}
+  .count-pill{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    letter-spacing:.02em;
+  }
+  .count-pill b{color:var(--ink);font-weight:600;}
+
+  /* ---------- Controls ---------- */
+  .controls{
+    max-width:1160px;
+    margin:18px auto 0;
+    padding:0 24px;
+  }
+  .controls-inner{
+    background:var(--bg-2);
+    border:1px solid var(--birch);
+    border-radius:18px;
+    padding:18px 20px 16px;
+  }
+  .search-row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:6px;
+  }
+  .search-wrap{position:relative;flex:1;min-width:0;}
+  .search-wrap svg{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    width:16px;height:16px;color:var(--ink-faint);pointer-events:none;
+  }
+  input#search{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:11px 14px 11px 38px;
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input#search:focus{
+    border-color:var(--sage);
+    box-shadow:0 0 0 3px var(--sage-pale);
+  }
+  input#search::placeholder{color:var(--ink-faint);}
+  button.clear-all{
+    font-size:13px;font-weight:500;
+    color:var(--ink-soft);
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:10px 14px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .14s ease;
+  }
+  button.clear-all:hover{border-color:var(--oak);color:var(--oak);}
+  button.clear-all[hidden]{display:none;}
+
+  .filter-group{
+    display:flex;
+    align-items:baseline;
+    gap:10px 12px;
+    padding:11px 0;
+    border-top:1px solid var(--birch);
+    flex-wrap:wrap;
+  }
+  .filter-group:first-of-type{border-top:1px solid var(--birch);margin-top:8px;}
+  .group-label{
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--ink-faint);
+    width:78px;
+    flex:none;
+    padding-top:3px;
+  }
+  .group-label .mode-hint{
+    display:block;
+    font-size:9px;
+    letter-spacing:.12em;
+    color:var(--oak);
+    font-weight:600;
+    margin-top:2px;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:500;
+    color:var(--ink-soft);
+    background:var(--card);
+    border:1px solid var(--sage-line);
+    border-radius:999px;
+    padding:5.5px 13px;
+    cursor:pointer;
+    transition:all .13s ease;
+    user-select:none;
+    line-height:1.3;
+  }
+  .chip:hover{border-color:var(--forest);color:var(--ink);}
+  .chip.active{
+    background:var(--forest);
+    border-color:var(--forest);
+    color:#F4F1E6;
+  }
+
+  /* ---------- Grid ---------- */
+  main.grid{
+    max-width:1160px;
+    margin:18px auto 10px;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
+    gap:18px;
+    align-items:start;
+  }
+  .no-results{
+    grid-column:1/-1;
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-faint);
+    font-size:15px;
+  }
+  .no-results b{color:var(--ink-soft);font-weight:600;}
+
+  /* ---------- Spirit section divider (botanical branch) ---------- */
+  .spirit-section{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin:18px 4px 0;
+  }
+  .spirit-section.first{margin-top:4px;}
+  .spirit-section .line{
+    flex:1;height:1px;
+    background:linear-gradient(90deg,transparent,var(--sage-line));
+  }
+  .spirit-section .line.r{background:linear-gradient(90deg,var(--sage-line),transparent);}
+  .spirit-section .sprig{flex:none;color:var(--sage);width:42px;height:16px;}
+  .spirit-section .sprig.flip{transform:scaleX(-1);}
+  .spirit-section .slabel{
+    flex:none;
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:600;
+    font-size:17px;
+    letter-spacing:.05em;
+    color:var(--forest);
+    white-space:nowrap;
+  }
+
+  /* ---------- Card ---------- */
+  article.card{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--birch);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  article.card:hover{border-color:var(--sage-line);}
+  article.card.open{border-color:var(--sage);}
+  /* quiet corner leaf glyph, top-right */
+  .card-leaf{
+    position:absolute;
+    top:12px;right:12px;
+    width:22px;height:22px;
+    color:var(--sage);
+    opacity:.16;
+    pointer-events:none;
+  }
+  .card-head{
+    padding:18px 20px 16px;
+    cursor:pointer;
+    position:relative;
+  }
+  .card-base{
+    font-size:10.5px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--oak);
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+  }
+  .card-base::before{
+    content:"";
+    width:13px;height:1.5px;background:var(--oak-soft);display:inline-block;
+  }
+  .card-name{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:500;
+    font-size:25px;
+    line-height:1.1;
+    margin:7px 0 0;
+    letter-spacing:-.01em;
+  }
+  .tag-pills{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0 0;}
+  .tag-pill{
+    font-size:10.5px;
+    font-weight:500;
+    letter-spacing:.02em;
+    color:var(--sage-deep);
+    border:1px solid var(--sage-line);
+    background:rgba(126,144,112,.07);
+    border-radius:999px;
+    padding:2.5px 9px;
+    white-space:nowrap;
+  }
+  .card-summary{
+    margin:12px 0 0;
+    font-size:14px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+  .expand-row{
+    margin-top:14px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .expand-btn{
+    font-family:'Inter',sans-serif;
+    font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--sage-deep);
+    background:none;border:none;cursor:pointer;padding:0;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .expand-btn .sign{
+    font-size:15px;line-height:1;transition:transform .2s ease;display:inline-block;
+  }
+  article.card.open .expand-btn .sign{transform:rotate(45deg);}
+  .meta-mini{
+    font-size:11px;color:var(--ink-faint);letter-spacing:.04em;
+  }
+
+  /* ---------- Card detail ---------- */
+  .card-detail{
+    display:none;
+    padding:0 20px 20px;
+    border-top:1px solid var(--birch);
+    margin-top:2px;
+  }
+  article.card.open .card-detail{display:block;}
+  .detail-meta{
+    display:flex;flex-wrap:wrap;gap:6px 18px;
+    padding:14px 0 4px;
+    font-size:11.5px;color:var(--ink-faint);
+    letter-spacing:.03em;
+  }
+  .detail-meta span b{color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:10px;}
+  .detail-section{margin-top:14px;}
+  .detail-section h3{
+    font-family:'Inter',sans-serif;
+    font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--oak);font-weight:600;margin:0 0 7px;
+  }
+  ul.spec{list-style:none;margin:0;padding:0;}
+  ul.spec li{
+    font-size:14px;
+    padding:4px 0;
+    border-bottom:1px dotted var(--line);
+    display:flex;gap:10px;
+    color:var(--ink);
+  }
+  ul.spec li:last-child{border-bottom:none;}
+  ul.spec li .amt{
+    font-variant-numeric:tabular-nums;
+    color:var(--sage-deep);font-weight:600;
+    flex:none;min-width:62px;
+  }
+  ol.steps{margin:0;padding-left:18px;}
+  ol.steps li{font-size:13.5px;color:var(--ink-soft);padding:2px 0;line-height:1.5;}
+  .detail-line{font-size:13.5px;color:var(--ink-soft);}
+  .detail-line b{color:var(--ink);font-weight:600;}
+  .history{font-size:13px;color:var(--ink-soft);font-style:italic;line-height:1.55;}
+  .footnote{
+    margin-top:14px;
+    font-size:12px;
+    color:var(--ink-soft);
+    background:var(--sage-pale);
+    border-left:2.5px solid var(--sage);
+    border-radius:0 8px 8px 0;
+    padding:9px 12px;
+    line-height:1.5;
+  }
+  .footnote b{color:var(--sage-deep);font-weight:600;}
+
+  /* ---------- Footer ---------- */
+  footer.site{
+    max-width:1160px;margin:10px auto 50px;padding:24px;
+    text-align:center;color:var(--ink-faint);font-size:12.5px;letter-spacing:.04em;
+    border-top:1px solid var(--birch);
+  }
+  footer.site .verified{color:var(--ink-soft);}
+
+  @media (max-width:560px){
+    header.site{padding:32px 18px 12px;}
+    .controls,main.grid{padding-left:16px;padding-right:16px;}
+    main.grid{grid-template-columns:1fr;}
+    .group-label{width:100%;}
+    .spirit-section{margin-left:0;margin-right:0;}
+  }
+
+  /* ---------- Print ---------- */
+  @media print{
+    @page{margin:14mm 12mm;}
+    :root{--card:#fff;--bg:#fff;}
+    body{background:#fff !important;background-image:none !important;color:#000;font-size:11pt;}
+    header.site,.controls,.head-actions,button.print-btn,.expand-row{display:none !important;}
+    .print-title{display:block !important;}
+    .card-leaf{display:none !important;}
+    main.grid{
+      display:block;max-width:none;margin:0;padding:0;
+    }
+    /* keep the spirit dividers as section rules in print */
+    .spirit-section{
+      display:flex;margin:14pt 0 6pt;break-after:avoid;page-break-after:avoid;
+    }
+    .spirit-section .line{background:#000;height:.5pt;opacity:.4;}
+    .spirit-section .sprig{color:#444;}
+    .spirit-section .slabel{color:#000;font-size:13pt;}
+    article.card{
+      border:none;border-bottom:1px solid #bbb;border-radius:0;box-shadow:none;
+      break-inside:avoid;page-break-inside:avoid;
+      padding:0 0 10pt;margin:0 0 12pt;
+    }
+    .card-head{padding:0;cursor:default;}
+    .card-base{color:#000;}
+    .card-base::before{background:#000;}
+    .card-name{font-size:18pt;margin-top:3pt;}
+    .tag-pill{color:#000;border-color:#888;background:none;}
+    .card-summary{color:#222;}
+    .card-detail{display:block !important;border-top:none;padding:6pt 0 0;margin:0;}
+    .detail-meta{color:#333;}
+    ul.spec li{border-bottom:1px dotted #bbb;color:#000;}
+    ul.spec li .amt{color:#000;}
+    ol.steps li,.detail-line,.history{color:#222;}
+    .footnote{background:none;border-left:2px solid #000;color:#222;border-radius:0;padding:5pt 8pt;}
+    .footnote b{color:#000;}
+    footer.site{display:block !important;border-top:1px solid #000;color:#000;margin:14pt 0 0;}
+    .no-results{display:none;}
+  }
+  .print-title{display:none;text-align:center;margin-bottom:14pt;}
+  .print-title h1{font-family:'Fraunces',serif;font-weight:500;font-size:24pt;letter-spacing:.06em;margin:0;}
+  .print-title p{font-size:10pt;letter-spacing:.2em;text-transform:uppercase;color:#444;margin:6pt 0 0;}
+</style>
+</head>
+<body>
+
+  <div class="print-title">
+    <h1>The Hollow</h1>
+    <p>Hernandez House Bar · Cocktail Menu</p>
+  </div>
+
+  <header class="site">
+    <div class="masthead">
+      <div class="botmark" aria-hidden="true">
+        <!-- thin-line pine sprig -->
+        <svg viewBox="0 0 46 74" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 72 L23 8"/>
+          <path d="M23 62 L10 54"/><path d="M23 62 L36 54"/>
+          <path d="M23 53 L11 45"/><path d="M23 53 L35 45"/>
+          <path d="M23 44 L12 36"/><path d="M23 44 L34 36"/>
+          <path d="M23 35 L13 27"/><path d="M23 35 L33 27"/>
+          <path d="M23 26 L14 18"/><path d="M23 26 L32 18"/>
+          <path d="M23 13 L16 7"/><path d="M23 13 L30 7"/>
+        </svg>
+      </div>
+      <h1 class="wordmark">THE HOLLOW</h1>
+      <div class="tagline">Hernandez House Bar</div>
+      <div class="masthead-rule" aria-hidden="true">
+        <span class="line"></span>
+        <svg viewBox="0 0 46 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)">
+          <path d="M3 9 H32"/>
+          <path d="M30 9 Q24 1 16 4 Q22 8 30 9 Z"/>
+          <path d="M26 9 Q20 17 12 14 Q18 9 26 9 Z"/>
+          <path d="M32 9 q6 -1 9 -5"/><path d="M32 9 q6 1 9 5"/>
+        </svg>
+        <svg viewBox="0 0 46 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9 H32"/>
+          <path d="M30 9 Q24 1 16 4 Q22 8 30 9 Z"/>
+          <path d="M26 9 Q20 17 12 14 Q18 9 26 9 Z"/>
+          <path d="M32 9 q6 -1 9 -5"/><path d="M32 9 q6 1 9 5"/>
+        </svg>
+        <span class="line r"></span>
+      </div>
+      <p class="lede">Forty cocktails the bottles will actually make — verified spec by spec, tagged by how they taste, balanced across the whole shelf.</p>
+    </div>
+    <div class="head-actions">
+      <button class="print-btn" onclick="window.print()" aria-label="Print menu">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print menu
+      </button>
+      <div class="count-pill"><b id="shown">40</b> of <b>40</b> showing</div>
+    </div>
+  </header>
+
+  <section class="controls" aria-label="Filters">
+    <div class="controls-inner">
+      <div class="search-row">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input id="search" type="search" placeholder="Search by name or ingredient — try “Campari”, “mint”, “lime”…" autocomplete="off">
+        </div>
+        <button class="clear-all" id="clearAll" hidden>Clear all</button>
+      </div>
+      <div id="filters"></div>
+    </div>
+  </section>
+
+  <main class="grid" id="grid"></main>
+
+  <footer class="site">
+    <span class="verified" id="footerText">The Hollow · Hernandez House Bar · 40 cocktails · verified June 27, 2026</span>
+  </footer>
+
+<!-- Recipe data lives in recipes.js — edit that file to change the menu -->
+<script src="recipes.js"></script>
+<script>
+"use strict";
+
+/* Safety net: if recipes.js did not load, say so instead of a blank page. */
+if (typeof COCKTAILS === "undefined" || !Array.isArray(COCKTAILS)) {
+  var _g = document.getElementById("grid");
+  if (_g) _g.innerHTML = '<div class="no-results">Couldn\u2019t load <b>recipes.js</b> \u2014 make sure it\u2019s in the same folder as this page.</div>';
+  throw new Error("recipes.js not loaded");
+}
+
+/* Recipe data (the COCKTAILS list) now lives in recipes.js — see that file. */
+
+/* ===================== FILTER CONFIG ===================== */
+const GROUPS = [
+  {key:"spirit",   label:"Spirit",   mode:"or",  order:["Gin","Bourbon","Rye","Tequila","Rum","Vodka","Cognac","Aperitivo"]},
+  {key:"tags",     label:"Flavor",   mode:"and", order:["Spirit-forward","Bitter","Sour/Tart","Sweet","Herbal","Floral","Citrus","Fruity","Refreshing/Long","Creamy/Rich"]},
+  {key:"build",    label:"Build",    mode:"or",  order:["Stirred","Shaken","Built","Muddled"]},
+  {key:"glass",    label:"Glass",    mode:"or",  order:["Rocks","Coupe","Highball","Collins","Copper mug","Mug","Julep cup","Wine glass"]},
+  {key:"occasion", label:"Occasion", mode:"or",  order:["Aperitif","Anytime","Brunch","Nightcap","Digestif"]},
+];
+
+const active = {};          // group.key -> Set of selected values
+GROUPS.forEach(g => active[g.key] = new Set());
+let searchText = "";
+
+/* ===================== BOTANICAL MARKS ===================== */
+// small horizontal sprig reused in the spirit-section dividers
+const SPRIG_SVG = ''
+  + '<svg class="sprig" viewBox="0 0 46 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+  +   '<path d="M3 9 H32"/>'
+  +   '<path d="M30 9 Q24 1 16 4 Q22 8 30 9 Z"/>'
+  +   '<path d="M26 9 Q20 17 12 14 Q18 9 26 9 Z"/>'
+  +   '<path d="M32 9 q6 -1 9 -5"/><path d="M32 9 q6 1 9 5"/>'
+  + '</svg>';
+// quiet single corner leaf for each card
+const CARD_LEAF_SVG = ''
+  + '<svg class="card-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+  +   '<path d="M4 20 C6 12 12 6 20 4 C18 12 12 18 4 20 Z"/>'
+  +   '<path d="M4 20 C9 16 14 11 20 4"/>'
+  + '</svg>';
+
+/* ===================== BUILD FILTER UI ===================== */
+function distinctValues(key){
+  const present = new Set();
+  COCKTAILS.forEach(c => {
+    const v = c[key];
+    if (Array.isArray(v)) v.forEach(x => present.add(x));
+    else present.add(v);
+  });
+  return present;
+}
+
+function buildFilters(){
+  const root = document.getElementById("filters");
+  GROUPS.forEach(g => {
+    const present = distinctValues(g.key);
+    // keep the curated order, then append any new values found in the data
+    const ordered = g.order.filter(v => present.has(v));
+    const extras = [...present].filter(v => !g.order.includes(v)).sort();
+    const values = ordered.concat(extras);
+    const row = document.createElement("div");
+    row.className = "filter-group";
+
+    const label = document.createElement("div");
+    label.className = "group-label";
+    label.innerHTML = g.label + (g.mode === "and"
+      ? '<span class="mode-hint">match all</span>'
+      : '<span class="mode-hint">any of</span>');
+    row.appendChild(label);
+
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    values.forEach(v => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.type = "button";
+      chip.textContent = v;
+      chip.setAttribute("aria-pressed", "false");
+      chip.addEventListener("click", () => {
+        const set = active[g.key];
+        if (set.has(v)) { set.delete(v); chip.classList.remove("active"); chip.setAttribute("aria-pressed","false"); }
+        else { set.add(v); chip.classList.add("active"); chip.setAttribute("aria-pressed","true"); }
+        render();
+      });
+      chips.appendChild(chip);
+    });
+    row.appendChild(chips);
+    root.appendChild(row);
+  });
+}
+
+/* ===================== MATCH + RENDER ===================== */
+function matches(c){
+  if (searchText){
+    const hay = (c.name + " " + c.summary + " " + c.spec.map(s => s[1]).join(" ")).toLowerCase();
+    if (!hay.includes(searchText)) return false;
+  }
+  for (const g of GROUPS){
+    const sel = active[g.key];
+    if (sel.size === 0) continue;
+    if (g.key === "tags"){                       // AND within Flavor
+      for (const v of sel) if (!c.tags.includes(v)) return false;
+    } else {                                      // OR within single-valued groups
+      if (!sel.has(c[g.key])) return false;
+    }
+  }
+  return true;
+}
+
+function pillsHTML(tags){
+  return '<div class="tag-pills">' + tags.map(t => '<span class="tag-pill">' + t + '</span>').join("") + '</div>';
+}
+
+function sectionHTML(spirit, first){
+  return ''
+    + '<div class="spirit-section' + (first ? ' first' : '') + '">'
+    +   '<span class="line"></span>'
+    +   SPRIG_SVG.replace('class="sprig"', 'class="sprig flip"')
+    +   '<span class="slabel">' + spirit + '</span>'
+    +   SPRIG_SVG
+    +   '<span class="line r"></span>'
+    + '</div>';
+}
+
+function cardHTML(c, idx){
+  const spec = c.spec.map(s =>
+    '<li><span class="amt">' + s[0] + '</span><span>' + s[1] + '</span></li>').join("");
+  const steps = c.steps.map(s => '<li>' + s + '</li>').join("");
+  return ''
+    + '<article class="card" data-idx="' + idx + '">'
+    +   CARD_LEAF_SVG
+    +   '<div class="card-head" role="button" tabindex="0" aria-expanded="false">'
+    +     '<div class="card-base">' + c.base + '</div>'
+    +     '<h2 class="card-name">' + c.name + '</h2>'
+    +     pillsHTML(c.tags)
+    +     '<p class="card-summary">' + c.summary + '</p>'
+    +     '<div class="expand-row">'
+    +       '<button class="expand-btn" type="button"><span class="sign">+</span> Recipe</button>'
+    +       '<span class="meta-mini">' + c.build + ' · ' + c.glass + '</span>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="card-detail">'
+    +     '<div class="detail-meta">'
+    +       '<span><b>Build</b> &nbsp;' + c.build + '</span>'
+    +       '<span><b>Glass</b> &nbsp;' + c.glass + '</span>'
+    +       '<span><b>Best for</b> &nbsp;' + c.occasion + '</span>'
+    +     '</div>'
+    +     '<div class="detail-section"><h3>Pour</h3><ul class="spec">' + spec + '</ul></div>'
+    +     '<div class="detail-section"><h3>Method</h3><ol class="steps">' + steps + '</ol></div>'
+    +     '<div class="detail-section"><h3>Garnish</h3><p class="detail-line">' + c.garnish + '</p></div>'
+    +     '<div class="detail-section"><h3>History</h3><p class="history">' + c.history + '</p></div>'
+    +     '<div class="footnote"><b>Source note —</b> ' + c.note + '</div>'
+    +   '</div>'
+    + '</article>';
+}
+
+function render(){
+  const grid = document.getElementById("grid");
+  const visible = COCKTAILS.map((c, i) => [c, i]).filter(([c]) => matches(c));
+
+  if (visible.length === 0){
+    grid.innerHTML = '<div class="no-results">No cocktails match those filters.<br><b>Loosen a filter or clear all to start over.</b></div>';
+  } else {
+    // Group the already-filtered list into spirit sections (canonical order),
+    // each preceded by a botanical-branch divider. Filtering logic is untouched.
+    const baseOrder = GROUPS.find(g => g.key === "spirit").order;
+    const extraSpirits = [...new Set(COCKTAILS.map(c => c.spirit))].filter(s => !baseOrder.includes(s)).sort();
+    const spiritOrder = baseOrder.concat(extraSpirits);
+    let html = "";
+    let firstSection = true;
+    spiritOrder.forEach(sp => {
+      const inSpirit = visible.filter(([c]) => c.spirit === sp);
+      if (inSpirit.length === 0) return;
+      html += sectionHTML(sp, firstSection);
+      html += inSpirit.map(([c, i]) => cardHTML(c, i)).join("");
+      firstSection = false;
+    });
+    grid.innerHTML = html;
+  }
+
+  document.getElementById("shown").textContent = visible.length;
+
+  // clear-all visibility
+  const anyActive = searchText !== "" || GROUPS.some(g => active[g.key].size > 0);
+  document.getElementById("clearAll").hidden = !anyActive;
+
+  // wire card expand
+  grid.querySelectorAll(".card-head").forEach(head => {
+    const toggle = () => {
+      const card = head.closest(".card");
+      const open = card.classList.toggle("open");
+      head.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    head.addEventListener("click", toggle);
+    head.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); }
+    });
+  });
+}
+
+/* ===================== WIRING ===================== */
+function clearAll(){
+  searchText = "";
+  document.getElementById("search").value = "";
+  GROUPS.forEach(g => active[g.key].clear());
+  document.querySelectorAll(".chip.active").forEach(ch => { ch.classList.remove("active"); ch.setAttribute("aria-pressed","false"); });
+  render();
+}
+
+document.getElementById("search").addEventListener("input", e => {
+  searchText = e.target.value.trim().toLowerCase();
+  render();
+});
+document.getElementById("clearAll").addEventListener("click", clearAll);
+
+document.getElementById("footerText").textContent =
+  "The Hollow · Hernandez House Bar · " + COCKTAILS.length + " cocktails · verified June 27, 2026";
+
+buildFilters();
+render();
+</script>
+</body>
+</html>
