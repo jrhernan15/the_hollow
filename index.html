@@ -208,7 +208,7 @@
     </sc-for>
   </main>
 
-  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
+  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpenLedger }}" aria-label="The Ledger — drink stats" title="The Ledger" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The Ledger</button> <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
 
   <sc-if value="{{ orderModalName }}" hint-placeholder-val="">
     <div data-chrome data-modalwrap onClick="{{ onCloseOrder }}" style="position:fixed;inset:0;z-index:60;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -499,6 +499,94 @@
     </div>
   </sc-if>
 
+  <sc-if value="{{ ledgerOpen }}" hint-placeholder-val="">
+    <div data-chrome onClick="{{ onCloseLedger }}" style="position:fixed;inset:0;z-index:58;background:rgba(12,11,8,.5);display:flex;justify-content:flex-end">
+      <aside onClick="{{ stop }}" style="width:min(560px,100%);height:100%;background:var(--bg2,#1A1E14);border-left:1px solid var(--card-border,#2D3422);box-shadow:-12px 0 48px rgba(0,0,0,.35);display:flex;flex-direction:column">
+        <header style="padding:16px 18px 12px;border-bottom:1px solid var(--card-border,#2D3422)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div>
+              <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">The bar · by the numbers</div>
+              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:2px 0 0;color:var(--ink,#ECE7D7)">The Ledger</h2>
+              <div style="font-size:12px;color:var(--ink-faint,#827E6D);margin-top:3px">{{ ledgerSince }}</div>
+            </div>
+            <button type="button" onClick="{{ onCloseLedger }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px">
+            <button type="button" onClick="{{ onLedgerTonight }}" style="{{ ledgerTonightStyle }}">Tonight</button>
+            <button type="button" onClick="{{ onLedgerAll }}" style="{{ ledgerAllStyle }}">All-time</button>
+          </div>
+        </header>
+        <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:14px 16px 16px">
+          <div style="display:flex;gap:9px">
+            <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:13px 8px;text-align:center">
+              <div style="font-family:'Fraunces',Georgia,serif;font-size:27px;color:var(--ink,#ECE7D7);line-height:1">{{ ledgerTotalDrinks }}</div>
+              <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-top:5px">Drinks</div>
+            </div>
+            <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:13px 8px;text-align:center">
+              <div style="font-family:'Fraunces',Georgia,serif;font-size:27px;color:var(--accent2,#CFA267);line-height:1">{{ ledgerTotalOz }}</div>
+              <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-top:5px">Oz poured</div>
+            </div>
+            <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:13px 8px;text-align:center">
+              <div style="font-family:'Fraunces',Georgia,serif;font-size:27px;color:var(--ink,#ECE7D7);line-height:1">{{ ledgerGuestCount }}</div>
+              <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-top:5px">Guests</div>
+            </div>
+          </div>
+          <sc-if value="{{ hasLedger }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">Most ordered</div>
+            <sc-for list="{{ ledgerTop }}" as="d" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--card-border,#2D3422)">
+                <span style="width:16px;font-size:12px;color:var(--ink-faint,#827E6D);font-variant-numeric:tabular-nums;text-align:right">{{ d.rank }}</span>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-size:14px;color:var(--ink,#ECE7D7)">{{ d.name }}</span><span style="font-size:13px;font-weight:700;color:var(--ink,#ECE7D7);font-variant-numeric:tabular-nums">{{ d.count }}</span></div>
+                  <div style="{{ d.bar }}"></div>
+                </div>
+              </div>
+            </sc-for>
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">By the spirit · ounces poured</div>
+            <sc-for list="{{ ledgerOz }}" as="o" hint-placeholder-count="4">
+              <div style="padding:7px 0;border-bottom:1px solid var(--card-border,#2D3422)">
+                <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font-size:14px;color:var(--ink,#ECE7D7)">{{ o.name }}</span><span style="font-size:13px;font-weight:700;color:var(--accent2,#CFA267);font-variant-numeric:tabular-nums">{{ o.oz }}</span></div>
+                <div style="{{ o.bar }}"></div>
+              </div>
+            </sc-for>
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">By guest</div>
+            <sc-for list="{{ ledgerGuests }}" as="g" hint-placeholder-count="3">
+              <div style="padding:7px 0;border-bottom:1px solid var(--card-border,#2D3422)">
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-size:14px;color:var(--ink,#ECE7D7)">{{ g.name }}</span><span style="font-size:13px;font-weight:700;color:var(--ink,#ECE7D7);font-variant-numeric:tabular-nums">{{ g.count }}</span></div>
+                <div style="{{ g.bar }}"></div>
+              </div>
+            </sc-for>
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">Notables</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <sc-for list="{{ ledgerSupers }}" as="s" hint-placeholder-count="6">
+                <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:12px;padding:10px 12px">
+                  <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">{{ s.label }}</div>
+                  <div style="font-size:16px;font-weight:600;color:var(--ink,#ECE7D7);margin-top:3px">{{ s.value }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">Recent pours</div>
+            <sc-for list="{{ ledgerFeed }}" as="f" hint-placeholder-count="5">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--card-border,#2D3422)">
+                <span style="font-size:13.5px;color:var(--ink,#ECE7D7)">{{ f.drink }}</span>
+                <span style="font-size:12px;color:var(--ink-soft,#B7B3A1);white-space:nowrap">{{ f.guest }} · {{ f.time }}</span>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ ledgerEmpty }}" hint-placeholder-val="">
+            <div style="text-align:center;color:var(--ink-faint,#827E6D);font-size:13.5px;line-height:1.6;padding:40px 16px">No drinks poured yet.<br>Mark a round <b style="color:var(--accent2,#CFA267)">Ready</b> on The Pass and it'll show up here.</div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ ledgerStaff }}" hint-placeholder-val="">
+          <footer style="padding:12px 16px;border-top:1px solid var(--card-border,#2D3422);display:flex;gap:10px">
+            <button type="button" onClick="{{ onNewNight }}" style="flex:1;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px;cursor:pointer">Start a new night</button>
+            <button type="button" onClick="{{ onClearHistory }}" style="font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px 14px;cursor:pointer">Clear all-time</button>
+          </footer>
+        </sc-if>
+      </aside>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ showTop }}" hint-placeholder-val="">
     <button type="button" data-chrome onClick="{{ onScrollTop }}" aria-label="Back to top" style="position:fixed;right:18px;bottom:24px;z-index:50;width:46px;height:46px;border-radius:999px;border:1px solid var(--pill-line,#B9C6AC);background:var(--accent,#2F3D2C);color:var(--accent-ink,#F4F1E6);box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" style-hover="filter:brightness(1.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg></button>
   </sc-if>
@@ -525,6 +613,7 @@ class Component extends DCLogic {
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
+      ledgerOpen: false, ledgerRows: [], ledgerNightStart: '', ledgerNow: '', ledgerScope: 'tonight',
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -607,6 +696,7 @@ class Component extends DCLogic {
     if (justReady) this.chime();
     const theme = (d && d.theme) || 'auto';
     this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme) });
+    if (this.state.ledgerOpen) this.fetchHistory();   // keep stats live while open
   }
 
   flashToast(msg, ms){ this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast:null }), ms||2000); }
@@ -750,6 +840,12 @@ class Component extends DCLogic {
   closeGate(){ this.setState({ pantryGate:false, gateErr:false }); }
   close86(){ this.setState({ pantryOpen:false }); }
   set86Tab(t){ this.setState({ eightySixTab: t }); }
+  openLedger(){ this.fetchHistory(); this.setState({ ledgerOpen:true, ledgerScope:'tonight' }); }
+  closeLedger(){ this.setState({ ledgerOpen:false }); }
+  setLedgerScope(s){ this.setState({ ledgerScope:s }); }
+  fetchHistory(){ fetch('/api/history').then(r=>r.json()).then(d=>{ this.setState({ ledgerRows: Array.isArray(d.rows)?d.rows:[], ledgerNightStart: d.nightStart||'', ledgerNow: d.now||'' }); }).catch(()=>{}); }
+  newNight(){ this.api('POST','/api/history/new-night',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not start a new night',2000)); }
+  clearHistory(){ try { if (!window.confirm('Clear all-time stats? This erases the whole history and cannot be undone.')) return; } catch(e){} this.api('POST','/api/history/clear',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not clear stats',2000)); }
   toggle86(ing, makeOut){ this.setState(s => { const set=new Set(s.eightySix); if (makeOut) set.add(ing); else set.delete(ing); return { eightySix:[...set] }; }); this.api('POST','/api/86',{ ingredient:ing, out:makeOut, code:'5352' }).then(()=>this.refreshState()).catch(()=>{ this.flashToast('Could not reach the bar',2000); this.refreshState(); }); }
   restockAll(){ this.setState({ eightySix: [] }); this.api('POST','/api/86/restock',{ code:'5352' }).then(()=>this.refreshState()).catch(()=>this.refreshState()); }
   onLogoDown(){ clearTimeout(this._logoT); this._logoT = setTimeout(()=>this.openEightySix(), 1500); }
@@ -825,7 +921,7 @@ class Component extends DCLogic {
     const dir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const pal = st.dark ? dir.dark : dir.light;
     try { document.documentElement.style.background = pal.bg; document.body.style.background = pal.bg; } catch(e){}
-    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate);
+    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.ledgerOpen);
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
     const meta = dir.meta;
@@ -1073,8 +1169,65 @@ class Component extends DCLogic {
     const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served').sort((a,b)=>a.ts-b.ts).map(o => ({ drink: o.drink + (o.qty>1?' ×'+o.qty:''), label: myLabel(o.status), style: myPill(o.status) }));
     const outIngredients = st.eightySix.filter(n => n.indexOf('drink:') !== 0).length;
 
+    // ---- The Ledger (drink stats) ----
+    const lgGlyph = {'¼':.25,'½':.5,'¾':.75,'⅓':1/3,'⅔':2/3,'⅛':.125,'⅜':.375,'⅝':.625,'⅞':.875,'⅙':1/6,'⅚':5/6,'⅕':.2,'⅖':.4,'⅗':.6,'⅘':.8};
+    const lgNumTok = (tt) => { const t = String(tt).trim(); const mm = t.match(/^(\d+)?\s*([¼½¾⅓⅔⅛⅜⅝⅞⅙⅚⅕⅖⅗⅘])?$/); if (mm && (mm[1]||mm[2])){ let v=0; if(mm[1])v+=parseInt(mm[1],10); if(mm[2])v+=lgGlyph[mm[2]]; return v; } const f=parseFloat(t); return isNaN(f)?null:f; };
+    const lgAmt = (a) => { const s=String(a||'').trim(); const sp=s.indexOf(' '); let num,unit; if(sp===-1){num=s;unit='';}else{num=s.slice(0,sp);unit=s.slice(sp+1);} let v; const rm=num.match(/^(.+?)[–\-](.+)$/); if(rm){ const x=lgNumTok(rm[1]),y=lgNumTok(rm[2]); v=(x!=null&&y!=null)?(x+y)/2:lgNumTok(num); } else v=lgNumTok(num); return { n:(v==null?0:v), unit:unit.toLowerCase() }; };
+    const lgOz = (a) => { const r=lgAmt(a); return /^oz\b/.test(r.unit) ? r.n : 0; };
+    const fmtOz = (v) => { const r = Math.round(v*10)/10; return (Math.abs(r-Math.round(r))<0.05 ? String(Math.round(r)) : String(r)); };
+    const lgBar = (frac, col) => ({ width: Math.max(5, Math.round((frac||0)*100)) + '%', height:'6px', borderRadius:'999px', background: col, marginTop:'5px' });
+    let ledgerVals = { hasLedger:false, ledgerEmpty:false, ledgerTotalDrinks:'0', ledgerTotalOz:'0', ledgerGuestCount:'0', ledgerKinds:'0', ledgerSince:'', ledgerTop:[], ledgerOz:[], ledgerGuests:[], ledgerSupers:[], ledgerFeed:[], ledgerStaff:false };
+    if (st.ledgerOpen){
+      const allRows = st.ledgerRows || [];
+      const ns = st.ledgerNightStart || '';
+      const rows = (st.ledgerScope === 'all') ? allRows : allRows.filter(r => String(r.created_at) >= ns);
+      const totalDrinks = rows.reduce((a,r)=>a+(r.qty||1),0);
+      const dq = {}; rows.forEach(r => { dq[r.drink] = (dq[r.drink]||0) + (r.qty||1); });
+      const topArr = Object.keys(dq).map(d=>({name:d,count:dq[d]})).sort((a,b)=>b.count-a.count);
+      const topMax = topArr.length ? topArr[0].count : 1;
+      const ledgerTop = topArr.slice(0,15).map((x,i)=>({ rank:String(i+1), name:x.name, count:String(x.count), bar:lgBar(x.count/topMax,'var(--accent)') }));
+      const ozMap = {}; let totalOz = 0;
+      rows.forEach(r => { const c=byName[r.drink]; if(!c) return; (c.spec||[]).forEach(sp => { const o=lgOz(sp[0]); if(o>0){ const k=this.cleanIng(sp[1]); ozMap[k]=(ozMap[k]||0)+o*(r.qty||1); totalOz+=o*(r.qty||1); } }); });
+      const ozArr = Object.keys(ozMap).map(k=>({name:k,oz:ozMap[k]})).sort((a,b)=>b.oz-a.oz);
+      const ozMax = ozArr.length ? ozArr[0].oz : 1;
+      const ledgerOz = ozArr.slice(0,15).map(x=>({ name:x.name, oz:fmtOz(x.oz)+' oz', tag:cat86(x.name), bar:lgBar(x.oz/ozMax,'var(--accent2)') }));
+      const gq = {}; rows.forEach(r => { const g=(r.guest && String(r.guest).trim()) || 'The house'; gq[g]=(gq[g]||0)+(r.qty||1); });
+      const gArr = Object.keys(gq).map(g=>({name:g,count:gq[g]})).sort((a,b)=>b.count-a.count);
+      const gMax = gArr.length ? gArr[0].count : 1;
+      const ledgerGuests = gArr.slice(0,16).map(x=>({ name:x.name, count:String(x.count), bar:lgBar(x.count/gMax,'var(--accent)') }));
+      const sup = [];
+      if (rows.length){
+        const times = rows.map(r=>this.toMs(r.created_at)).sort((a,b)=>a-b);
+        sup.push({ label:'First call', value: fmtTime(times[0]) });
+        sup.push({ label:'Last call', value: fmtTime(times[times.length-1]) });
+        const hr = {}; times.forEach(ms=>{ const h=new Date(ms).getHours(); hr[h]=(hr[h]||0)+1; });
+        let bh=null, bhc=-1; Object.keys(hr).forEach(h=>{ if(hr[h]>bhc){bhc=hr[h];bh=+h;} });
+        if (bh!=null){ const h12=(x)=>{ const ap=x<12?'AM':'PM'; let hh=x%12; if(hh===0)hh=12; return hh+ap; }; sup.push({ label:'Busiest hour', value: h12(bh)+'–'+h12((bh+1)%24) }); }
+        const rr = {}; rows.forEach(r=>{ if(r.round_id!=null) rr[r.round_id]=(rr[r.round_id]||0)+(r.qty||1); });
+        const rmax = Object.keys(rr).reduce((a,k)=>Math.max(a,rr[k]),0); if (rmax>0) sup.push({ label:'Biggest round', value: rmax+' drink'+(rmax===1?'':'s') });
+        let limeOz=0; rows.forEach(r=>{ const c=byName[r.drink]; if(!c)return; (c.spec||[]).forEach(sp=>{ if(/lime juice/i.test(sp[1])){ const o=lgOz(sp[0]); if(o>0) limeOz+=o*(r.qty||1); } }); });
+        if (limeOz>=1) sup.push({ label:'Limes juiced', value:'≈ '+Math.round(limeOz) });
+        sup.push({ label:'Total poured', value: fmtOz(totalOz)+' oz' });
+      }
+      const feed = rows.slice().sort((a,b)=>this.toMs(b.created_at)-this.toMs(a.created_at)).slice(0,40).map(r=>({ drink: r.drink + ((r.qty||1)>1?' ×'+r.qty:''), guest:(r.guest && String(r.guest).trim()) || 'House', time: fmtTime(this.toMs(r.created_at)) }));
+      let lgStaff=false; try { lgStaff = localStorage.getItem('hollow_86_ok')==='1'; } catch(e){}
+      ledgerVals = {
+        hasLedger: rows.length>0, ledgerEmpty: rows.length===0,
+        ledgerTotalDrinks: String(totalDrinks), ledgerTotalOz: fmtOz(totalOz), ledgerGuestCount: String(gArr.length), ledgerKinds: String(topArr.length),
+        ledgerSince: (st.ledgerScope!=='all' && ns) ? ('Tonight · since ' + fmtTime(this.toMs(ns))) : 'All-time totals',
+        ledgerTop, ledgerOz, ledgerGuests, ledgerSupers: sup, ledgerFeed: feed, ledgerStaff: lgStaff,
+      };
+    }
+
     return {
       appStyle,
+      ledgerOpen: st.ledgerOpen, onOpenLedger: () => this.openLedger(), onCloseLedger: () => this.closeLedger(),
+      ledgerScope: st.ledgerScope, ledgerTonightStyle: tabStyle(st.ledgerScope!=='all'), ledgerAllStyle: tabStyle(st.ledgerScope==='all'),
+      onLedgerTonight: () => this.setLedgerScope('tonight'), onLedgerAll: () => this.setLedgerScope('all'),
+      onNewNight: () => this.newNight(), onClearHistory: () => this.clearHistory(),
+      ledgerTotalDrinks: ledgerVals.ledgerTotalDrinks, ledgerTotalOz: ledgerVals.ledgerTotalOz, ledgerGuestCount: ledgerVals.ledgerGuestCount, ledgerKinds: ledgerVals.ledgerKinds,
+      ledgerSince: ledgerVals.ledgerSince, hasLedger: ledgerVals.hasLedger, ledgerEmpty: ledgerVals.ledgerEmpty, ledgerStaff: ledgerVals.ledgerStaff,
+      ledgerTop: ledgerVals.ledgerTop, ledgerOz: ledgerVals.ledgerOz, ledgerGuests: ledgerVals.ledgerGuests, ledgerSupers: ledgerVals.ledgerSupers, ledgerFeed: ledgerVals.ledgerFeed,
       darkIconPath: st.dark ? sunPath : moonPath,
       onToggleOrders: () => this.toggleOrders(),
       ordersOpen: st.ordersOpen, hasOrders: activeCount > 0, ordersCount: String(activeCount),

@@ -58,6 +58,16 @@ try {
 db.exec(`CREATE TABLE IF NOT EXISTS eighty_six ( ingredient TEXT PRIMARY KEY, created_at TEXT NOT NULL DEFAULT (datetime('now')) );`);
 // Shared settings (e.g. the active theme).
 db.exec(`CREATE TABLE IF NOT EXISTS settings ( key TEXT PRIMARY KEY, value TEXT );`);
+// The Ledger: a persistent log of every drink actually poured (one row per
+// ticket, written when its round is marked Ready). Survives board resets.
+db.exec(`CREATE TABLE IF NOT EXISTS history (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  drink      TEXT    NOT NULL,
+  qty        INTEGER NOT NULL DEFAULT 1,
+  guest      TEXT,
+  round_id   INTEGER,
+  created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
+);`);
 
 const Q = {
   insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
@@ -84,7 +94,22 @@ const Q = {
   clear86: db.prepare("DELETE FROM eighty_six"),
   getSetting: db.prepare("SELECT value FROM settings WHERE key = ?"),
   setSetting: db.prepare("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value"),
+  nowStr:        db.prepare("SELECT strftime('%Y-%m-%d %H:%M:%f','now') AS t"),
+  insertHistory: db.prepare("INSERT INTO history (drink, qty, guest, round_id) VALUES (?,?,?,?)"),
+  historyRows:   db.prepare("SELECT drink, qty, guest, round_id, created_at FROM history ORDER BY created_at, id"),
+  historyHasRound: db.prepare("SELECT 1 FROM history WHERE round_id = ? LIMIT 1"),
+  clearHistory:  db.prepare("DELETE FROM history"),
 };
+
+// Log a round's drinks to the persistent Ledger exactly once (deduped by
+// round_id, so re-opening + re-readying a round never double-counts).
+function logRoundToHistory(roundId) {
+  if (Q.historyHasRound.get(roundId)) return;
+  const tix = Q.roundTickets.all(roundId);
+  db.transaction(() => {
+    for (const t of tix) Q.insertHistory.run(t.drink, t.qty || 1, t.guest_name || null, roundId);
+  })();
+}
 
 function getState() {
   const rail = Q.railTickets.all();
@@ -182,6 +207,7 @@ const server = http.createServer(async (req, res) => {
       const id = Number(m[1]);
       if (!Q.getRound.get(id)) return sendJSON(res, 404, { error: "round not found" });
       db.transaction(() => { Q.setRoundStat.run(status, id); Q.cascade.run(status, id); })();
+      if (status === "up") logRoundToHistory(id);   // poured → record it in the Ledger
       broadcast();
       return sendJSON(res, 200, { ...Q.getRound.get(id), tickets: Q.roundTickets.all(id) });
     }
@@ -232,6 +258,25 @@ const server = http.createServer(async (req, res) => {
     if (pathname === "/api/reset" && method === "POST") {
       db.transaction(() => { Q.clearTickets.run(); Q.clearRounds.run(); })();
       broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+    // ---- The Ledger (persistent drink stats) ----
+    if (pathname === "/api/history" && method === "GET") {
+      const ns = Q.getSetting.get("night_start");
+      return sendJSON(res, 200, { rows: Q.historyRows.all(), nightStart: (ns && ns.value) || null, now: Q.nowStr.get().t });
+    }
+    if (pathname === "/api/history/new-night" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      Q.setSetting.run("night_start", Q.nowStr.get().t);
+      return sendJSON(res, 200, { ok: true, nightStart: Q.nowStr.get().t });
+    }
+    if (pathname === "/api/history/clear" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      Q.clearHistory.run();
+      Q.setSetting.run("night_start", Q.nowStr.get().t);
       return sendJSON(res, 200, { ok: true });
     }
 
