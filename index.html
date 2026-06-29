@@ -560,13 +560,6 @@
                 <div style="{{ o.bar }}"></div>
               </div>
             </sc-for>
-            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">By guest</div>
-            <sc-for list="{{ ledgerGuests }}" as="g" hint-placeholder-count="3">
-              <div style="padding:7px 0;border-bottom:1px solid var(--card-border,#2D3422)">
-                <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-size:14px;color:var(--ink,#ECE7D7)">{{ g.name }}</span><span style="font-size:13px;font-weight:700;color:var(--ink,#ECE7D7);font-variant-numeric:tabular-nums">{{ g.count }}</span></div>
-                <div style="{{ g.bar }}"></div>
-              </div>
-            </sc-for>
             <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">Notables</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <sc-for list="{{ ledgerSupers }}" as="s" hint-placeholder-count="6">
@@ -1129,8 +1122,8 @@ class Component extends DCLogic {
     st.cocktails.forEach(c => { const seen={}; (c.spec||[]).forEach(sp => { if (/optional/i.test(sp[1])) return; const k=clean86(sp[1]); if(!seen[k]){ seen[k]=1; reqCount[k]=(reqCount[k]||0)+1; } }); });
     const outSet = {}; st.eightySix.forEach(n => outSet[n]=1);
     const cat86 = (n) => { const l=n.toLowerCase();
-      if (/\b(gin|bourbon|rye|tequila|rum|vodka|cognac|vsop|blanco)\b/.test(l)) return 'Spirits';
-      if (/campari|vermouth|cointreau|maraschino|chartreuse|lillet|violette|liqueur|absinthe|aperitivo/.test(l)) return 'Liqueurs & Aperitivi';
+      if (/\b(gin|bourbon|rye|tequila|rum|vodka|cognac|vsop|blanco|reposado|añejo|anejo|mezcal|scotch|whisky|whiskey|brandy|pisco|cachaça|cachaca|aquavit)\b/.test(l)) return 'Spirits';
+      if (/campari|aperol|amaro|vermouth|cointreau|curaçao|curacao|triple sec|maraschino|chartreuse|lillet|cocchi|violette|liqueur|absinthe|aperitivo/.test(l)) return 'Liqueurs & Aperitivi';
       if (/bitters|angostura|peychaud/.test(l)) return 'Bitters';
       if (/juice/.test(l)) return 'Citrus & Juice';
       if (/syrup|agave|honey|sugar|coconut/.test(l)) return 'Syrups & Sweeteners';
@@ -1181,7 +1174,7 @@ class Component extends DCLogic {
     const lgOz = (a) => { const r=lgAmt(a); return /^oz\b/.test(r.unit) ? r.n : 0; };
     const fmtOz = (v) => { const r = Math.round(v*10)/10; return (Math.abs(r-Math.round(r))<0.05 ? String(Math.round(r)) : String(r)); };
     const lgBar = (frac, col) => ({ width: Math.max(5, Math.round((frac||0)*100)) + '%', height:'6px', borderRadius:'999px', background: col, marginTop:'5px' });
-    let ledgerVals = { hasLedger:false, ledgerEmpty:false, ledgerTotalDrinks:'0', ledgerTotalOz:'0', ledgerGuestCount:'0', ledgerKinds:'0', ledgerSince:'', ledgerTop:[], ledgerOz:[], ledgerGuests:[], ledgerSupers:[], ledgerFeed:[], ledgerStaff:false };
+    let ledgerVals = { hasLedger:false, ledgerEmpty:false, ledgerTotalDrinks:'0', ledgerTotalOz:'0', ledgerGuestCount:'0', ledgerKinds:'0', ledgerSince:'', ledgerTop:[], ledgerOz:[], ledgerSupers:[], ledgerFeed:[], ledgerStaff:false };
     if (st.ledgerOpen){
       const allRows = st.ledgerRows || [];
       const ns = st.ledgerNightStart || '';
@@ -1193,13 +1186,12 @@ class Component extends DCLogic {
       const ledgerTop = topArr.slice(0,15).map((x,i)=>({ rank:String(i+1), name:x.name, count:String(x.count), bar:lgBar(x.count/topMax,'var(--accent)') }));
       const ozMap = {}; let totalOz = 0;
       rows.forEach(r => { const c=byName[r.drink]; if(!c) return; (c.spec||[]).forEach(sp => { const o=lgOz(sp[0]); if(o>0){ const k=this.cleanIng(sp[1]); ozMap[k]=(ozMap[k]||0)+o*(r.qty||1); totalOz+=o*(r.qty||1); } }); });
-      const ozArr = Object.keys(ozMap).map(k=>({name:k,oz:ozMap[k]})).sort((a,b)=>b.oz-a.oz);
+      const spiritCats = { 'Spirits':1, 'Liqueurs & Aperitivi':1 };
+      const ozArr = Object.keys(ozMap).map(k=>({name:k,oz:ozMap[k]})).filter(x=>spiritCats[cat86(x.name)]).sort((a,b)=>b.oz-a.oz);
       const ozMax = ozArr.length ? ozArr[0].oz : 1;
-      const ledgerOz = ozArr.slice(0,15).map(x=>({ name:x.name, oz:fmtOz(x.oz)+' oz', tag:cat86(x.name), bar:lgBar(x.oz/ozMax,'var(--accent2)') }));
+      const ledgerOz = ozArr.slice(0,15).map(x=>({ name:x.name, oz:fmtOz(x.oz)+' oz', bar:lgBar(x.oz/ozMax,'var(--accent2)') }));
       const gq = {}; rows.forEach(r => { const g=(r.guest && String(r.guest).trim()) || 'The house'; gq[g]=(gq[g]||0)+(r.qty||1); });
       const gArr = Object.keys(gq).map(g=>({name:g,count:gq[g]})).sort((a,b)=>b.count-a.count);
-      const gMax = gArr.length ? gArr[0].count : 1;
-      const ledgerGuests = gArr.slice(0,16).map(x=>({ name:x.name, count:String(x.count), bar:lgBar(x.count/gMax,'var(--accent)') }));
       const sup = [];
       if (rows.length){
         const times = rows.map(r=>this.toMs(r.created_at)).sort((a,b)=>a-b);
@@ -1220,7 +1212,7 @@ class Component extends DCLogic {
         hasLedger: rows.length>0, ledgerEmpty: rows.length===0,
         ledgerTotalDrinks: String(totalDrinks), ledgerTotalOz: fmtOz(totalOz), ledgerGuestCount: String(gArr.length), ledgerKinds: String(topArr.length),
         ledgerSince: (st.ledgerScope!=='all' && ns) ? ('Tonight · since ' + fmtTime(this.toMs(ns))) : 'All-time totals',
-        ledgerTop, ledgerOz, ledgerGuests, ledgerSupers: sup, ledgerFeed: feed, ledgerStaff: lgStaff,
+        ledgerTop, ledgerOz, ledgerSupers: sup, ledgerFeed: feed, ledgerStaff: lgStaff,
       };
     }
 
@@ -1232,7 +1224,7 @@ class Component extends DCLogic {
       onNewNight: () => this.newNight(), onClearHistory: () => this.clearHistory(),
       ledgerTotalDrinks: ledgerVals.ledgerTotalDrinks, ledgerTotalOz: ledgerVals.ledgerTotalOz, ledgerGuestCount: ledgerVals.ledgerGuestCount, ledgerKinds: ledgerVals.ledgerKinds,
       ledgerSince: ledgerVals.ledgerSince, hasLedger: ledgerVals.hasLedger, ledgerEmpty: ledgerVals.ledgerEmpty, ledgerStaff: ledgerVals.ledgerStaff,
-      ledgerTop: ledgerVals.ledgerTop, ledgerOz: ledgerVals.ledgerOz, ledgerGuests: ledgerVals.ledgerGuests, ledgerSupers: ledgerVals.ledgerSupers, ledgerFeed: ledgerVals.ledgerFeed,
+      ledgerTop: ledgerVals.ledgerTop, ledgerOz: ledgerVals.ledgerOz, ledgerSupers: ledgerVals.ledgerSupers, ledgerFeed: ledgerVals.ledgerFeed,
       darkIconPath: st.dark ? sunPath : moonPath,
       onToggleOrders: () => this.toggleOrders(),
       ordersOpen: st.ordersOpen, hasOrders: activeCount > 0, ordersCount: String(activeCount),
