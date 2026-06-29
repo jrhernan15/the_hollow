@@ -39,6 +39,7 @@ db.exec(`
     drink      TEXT    NOT NULL,
     guest_name TEXT,
     notes      TEXT,
+    qty        INTEGER NOT NULL DEFAULT 1,
     status     TEXT    NOT NULL DEFAULT 'rail',       -- rail | working | up | served
     round_id   INTEGER REFERENCES rounds(id) ON DELETE SET NULL,
     created_at TEXT    NOT NULL DEFAULT (datetime('now')),
@@ -46,8 +47,14 @@ db.exec(`
   );
 `);
 
+// Migrate older databases that predate the qty column.
+try {
+  const cols = db.prepare("PRAGMA table_info(tickets)").all().map((c) => c.name);
+  if (!cols.includes("qty")) db.exec("ALTER TABLE tickets ADD COLUMN qty INTEGER NOT NULL DEFAULT 1");
+} catch (e) {}
+
 const Q = {
-  insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes) VALUES (?,?,?)"),
+  insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
   getTicket:     db.prepare("SELECT * FROM tickets WHERE id = ?"),
   railTickets:   db.prepare("SELECT * FROM tickets WHERE status = 'rail' ORDER BY created_at, id"),
   deleteTicket:  db.prepare("DELETE FROM tickets WHERE id = ?"),
@@ -62,6 +69,8 @@ const Q = {
   deleteRound:   db.prepare("DELETE FROM rounds WHERE id = ?"),
   clearTickets:  db.prepare("DELETE FROM tickets"),
   clearRounds:   db.prepare("DELETE FROM rounds"),
+  clearServedTix: db.prepare("DELETE FROM tickets WHERE round_id IN (SELECT id FROM rounds WHERE status = 'served')"),
+  clearServedRnd: db.prepare("DELETE FROM rounds WHERE status = 'served'"),
 };
 
 function getState() {
@@ -120,7 +129,8 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       const drink = str(b.drink, 80);
       if (!drink) return sendJSON(res, 400, { error: "drink is required" });
-      const info = Q.insertTicket.run(drink, str(b.name, 60), str(b.notes, 200));
+      const qty = Math.max(1, Math.min(99, parseInt(b.qty, 10) || 1));
+      const info = Q.insertTicket.run(drink, str(b.name, 60), str(b.notes, 200), qty);
       broadcast();
       return sendJSON(res, 201, Q.getTicket.get(info.lastInsertRowid));
     }
@@ -142,7 +152,7 @@ const server = http.createServer(async (req, res) => {
       const drink = tix[0].drink;
       if (tix.some((t) => t.drink !== drink)) return sendJSON(res, 409, { error: "a round must be all the same drink" });
       const fire = db.transaction(() => {
-        const rid = Q.insertRound.run(drink, tix.length).lastInsertRowid;
+        const rid = Q.insertRound.run(drink, tix.reduce((a, t) => a + (t.qty || 1), 0)).lastInsertRowid;
         for (const t of tix) Q.fireTicket.run(rid, t.id);
         return rid;
       });
@@ -165,6 +175,12 @@ const server = http.createServer(async (req, res) => {
     if ((m = pathname.match(/^\/api\/rounds\/(\d+)$/)) && method === "DELETE") {
       const id = Number(m[1]);
       db.transaction(() => { Q.disband.run(id); Q.deleteRound.run(id); })();
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+    if (pathname === "/api/clear-served" && method === "POST") {
+      db.transaction(() => { Q.clearServedTix.run(); Q.clearServedRnd.run(); })();
       broadcast();
       return sendJSON(res, 200, { ok: true });
     }

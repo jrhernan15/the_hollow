@@ -113,6 +113,10 @@ custom DNS entry in your router) is the fallback.
 
 Only if you change the **Caddyfile** do you need: `sudo systemctl reload caddy`.
 
+If the ordering API code (`server/`) changes, restart it after pulling:
+`sudo systemctl restart thehollow-api` (and `cd server && npm install` if its
+dependencies changed). `index.html` is static — a browser refresh is enough.
+
 ## Troubleshooting
 
 - **Blank page / no drinks:** check the logs with `journalctl -u caddy -e`.

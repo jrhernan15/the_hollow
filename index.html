@@ -212,8 +212,8 @@
           <button type="button" onClick="{{ onCloseOrder }}" aria-label="Close" style="flex:none;width:32px;height:32px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:18px;line-height:1;cursor:pointer">×</button>
         </div>
         <div style="margin-top:18px">
-          <label style="display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink-faint,#827E6D);margin-bottom:6px">Name or table</label>
-          <input value="{{ draftGuest }}" onChange="{{ onDraftGuest }}" autocomplete="off" placeholder="e.g. Table 4, or Sam" style="width:100%;font-family:Inter,sans-serif;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:11px 13px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
+          <label style="display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink-faint,#827E6D);margin-bottom:6px">Who's it for? (optional)</label>
+          <input value="{{ draftGuest }}" onChange="{{ onDraftGuest }}" autocomplete="off" placeholder="Sam, Table 4 — or leave it blank" style="width:100%;font-family:Inter,sans-serif;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:11px 13px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
         </div>
         <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:14px">
           <label style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink-faint,#827E6D)">Quantity</label>
@@ -241,7 +241,7 @@
         <header style="padding:16px 18px 12px;border-bottom:1px solid var(--card-border,#2D3422)">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
             <div>
-              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:0;color:var(--ink,#ECE7D7)">The Well</h2>
+              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:0;color:var(--ink,#ECE7D7)">The Pass</h2>
               <div style="font-size:12px;color:var(--ink-faint,#827E6D);margin-top:3px">{{ ordersSummary }}</div>
             </div>
             <button type="button" onClick="{{ onToggleOrders }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
@@ -289,7 +289,7 @@
             <sc-if value="{{ noBatches }}" hint-placeholder-val="">
               <div style="text-align:center;padding:46px 20px;color:var(--ink-faint,#827E6D)">
                 <div style="font-size:30px;margin-bottom:10px;opacity:.5">🥂</div>
-                <div style="font-size:14px;line-height:1.5">No flights yet.<br>Select drinks on the rail and tap <b style="color:var(--ink-soft,#B7B3A1)">Create flight</b>.</div>
+                <div style="font-size:14px;line-height:1.5">No rounds yet.<br>Select drinks on the rail and tap <b style="color:var(--ink-soft,#B7B3A1)">Create round</b>.</div>
               </div>
             </sc-if>
             <sc-for list="{{ batchList }}" as="b" hint-placeholder-count="0">
@@ -304,7 +304,7 @@
                 <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
                   <button type="button" onClick="{{ b.onOpen }}" style="font-size:12.5px;font-weight:600;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:999px;padding:7px 15px;cursor:pointer">Open &amp; make</button>
                   <span style="flex:1"></span>
-                  <button type="button" onClick="{{ b.onRemove }}" aria-label="Remove flight" style="font-size:12px;font-weight:600;color:var(--ink-faint,#827E6D);background:transparent;border:none;cursor:pointer;padding:5px 6px">Remove</button>
+                  <button type="button" onClick="{{ b.onRemove }}" aria-label="Remove round" style="font-size:12px;font-weight:600;color:var(--ink-faint,#827E6D);background:transparent;border:none;cursor:pointer;padding:5px 6px">Remove</button>
                 </div>
               </div>
             </sc-for>
@@ -316,12 +316,12 @@
             <span style="font-size:13px;font-weight:600;color:var(--ink,#ECE7D7)">{{ selectionLabel }}</span>
             <button type="button" onClick="{{ onClearSelection }}" style="font-size:12.5px;font-weight:500;color:var(--ink-soft,#B7B3A1);background:transparent;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px">Clear</button>
             <span style="flex:1"></span>
-            <button type="button" onClick="{{ onCreateBatch }}" style="font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px 18px;cursor:pointer">Create flight</button>
+            <button type="button" onClick="{{ onCreateBatch }}" style="font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px 18px;cursor:pointer">Create round</button>
           </footer>
         </sc-if>
         <sc-if value="{{ hasDoneBatches }}" hint-placeholder-val="">
           <footer style="padding:10px 16px;border-top:1px solid var(--card-border,#2D3422);display:flex;gap:8px">
-            <button type="button" onClick="{{ onClearDoneBatches }}" style="flex:1;font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:10px;padding:9px;cursor:pointer">Clear finished flights</button>
+            <button type="button" onClick="{{ onClearDoneBatches }}" style="flex:1;font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:10px;padding:9px;cursor:pointer">Clear finished rounds</button>
           </footer>
         </sc-if>
       </aside>
@@ -381,13 +381,13 @@
         </div>
         <sc-if value="{{ makeIsBatch }}" hint-placeholder-val="">
           <footer style="padding:12px 16px;border-top:1px solid var(--card-border,#2D3422);display:flex;gap:10px">
-            <button type="button" onClick="{{ onMakeRemove }}" style="font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px 16px;cursor:pointer">Remove flight</button>
+            <button type="button" onClick="{{ onMakeRemove }}" style="font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px 16px;cursor:pointer">Remove round</button>
             <span style="flex:1"></span>
             <sc-if value="{{ makeIsDone }}" hint-placeholder-val="">
               <button type="button" onClick="{{ onMakeReopen }}" style="font-size:13px;font-weight:600;color:var(--accent,#A6BB8E);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px 18px;cursor:pointer">Reopen</button>
             </sc-if>
             <sc-if value="{{ makeNotDone }}" hint-placeholder-val="{{ true }}">
-              <button type="button" onClick="{{ onMakeMarkDone }}" style="font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px 20px;cursor:pointer">Mark flight done</button>
+              <button type="button" onClick="{{ onMakeMarkDone }}" style="font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px 20px;cursor:pointer">Mark round done</button>
             </sc-if>
           </footer>
         </sc-if>
@@ -437,30 +437,56 @@ class Component extends DCLogic {
       .catch(e => { console.error('Could not load cocktails.js', e); this.setState({ loaded: true }); });
     import('./scale.js').then(m => { this._scaleSpec = m.scaleSpec; this.forceUpdate(); }).catch(()=>{});
     try { if (window.matchMedia && window.matchMedia('(max-width:680px)').matches) this.setState({ filtersOpen: false }); } catch(e){}
-    try { const raw = localStorage.getItem('hollow_orders_v1'); if (raw) { const o = JSON.parse(raw); if (Array.isArray(o)) this.setState({ orders: o }); } } catch(e){}
-    try { const rb = localStorage.getItem('hollow_batches_v1'); if (rb) { const b = JSON.parse(rb); if (Array.isArray(b)) this.setState({ batches: b }); } } catch(e){}
-    this._onStorage = (e) => {
-      if (e.key === 'hollow_orders_v1') { try { const o = JSON.parse(e.newValue||'[]'); if (Array.isArray(o)) this.setState({ orders:o }); } catch(_){} }
-      if (e.key === 'hollow_batches_v1') { try { const b = JSON.parse(e.newValue||'[]'); if (Array.isArray(b)) this.setState({ batches:b }); } catch(_){} }
-    };
-    try { window.addEventListener('storage', this._onStorage); } catch(e){}
+    try { this._myName = localStorage.getItem('hollow_name_v1') || ''; } catch(e){ this._myName = ''; }
+    try { this._mine = JSON.parse(localStorage.getItem('hollow_mine_v1') || '[]'); if (!Array.isArray(this._mine)) this._mine = []; } catch(e){ this._mine = []; }
+    this.refreshState();
+    this.openStream();
   }
-  componentWillUnmount(){ try { window.removeEventListener('storage', this._onStorage); } catch(e){} }
+  componentWillUnmount(){ try { if (this._es) this._es.close(); } catch(e){} }
 
-  persist(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-  persistOrders(orders){ this.persist('hollow_orders_v1', orders); }
-  persistBatches(batches){ this.persist('hollow_batches_v1', batches); }
+  // ---- shared board (The Pass): server-backed + live over SSE ----
+  api(method, path, body){
+    return fetch(path, { method: method, headers: { 'Content-Type':'application/json' }, body: body ? JSON.stringify(body) : undefined })
+      .then(r => r.json().catch(() => ({})).then(j => r.ok ? j : Promise.reject(j)));
+  }
+  refreshState(){ fetch('/api/state').then(r => r.json()).then(d => this.applyServerState(d)).catch(()=>{}); }
+  openStream(){
+    try {
+      this._es = new EventSource('/api/stream');
+      this._es.addEventListener('state', (e) => { try { this.applyServerState(JSON.parse(e.data)); } catch(_){} });
+    } catch(e){}
+  }
+  toMs(t){ const ms = Date.parse(String(t || '').replace(' ', 'T') + 'Z'); return isNaN(ms) ? Date.now() : ms; }
+  mapTicket(t){ return { id:String(t.id), drink:t.drink, qty:t.qty || 1, guest:t.guest_name || '', note:t.notes || '', ts:this.toMs(t.created_at), batchId: (t.round_id != null ? String(t.round_id) : null), mine: (this._mine || []).indexOf(t.id) !== -1 }; }
+  applyServerState(d){
+    const rounds = (d && Array.isArray(d.rounds)) ? d.rounds : [];
+    const rail   = (d && Array.isArray(d.rail))   ? d.rail   : [];
+    const orders = [];
+    rail.forEach(t => orders.push(this.mapTicket(t)));
+    rounds.forEach(r => (r.tickets || []).forEach(t => orders.push(this.mapTicket(t))));
+    orders.sort((a, b) => b.ts - a.ts);
+    const batches = rounds.map(r => ({ id:String(r.id), ts:this.toMs(r.created_at), status: (r.status === 'served' ? 'done' : 'making') }));
+    batches.sort((a, b) => b.ts - a.ts);
+    this.setState({ orders: orders, batches: batches });
+  }
+
   flashToast(msg, ms){ this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast:null }), ms||2000); }
 
-  openOrder(name){ this.setState({ orderModalName: name, draftGuest:'', draftQty:1, draftNote:'' }); }
+  openOrder(name){ this.setState({ orderModalName: name, draftGuest: this._myName || '', draftQty:1, draftNote:'' }); }
   closeOrder(){ this.setState({ orderModalName: null }); }
   incQty(){ this.setState(s => ({ draftQty: Math.min(99, s.draftQty + 1) })); }
   decQty(){ this.setState(s => ({ draftQty: Math.max(1, s.draftQty - 1) })); }
   placeOrder(){
-    const name = this.state.orderModalName; if (!name) return;
-    const o = { id:'o'+Date.now()+Math.floor(Math.random()*1000), drink:name, qty:this.state.draftQty, guest:(this.state.draftGuest||'').trim(), note:(this.state.draftNote||'').trim(), ts:Date.now(), batchId:null };
-    this.setState(s => { const orders = [o, ...s.orders]; this.persistOrders(orders); return { orders, orderModalName:null }; });
-    this.flashToast('Poured — sent to the bar ✓', 2200);
+    const drink = this.state.orderModalName; if (!drink) return;
+    const name = (this.state.draftGuest || '').trim();
+    const note = (this.state.draftNote || '').trim();
+    const qty = this.state.draftQty || 1;
+    try { this._myName = name; localStorage.setItem('hollow_name_v1', name); } catch(e){}
+    this.api('POST', '/api/tickets', { drink: drink, name: name, notes: note, qty: qty })
+      .then(t => { try { this._mine = (this._mine || []).concat(t.id); localStorage.setItem('hollow_mine_v1', JSON.stringify(this._mine)); } catch(e){} this.refreshState(); })
+      .catch(() => this.flashToast('Could not reach the bar — try again', 2400));
+    this.setState({ orderModalName: null });
+    this.flashToast('Sent to the bar ✓', 2200);
   }
 
   toggleOrders(){ this.setState(s => ({ ordersOpen: !s.ordersOpen, makeView:null })); }
@@ -469,48 +495,43 @@ class Component extends DCLogic {
   clearSelection(){ this.setState({ selected: {} }); }
   selectAllQueue(){ this.setState(s => { const sel = {}; s.orders.forEach(o => { if (!o.batchId) sel[o.id] = true; }); return { selected: sel }; }); }
 
+  // Fire selected rail tickets into rounds — one round per drink (same-drink batching).
   createBatch(){
-    const ids = Object.keys(this.state.selected).filter(id => { const o = this.state.orders.find(x => x.id===id); return o && !o.batchId; });
-    if (!ids.length) return;
-    const bid = 'b'+Date.now()+Math.floor(Math.random()*1000);
-    this.setState(s => {
-      const orders = s.orders.map(o => ids.indexOf(o.id)!==-1 ? Object.assign({}, o, { batchId:bid }) : o);
-      const batches = [{ id:bid, ts:Date.now(), status:'making', made:{} }, ...s.batches];
-      this.persistOrders(orders); this.persistBatches(batches);
-      return { orders, batches, selected:{}, stationTab:'batches' };
-    });
-    this.flashToast('Flight created ✓', 1800);
+    const sel = this.state.selected;
+    const chosen = this.state.orders.filter(o => sel[o.id] && !o.batchId);
+    if (!chosen.length) return;
+    const byDrink = {};
+    chosen.forEach(o => { (byDrink[o.drink] = byDrink[o.drink] || []).push(Number(o.id)); });
+    const groups = Object.keys(byDrink);
+    Promise.all(groups.map(d => this.api('POST', '/api/rounds', { ticketIds: byDrink[d] })))
+      .then(() => this.refreshState())
+      .catch(() => this.flashToast('Could not fire the round', 2200));
+    this.setState({ selected:{}, stationTab:'batches' });
+    this.flashToast(groups.length > 1 ? 'Rounds fired ✓' : 'Round fired ✓', 1800);
   }
   makeOrderNow(id){
     const o = this.state.orders.find(x => x.id===id); if (!o || o.batchId) return;
-    const bid = 'b'+Date.now()+Math.floor(Math.random()*1000);
-    this.setState(s => {
-      const orders = s.orders.map(x => x.id===id ? Object.assign({}, x, { batchId:bid }) : x);
-      const batches = [{ id:bid, ts:Date.now(), status:'making', made:{} }, ...s.batches];
-      this.persistOrders(orders); this.persistBatches(batches);
-      return { orders, batches, stationTab:'batches', makeView:{ kind:'batch', id:bid } };
-    });
+    this.api('POST', '/api/rounds', { ticketIds: [Number(id)] })
+      .then(r => { this.refreshState(); this.setState({ stationTab:'batches', makeView:{ kind:'batch', id:String(r.id) } }); })
+      .catch(() => this.flashToast('Could not fire the round', 2200));
   }
   openMake(kind, id){ this.setState({ makeView: { kind, id } }); }
   closeMake(){ this.setState({ makeView: null }); }
-  toggleMade(batchId, drink){
-    this.setState(s => {
-      const batches = s.batches.map(b => { if (b.id!==batchId) return b; const made = Object.assign({}, b.made||{}); if (made[drink]) delete made[drink]; else made[drink] = true; return Object.assign({}, b, { made }); });
-      this.persistBatches(batches); return { batches };
-    });
+  toggleMade(){ /* per-drink check-off not used for same-drink rounds */ }
+  setBatchStatus(batchId, status){
+    this.api('PATCH', '/api/rounds/' + batchId, { status: (status === 'done' ? 'served' : 'working') })
+      .then(() => this.refreshState()).catch(() => this.flashToast('Could not update the round', 2000));
   }
-  setBatchStatus(batchId, status){ this.setState(s => { const batches = s.batches.map(b => b.id===batchId ? Object.assign({}, b, { status }) : b); this.persistBatches(batches); return { batches }; }); }
   removeBatch(batchId){
-    this.setState(s => {
-      const batches = s.batches.filter(b => b.id!==batchId);
-      const orders = s.orders.filter(o => o.batchId!==batchId);
-      this.persistBatches(batches); this.persistOrders(orders);
-      return { batches, orders, makeView:null };
-    });
+    this.setState({ makeView: null });
+    this.api('DELETE', '/api/rounds/' + batchId).then(() => this.refreshState()).catch(()=>{});
   }
-  clearDoneBatches(){ this.setState(s => { const doneIds = s.batches.filter(b=>b.status==='done').map(b=>b.id); const batches = s.batches.filter(b=>b.status!=='done'); const orders = s.orders.filter(o => doneIds.indexOf(o.batchId)===-1); this.persistBatches(batches); this.persistOrders(orders); return { batches, orders }; }); }
-  removeOrder(id){ this.setState(s => { const orders = s.orders.filter(o => o.id!==id); const sel = Object.assign({}, s.selected); delete sel[id]; this.persistOrders(orders); return { orders, selected:sel }; }); }
-  clearAllOrders(){ this.persistOrders([]); this.persistBatches([]); this.setState({ orders: [], batches: [], selected:{}, makeView:null }); }
+  clearDoneBatches(){ this.api('POST', '/api/clear-served').then(() => this.refreshState()).catch(()=>{}); }
+  removeOrder(id){
+    this.setState(s => { const sel = Object.assign({}, s.selected); delete sel[id]; return { selected: sel }; });
+    this.api('DELETE', '/api/tickets/' + id).then(() => this.refreshState()).catch(()=>{});
+  }
+  clearAllOrders(){ this.api('POST', '/api/reset').then(() => this.refreshState()).catch(()=>{}); }
 
   setDirection(d){ this.setState({ direction: d }); }
   toggleDark(){ this.setState(s => ({ dark: !s.dark })); }
@@ -703,7 +724,7 @@ class Component extends DCLogic {
       const madeCount = drinks.filter(d => (b.made||{})[d]).length;
       const isDone = b.status === 'done';
       return {
-        id:b.id, timeLabel: fmtTime(b.ts), title: 'Flight · ' + fmtTime(b.ts),
+        id:b.id, timeLabel: fmtTime(b.ts), title: 'Round · ' + fmtTime(b.ts),
         summary: drinks.map(d => agg[d] + '× ' + d).join('  ·  '),
         countLabel: totalDrinks + ' drink' + (totalDrinks===1?'':'s') + ' · ' + drinks.length + ' recipe' + (drinks.length===1?'':'s'),
         progressLabel: madeCount + '/' + drinks.length + ' made',
@@ -734,13 +755,13 @@ class Component extends DCLogic {
           const lines = Object.keys(agg).map(d => { const c = byName[d]; const made = !!(b.made||{})[d]; return {
             key:b.id+'|'+d, drink:d, qtyLabel:'×'+agg[d], glass:c?c.glass:'', garnish:c?c.garnish:'',
             specRows: c ? rowsOf(scaleSpec(c.spec, agg[d])) : [], steps: c?c.steps:[],
-            notesList: notes[d]||[], hasNotes: !!(notes[d]&&notes[d].length), isBatchLine:true, made,
+            notesList: notes[d]||[], hasNotes: !!(notes[d]&&notes[d].length), isBatchLine:false, made,
             checkMark: made ? '✓' : '',
             boxStyle: { flex:'none', width:'24px', height:'24px', borderRadius:'7px', border:'1.5px solid ' + (made?'var(--accent)':'var(--pill-line)'), background: made?'var(--accent)':'transparent', color:'var(--accent-ink)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'15px', lineHeight:1, cursor:'pointer' },
             lineStyle:{ background:'var(--card)', border:'1px solid var(--card-border)', borderRadius:'14px', padding:'15px 16px 14px', opacity: made?0.6:1 },
             onToggleMade: () => this.toggleMade(b.id, d),
           }; });
-          makeData = { kind:'batch', id:b.id, title:'Flight · ' + fmtTime(b.ts),
+          makeData = { kind:'batch', id:b.id, title:'Round · ' + fmtTime(b.ts),
             subtitle: lines.length + ' recipe' + (lines.length===1?'':'s') + ' · ' + ords.reduce((a,o)=>a+o.qty,0) + ' drinks',
             isDone: b.status==='done', lines,
             onMarkDone: () => this.setBatchStatus(b.id, 'done'),
@@ -752,7 +773,7 @@ class Component extends DCLogic {
 
     const makingBatches = st.batches.filter(b => b.status!=='done').length;
     const activeCount = queueOrders.length + st.orders.filter(o => { if (!o.batchId) return false; const b = st.batches.find(x=>x.id===o.batchId); return b && b.status!=='done'; }).length;
-    const ordersSummary = (queueOrders.length + ' on the rail · ' + st.batches.length + ' flight' + (st.batches.length===1?'':'s'));
+    const ordersSummary = (queueOrders.length + ' on the rail · ' + st.batches.length + ' round' + (st.batches.length===1?'':'s'));
     const ordersBadgeStyle = { minWidth:'18px', height:'18px', padding:'0 5px', borderRadius:'999px', backgroundColor: activeCount ? 'var(--accent)' : 'var(--ink-faint)', color:'var(--accent-ink)', fontSize:'11px', fontWeight:700, display:'inline-flex', alignItems:'center', justifyContent:'center', fontVariantNumeric:'tabular-nums' };
     const tabStyle = (active) => ({ flex:1, textAlign:'center', fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, letterSpacing:'.02em', padding:'8px 10px', borderRadius:'9px', cursor:'pointer', border:'none', backgroundColor: active ? 'var(--accent)' : 'transparent', color: active ? 'var(--accent-ink)' : 'var(--ink-soft)' });
 
@@ -765,7 +786,7 @@ class Component extends DCLogic {
       stationTab: st.stationTab, stationIsQueue: st.stationTab==='queue', stationIsBatches: st.stationTab==='batches',
       queueTabStyle: tabStyle(st.stationTab==='queue'), batchTabStyle: tabStyle(st.stationTab==='batches'),
       onTabQueue: () => this.setTab('queue'), onTabBatches: () => this.setTab('batches'),
-      queueTabLabel: 'On the Rail (' + queueOrders.length + ')', batchTabLabel: 'Flights (' + st.batches.length + ')',
+      queueTabLabel: 'On the Rail (' + queueOrders.length + ')', batchTabLabel: 'Rounds (' + st.batches.length + ')',
       queueList, noQueue: queueOrders.length===0, batchList, noBatches: st.batches.length===0,
       hasSelection: selCount>0, selectionLabel: selCount + ' selected',
       onClearSelection: () => this.clearSelection(), onSelectAll: () => this.selectAllQueue(), onCreateBatch: () => this.createBatch(),
