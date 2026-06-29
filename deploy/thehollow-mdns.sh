@@ -8,4 +8,4 @@
 # fall back to the first address from `hostname -I`.
 IP="$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src"){print $(i+1); exit}}')"
 [ -z "$IP" ] && IP="$(hostname -I | awk '{print $1}')"
-exec avahi-publish-address thehollow.local "$IP"
+exec avahi-publish -a -R thehollow.local "$IP"
