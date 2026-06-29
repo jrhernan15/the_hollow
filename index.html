@@ -53,7 +53,7 @@
     <div style="display:flex;align-items:center;justify-content:center;gap:18px;width:100%;max-width:760px;margin:0 auto">
       <span style="flex:1;min-width:0;height:1px;background:linear-gradient(90deg,transparent,var(--div-line,#B9C6AC))" aria-hidden="true"></span>
       <svg viewBox="0 0 46 18" width="52" height="20" fill="none" stroke="var(--accent2,#AD7C44)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" style="flex:none;transform:scaleX(-1);opacity:.85" aria-hidden="true"><path d="M3 9 H32"/><path d="M30 9 Q24 1 16 4 Q22 8 30 9 Z"/><path d="M26 9 Q20 17 12 14 Q18 9 26 9 Z"/><path d="M32 9 q6 -1 9 -5"/><path d="M32 9 q6 1 9 5"/></svg>
-      <img src="assets/logo.png" alt="The Hollow — Hernandez House Bar · Cocktails · Est. 2026" style="width:min(248px,52vw);height:auto;display:block;flex:none;filter:drop-shadow(0 6px 18px rgba(20,18,12,.18))">
+      <img src="assets/logo.png" alt="The Hollow — Hernandez House Bar · Cocktails · Est. 2026" style="width:min(248px,52vw);height:auto;display:block;flex:none;filter:drop-shadow(0 6px 18px rgba(20,18,12,.18))" onMouseDown="{{ onLogoDown }}" onMouseUp="{{ onLogoUp }}" onMouseLeave="{{ onLogoUp }}" onTouchStart="{{ onLogoDown }}" onTouchEnd="{{ onLogoUp }}">
       <svg viewBox="0 0 46 18" width="52" height="20" fill="none" stroke="var(--accent2,#AD7C44)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" style="flex:none;opacity:.85" aria-hidden="true"><path d="M3 9 H32"/><path d="M30 9 Q24 1 16 4 Q22 8 30 9 Z"/><path d="M26 9 Q20 17 12 14 Q18 9 26 9 Z"/><path d="M32 9 q6 -1 9 -5"/><path d="M32 9 q6 1 9 5"/></svg>
       <span style="flex:1;min-width:0;height:1px;background:linear-gradient(90deg,var(--div-line,#B9C6AC),transparent)" aria-hidden="true"></span>
     </div>
@@ -199,7 +199,7 @@
     </sc-for>
   </main>
 
-  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }}</footer>
+  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="Staff" title="Staff" style="margin-left:6px;background:none;border:none;cursor:pointer;color:var(--ink-faint,#8A8474);opacity:.45;vertical-align:middle;padding:4px;line-height:0" style-hover="opacity:1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></button></footer>
 
   <sc-if value="{{ orderModalName }}" hint-placeholder-val="">
     <div data-chrome data-modalwrap onClick="{{ onCloseOrder }}" style="position:fixed;inset:0;z-index:60;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -395,6 +395,58 @@
     </div>
   </sc-if>
 
+  <sc-if value="{{ pantryGate }}" hint-placeholder-val="">
+    <div data-chrome data-modalwrap onClick="{{ onCloseGate }}" style="position:fixed;inset:0;z-index:62;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
+      <div onClick="{{ stop }}" style="width:min(320px,100%);background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.45);padding:22px">
+        <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);text-align:center">Staff only</div>
+        <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:6px 0 14px;color:var(--ink,#ECE7D7);text-align:center">The 86</h2>
+        <input type="password" inputmode="numeric" value="{{ gateInput }}" onChange="{{ onGateInput }}" placeholder="Passcode" autocomplete="off" style="width:100%;text-align:center;letter-spacing:.3em;font-family:Inter,sans-serif;font-size:18px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
+        <sc-if value="{{ gateErr }}" hint-placeholder-val=""><div style="color:#CC7A6A;font-size:12.5px;text-align:center;margin-top:8px">Wrong passcode</div></sc-if>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button type="button" onClick="{{ onCloseGate }}" style="flex:1;font-size:13px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px;cursor:pointer">Cancel</button>
+          <button type="button" onClick="{{ onSubmitGate }}" style="flex:1;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px;cursor:pointer">Unlock</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ pantryOpen }}" hint-placeholder-val="">
+    <div data-chrome onClick="{{ onClose86 }}" style="position:fixed;inset:0;z-index:58;background:rgba(12,11,8,.5);display:flex;justify-content:flex-end">
+      <aside onClick="{{ stop }}" style="width:min(520px,100%);height:100%;background:var(--bg2,#1A1E14);border-left:1px solid var(--card-border,#2D3422);box-shadow:-12px 0 48px rgba(0,0,0,.35);display:flex;flex-direction:column">
+        <header style="padding:16px 18px 12px;border-bottom:1px solid var(--card-border,#2D3422)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div>
+              <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">Staff · stock</div>
+              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:2px 0 0;color:var(--ink,#ECE7D7)">The 86</h2>
+              <div style="font-size:12px;color:var(--ink-faint,#827E6D);margin-top:3px">{{ eightySixStock }} · {{ eightySixHidden }}</div>
+            </div>
+            <button type="button" onClick="{{ onClose86 }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
+          </div>
+          <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:10px;line-height:1.5">Uncheck anything you're out of — drinks that need it disappear from the menu for everyone. Optional items and garnishes don't count.</div>
+        </header>
+        <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:8px 16px 16px">
+          <sc-for list="{{ eightySixGroups }}" as="grp" hint-placeholder-count="1">
+            <div style="margin-top:14px">
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:2px">{{ grp.label }}</div>
+              <sc-for list="{{ grp.items }}" as="it" hint-placeholder-count="3">
+                <div onClick="{{ it.onToggle }}" style="{{ it.rowStyle }}">
+                  <span style="{{ it.boxStyle }}">{{ it.checkMark }}</span>
+                  <span style="flex:1;font-size:14.5px;color:var(--ink,#ECE7D7)">{{ it.name }}</span>
+                  <span style="font-size:11.5px;color:var(--ink-faint,#827E6D);font-variant-numeric:tabular-nums">{{ it.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ has86 }}" hint-placeholder-val="">
+          <footer style="padding:12px 16px;border-top:1px solid var(--card-border,#2D3422)">
+            <button type="button" onClick="{{ onRestockAll }}" style="width:100%;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:12px;cursor:pointer">Restock all (clear the 86)</button>
+          </footer>
+        </sc-if>
+      </aside>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ showTop }}" hint-placeholder-val="">
     <button type="button" data-chrome onClick="{{ onScrollTop }}" aria-label="Back to top" style="position:fixed;right:18px;bottom:24px;z-index:50;width:46px;height:46px;border-radius:999px;border:1px solid var(--pill-line,#B9C6AC);background:var(--accent,#2F3D2C);color:var(--accent-ink,#F4F1E6);box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" style-hover="filter:brightness(1.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg></button>
   </sc-if>
@@ -420,6 +472,7 @@ class Component extends DCLogic {
       orders: [], batches: [], ordersOpen: false, stationTab: 'queue',
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
+      eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false,
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -447,8 +500,10 @@ class Component extends DCLogic {
     this.openStream();
     this._onScroll = () => { const v = (window.scrollY || window.pageYOffset || 0) > 400; if (v !== this.state.showTop) this.setState({ showTop: v }); };
     try { window.addEventListener('scroll', this._onScroll, { passive: true }); } catch(e){}
+    this._onHash = () => { try { if ((location.hash || '').toLowerCase() === '#pantry') this.openEightySix(); } catch(e){} };
+    try { window.addEventListener('hashchange', this._onHash); this._onHash(); } catch(e){}
   }
-  componentWillUnmount(){ try { if (this._es) this._es.close(); } catch(e){} try { window.removeEventListener('scroll', this._onScroll); } catch(e){} }
+  componentWillUnmount(){ try { if (this._es) this._es.close(); } catch(e){} try { window.removeEventListener('scroll', this._onScroll); } catch(e){} try { window.removeEventListener('hashchange', this._onHash); } catch(e){} }
 
   // ---- shared board (The Pass): server-backed + live over SSE ----
   api(method, path, body){
@@ -473,7 +528,7 @@ class Component extends DCLogic {
     orders.sort((a, b) => b.ts - a.ts);
     const batches = rounds.map(r => ({ id:String(r.id), ts:this.toMs(r.created_at), status: (r.status === 'served' ? 'done' : 'making') }));
     batches.sort((a, b) => b.ts - a.ts);
-    this.setState({ orders: orders, batches: batches });
+    this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [] });
   }
 
   flashToast(msg, ms){ this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast:null }), ms||2000); }
@@ -538,6 +593,17 @@ class Component extends DCLogic {
   }
   clearAllOrders(){ this.api('POST', '/api/reset').then(() => this.refreshState()).catch(()=>{}); }
 
+  // ---- The 86 (gated stock board) ----
+  openEightySix(){ let ok=false; try { ok = localStorage.getItem('hollow_86_ok')==='1'; } catch(e){} if (ok) this.setState({ pantryOpen:true, pantryGate:false }); else this.setState({ pantryGate:true, gateInput:'', gateErr:false }); }
+  onGateInput(e){ this.setState({ gateInput: e.target.value, gateErr:false }); }
+  submitGate(){ if ((this.state.gateInput||'').trim() === '5352'){ try { localStorage.setItem('hollow_86_ok','1'); } catch(e){} this.setState({ pantryGate:false, pantryOpen:true, gateErr:false, gateInput:'' }); } else { this.setState({ gateErr:true, gateInput:'' }); } }
+  closeGate(){ this.setState({ pantryGate:false, gateErr:false }); }
+  close86(){ this.setState({ pantryOpen:false }); }
+  toggle86(ing, makeOut){ this.setState(s => { const set=new Set(s.eightySix); if (makeOut) set.add(ing); else set.delete(ing); return { eightySix:[...set] }; }); this.api('POST','/api/86',{ ingredient:ing, out:makeOut, code:'5352' }).then(()=>this.refreshState()).catch(()=>{ this.flashToast('Could not reach the bar',2000); this.refreshState(); }); }
+  restockAll(){ this.setState({ eightySix: [] }); this.api('POST','/api/86/restock',{ code:'5352' }).then(()=>this.refreshState()).catch(()=>this.refreshState()); }
+  onLogoDown(){ clearTimeout(this._logoT); this._logoT = setTimeout(()=>this.openEightySix(), 1500); }
+  onLogoUp(){ clearTimeout(this._logoT); }
+
   setDirection(d){ this.setState({ direction: d }); }
   toggleDark(){ this.setState(s => ({ dark: !s.dark })); }
   scrollTop(){ try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){ window.scrollTo(0, 0); } }
@@ -586,14 +652,17 @@ class Component extends DCLogic {
     }
     return true;
   }
-  computeVisible(){ return this.state.cocktails.filter(c => this.passSearch(c) && this.passGroups(c, null)); }
+  cleanIng(s){ return String(s||'').replace(/\s*\([^)]*\)/g, '').trim(); }
+  reqIngs(c){ return (c.spec||[]).filter(s => !/optional/i.test(s[1])).map(s => this.cleanIng(s[1])); }
+  isAvailable(c){ const out = this.state.eightySix; if (!out || !out.length) return true; const req = this.reqIngs(c); for (const i of req) if (out.indexOf(i) !== -1) return false; return true; }
+  computeVisible(){ return this.state.cocktails.filter(c => this.passSearch(c) && this.passGroups(c, null) && this.isAvailable(c)); }
 
   renderVals(){
     const st = this.state;
     const dir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const pal = st.dark ? dir.dark : dir.light;
     try { document.documentElement.style.background = pal.bg; document.body.style.background = pal.bg; } catch(e){}
-    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView);
+    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate);
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
     const meta = dir.meta;
@@ -625,6 +694,7 @@ class Component extends DCLogic {
       for (const c of st.cocktails){
         if (!this.passSearch(c)) continue;
         if (!this.passGroups(c, g.key)) continue;
+        if (!this.isAvailable(c)) continue;
         if (g.key === 'tags' ? c.tags.includes(v) : c[g.key] === v) n++;
       }
       return n;
@@ -789,6 +859,32 @@ class Component extends DCLogic {
     const ordersBadgeStyle = { minWidth:'18px', height:'18px', padding:'0 5px', borderRadius:'999px', backgroundColor: activeCount ? 'var(--accent)' : 'var(--ink-faint)', color:'var(--accent-ink)', fontSize:'11px', fontWeight:700, display:'inline-flex', alignItems:'center', justifyContent:'center', fontVariantNumeric:'tabular-nums' };
     const tabStyle = (active) => ({ flex:1, textAlign:'center', fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, letterSpacing:'.02em', padding:'8px 10px', borderRadius:'9px', cursor:'pointer', border:'none', backgroundColor: active ? 'var(--accent)' : 'transparent', color: active ? 'var(--accent-ink)' : 'var(--ink-soft)' });
 
+    // ---- The 86 (stock board) ----
+    const clean86 = (s) => String(s||'').replace(/\s*\([^)]*\)/g, '').trim();
+    const reqCount = {};
+    st.cocktails.forEach(c => { const seen={}; (c.spec||[]).forEach(sp => { if (/optional/i.test(sp[1])) return; const k=clean86(sp[1]); if(!seen[k]){ seen[k]=1; reqCount[k]=(reqCount[k]||0)+1; } }); });
+    const outSet = {}; st.eightySix.forEach(n => outSet[n]=1);
+    const cat86 = (n) => { const l=n.toLowerCase();
+      if (/\b(gin|bourbon|rye|tequila|rum|vodka|cognac|vsop|blanco)\b/.test(l)) return 'Spirits';
+      if (/campari|vermouth|cointreau|maraschino|chartreuse|lillet|violette|liqueur|absinthe|aperitivo/.test(l)) return 'Liqueurs & Aperitivi';
+      if (/bitters|angostura|peychaud/.test(l)) return 'Bitters';
+      if (/juice/.test(l)) return 'Citrus & Juice';
+      if (/syrup|agave|honey|sugar|coconut/.test(l)) return 'Syrups & Sweeteners';
+      if (/soda|tonic|ginger beer|water|espresso|tea|mint|cucumber|salt/.test(l)) return 'Mixers';
+      if (/thc/.test(l)) return 'THC';
+      return 'Other'; };
+    const order86 = ['Spirits','Liqueurs & Aperitivi','Bitters','Citrus & Juice','Syrups & Sweeteners','Mixers','THC','Other'];
+    const gmap86 = {};
+    Object.keys(reqCount).sort().forEach(n => { const g=cat86(n); (gmap86[g]=gmap86[g]||[]).push(n); });
+    const box86 = (inStock) => ({ flex:'none', width:'22px', height:'22px', borderRadius:'6px', border:'1.5px solid '+(inStock?'var(--accent)':'var(--pill-line)'), background: inStock?'var(--accent)':'transparent', color:'var(--accent-ink)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'14px', lineHeight:1 });
+    const eightySixGroups = order86.filter(g=>gmap86[g]).map(g => ({ label:g, items: gmap86[g].map(n => { const inStock=!outSet[n]; return {
+        name:n, count: reqCount[n]+' drink'+(reqCount[n]===1?'':'s'), inStock,
+        rowStyle:{ display:'flex', alignItems:'center', gap:'11px', padding:'9px 4px', cursor:'pointer', borderBottom:'1px solid var(--card-border)', opacity: inStock?1:0.5 },
+        boxStyle: box86(inStock), checkMark: inStock?'✓':'',
+        onToggle: () => this.toggle86(n, inStock) }; }) }));
+    const stockTotal = Object.keys(reqCount).length;
+    const hiddenCount = st.cocktails.filter(c => !this.isAvailable(c)).length;
+
     return {
       appStyle,
       darkIcon: st.dark ? '☀' : '☾',
@@ -821,6 +917,14 @@ class Component extends DCLogic {
       toast: st.toast,
       onToggleDark: () => this.toggleDark(),
       showTop: st.showTop, onScrollTop: () => this.scrollTop(),
+      onOpen86: () => this.openEightySix(),
+      onLogoDown: () => this.onLogoDown(), onLogoUp: () => this.onLogoUp(),
+      pantryGate: st.pantryGate, gateInput: st.gateInput, gateErr: st.gateErr,
+      onGateInput: (e) => this.onGateInput(e), onSubmitGate: () => this.submitGate(), onCloseGate: () => this.closeGate(),
+      pantryOpen: st.pantryOpen, onClose86: () => this.close86(),
+      eightySixGroups: eightySixGroups, has86: st.eightySix.length>0, onRestockAll: () => this.restockAll(),
+      eightySixStock: (stockTotal - st.eightySix.length) + ' of ' + stockTotal + ' in stock',
+      eightySixHidden: hiddenCount + ' drink' + (hiddenCount===1?'':'s') + ' hidden',
       search: st.search, onSearch: (e) => this.onSearch(e),
       onSurprise: () => this.surprise(),
       onToggleFilters: () => this.toggleFilters(),

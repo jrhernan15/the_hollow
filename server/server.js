@@ -19,6 +19,7 @@ const Database = require("better-sqlite3");
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || "127.0.0.1";
 const DB_PATH = process.env.HOLLOW_DB || path.join(__dirname, "..", "data", "hollow.db");
+const CODE = process.env.HOLLOW_CODE || "5352";   // passcode for The 86 (stock) edits
 
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
@@ -53,6 +54,9 @@ try {
   if (!cols.includes("qty")) db.exec("ALTER TABLE tickets ADD COLUMN qty INTEGER NOT NULL DEFAULT 1");
 } catch (e) {}
 
+// The 86: ingredients currently marked out of stock (hides drinks that need them).
+db.exec(`CREATE TABLE IF NOT EXISTS eighty_six ( ingredient TEXT PRIMARY KEY, created_at TEXT NOT NULL DEFAULT (datetime('now')) );`);
+
 const Q = {
   insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
   getTicket:     db.prepare("SELECT * FROM tickets WHERE id = ?"),
@@ -72,12 +76,16 @@ const Q = {
   clearRounds:   db.prepare("DELETE FROM rounds"),
   clearServedTix: db.prepare("DELETE FROM tickets WHERE round_id IN (SELECT id FROM rounds WHERE status = 'served')"),
   clearServedRnd: db.prepare("DELETE FROM rounds WHERE status = 'served'"),
+  all86:   db.prepare("SELECT ingredient FROM eighty_six ORDER BY ingredient"),
+  set86:   db.prepare("INSERT OR IGNORE INTO eighty_six (ingredient) VALUES (?)"),
+  unset86: db.prepare("DELETE FROM eighty_six WHERE ingredient = ?"),
+  clear86: db.prepare("DELETE FROM eighty_six"),
 };
 
 function getState() {
   const rail = Q.railTickets.all();
   const rounds = Q.allRounds.all().map((r) => ({ ...r, tickets: Q.roundTickets.all(r.id) }));
-  return { rail, rounds };
+  return { rail, rounds, eightySix: Q.all86.all().map((r) => r.ingredient) };
 }
 
 /* ---- Server-Sent Events ---- */
@@ -177,6 +185,24 @@ const server = http.createServer(async (req, res) => {
       const id = Number(m[1]);
       // Remove = discard the round and its drinks entirely (not back to the rail).
       db.transaction(() => { Q.deleteRoundTickets.run(id); Q.deleteRound.run(id); })();
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+    if (pathname === "/api/86" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      const ing = str(b.ingredient, 80);
+      if (!ing) return sendJSON(res, 400, { error: "ingredient required" });
+      if (b.out) Q.set86.run(ing); else Q.unset86.run(ing);
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+    if (pathname === "/api/86/restock" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      Q.clear86.run();
       broadcast();
       return sendJSON(res, 200, { ok: true });
     }
