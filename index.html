@@ -482,6 +482,14 @@
                 </sc-for>
               </div>
               <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:10px;line-height:1.4">{{ themeAutoNote }}</div>
+              <div style="height:1px;background:var(--card-border,#2D3422);margin:16px 0 0"></div>
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:14px 0 4px">Notification sound</div>
+              <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin:0 0 9px;line-height:1.5">Plays on this phone when one of your drinks is marked ready. Tap to hear &amp; set — “Match theme” follows the season.</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px">
+                <sc-for list="{{ chimeOptions }}" as="ch" hint-placeholder-count="7">
+                  <button type="button" onClick="{{ ch.onSelect }}" style="{{ ch.style }}">{{ ch.label }}</button>
+                </sc-for>
+              </div>
             </div>
           </sc-if>
         </div>
@@ -519,7 +527,7 @@ class Component extends DCLogic {
       orders: [], batches: [], ordersOpen: false, stationTab: 'queue',
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
-      eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients',
+      eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -562,6 +570,7 @@ class Component extends DCLogic {
     try { if (window.matchMedia && window.matchMedia('(max-width:680px)').matches) this.setState({ filtersOpen: false }); } catch(e){}
     try { this._myName = localStorage.getItem('hollow_name_v1') || ''; } catch(e){ this._myName = ''; }
     try { this._mine = JSON.parse(localStorage.getItem('hollow_mine_v1') || '[]'); if (!Array.isArray(this._mine)) this._mine = []; } catch(e){ this._mine = []; }
+    try { const cp = localStorage.getItem('hollow_chime'); if (cp) this.setState({ chimePref: cp }); } catch(e){}
     this.refreshState();
     this.openStream();
     this._onScroll = () => { const v = (window.scrollY || window.pageYOffset || 0) > 400; if (v !== this.state.showTop) this.setState({ showTop: v }); };
@@ -657,13 +666,58 @@ class Component extends DCLogic {
   }
   setRoundStatus(id, s){ this.api('PATCH', '/api/rounds/' + id, { status: s }).then(() => this.refreshState()).catch(() => this.flashToast('Could not update the round', 2000)); }
   unlockAudio(){ try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; this._actx = this._actx || new C(); if (this._actx.state === 'suspended') this._actx.resume(); } catch(e){} }
-  chime(){ try {
+  CHIMES(){ return {
+    woodsy: [
+      {f:220.00, type:'triangle', dur:0.36, g:0.30, atk:0.006, gap:0.12, partials:[[0.5,0.12,1]]},
+      {f:277.18, type:'triangle', dur:0.36, g:0.30, atk:0.006, gap:0.12, partials:[[0.5,0.12,1]]},
+      {f:329.63, type:'triangle', dur:0.62, g:0.32, atk:0.006, gap:0.62, partials:[[0.5,0.12,1]]},
+    ],
+    spooky: [
+      {f:110.00, type:'sine',     dur:1.05, g:0.10, atk:0.06, gap:0.05},
+      {f:415.30, type:'sawtooth', dur:0.55, g:0.12, atk:0.03, gap:0.30, vib:7, vibd:11, slideTo:392.00},
+      {f:293.66, type:'sawtooth', dur:0.85, g:0.12, atk:0.03, gap:0.85, vib:6, vibd:9,  slideTo:277.18},
+    ],
+    sleigh: [
+      {f:1318.51, type:'sine', dur:0.18, g:0.20, atk:0.004, gap:0.15, partials:[[2.76,0.05,0.6],[5.4,0.03,0.5]]},
+      {f:1318.51, type:'sine', dur:0.18, g:0.20, atk:0.004, gap:0.15, partials:[[2.76,0.05,0.6],[5.4,0.03,0.5]]},
+      {f:1318.51, type:'sine', dur:0.18, g:0.20, atk:0.004, gap:0.20, partials:[[2.76,0.05,0.6],[5.4,0.03,0.5]]},
+      {f:1567.98, type:'sine', dur:0.55, g:0.22, atk:0.004, gap:0.55, partials:[[2.76,0.06,0.6],[5.4,0.03,0.5]]},
+    ],
+    party: [
+      {f:523.25,  type:'triangle', dur:0.16, g:0.26, atk:0.004, gap:0.12},
+      {f:659.25,  type:'triangle', dur:0.16, g:0.26, atk:0.004, gap:0.12},
+      {f:783.99,  type:'triangle', dur:0.16, g:0.26, atk:0.004, gap:0.12},
+      {f:1046.50, type:'triangle', dur:0.55, g:0.30, atk:0.004, gap:0.55, partials:[[2.0,0.08,0.6]]},
+    ],
+    classic: [
+      {f:880,  type:'sine', dur:0.26, g:0.28, atk:0.02, gap:0.16},
+      {f:1320, type:'sine', dur:0.30, g:0.28, atk:0.02, gap:0.30},
+    ],
+  }; }
+  _voice(ctx, t, n){
+    const dur = n.dur || 0.25, g0 = (n.g == null ? 0.25 : n.g);
+    const out = ctx.createGain(); out.connect(ctx.destination);
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(g0, t + (n.atk || 0.008));
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    const o = ctx.createOscillator(); o.type = n.type || 'sine'; o.frequency.setValueAtTime(n.f, t);
+    if (n.slideTo) o.frequency.exponentialRampToValueAtTime(n.slideTo, t + dur);
+    o.connect(out);
+    if (n.vib){ const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = n.vib; lg.gain.value = n.vibd || 6; lfo.connect(lg); lg.connect(o.frequency); lfo.start(t); lfo.stop(t + dur); }
+    o.start(t); o.stop(t + dur + 0.03);
+    (n.partials || []).forEach(p => { const po = ctx.createOscillator(), pg = ctx.createGain(); po.type = 'sine'; po.frequency.value = n.f * p[0]; pg.gain.setValueAtTime(0.0001, t); pg.gain.exponentialRampToValueAtTime(g0 * p[1], t + (n.atk || 0.008)); pg.gain.exponentialRampToValueAtTime(0.0001, t + dur * (p[2] || 1)); po.connect(pg); pg.connect(ctx.destination); po.start(t); po.stop(t + dur + 0.03); });
+  }
+  playChime(name){ try {
     const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
     const ctx = this._actx || (this._actx = new C()); if (ctx.state === 'suspended') ctx.resume();
-    const t0 = ctx.currentTime;
-    [880, 1320].forEach((f, i) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(ctx.destination); const t=t0+i*0.16; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.28,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.3); o.start(t); o.stop(t+0.32); });
-    if (navigator.vibrate) navigator.vibrate([90, 50, 90]);
+    const seqs = this.CHIMES(); const seq = seqs[name] || seqs.woodsy;
+    let t = ctx.currentTime + 0.03;
+    seq.forEach(n => { this._voice(ctx, t, n); t += (n.gap == null ? (n.dur || 0.25) : n.gap); });
+    if (navigator.vibrate) navigator.vibrate(name === 'sleigh' ? [30,30,30,30,30,30] : [70,40,70]);
   } catch(e){} }
+  resolveChime(){ const pref = this.state.chimePref || 'auto'; if (pref === 'off') return null; if (pref === 'auto'){ return ({ herbarium:'woodsy', halloween:'spooky', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'woodsy'; } return pref; }
+  chime(){ const name = this.resolveChime(); if (name) this.playChime(name); }
+  setChime(name){ try { localStorage.setItem('hollow_chime', name); } catch(e){} this.unlockAudio(); this.setState({ chimePref: name }); if (name !== 'off'){ const themed = ({ herbarium:'woodsy', halloween:'spooky', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'woodsy'; this.playChime(name === 'auto' ? themed : name); } }
   removeBatch(batchId){
     this.setState({ makeView: null });
     this.api('DELETE', '/api/rounds/' + batchId).then(() => this.refreshState()).catch(()=>{});
@@ -985,6 +1039,7 @@ class Component extends DCLogic {
     const themeChip = (active) => ({ fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'6px 13px', cursor:'pointer', border:'1px solid '+(active?'var(--accent)':'var(--pill-line)'), background: active?'var(--accent)':'var(--field)', color: active?'var(--accent-ink)':'var(--ink-soft)' });
     const themeOptions = [['auto','Auto'],['herbarium','Default'],['halloween','Halloween'],['christmas','Christmas'],['birthday','Birthday']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.serverTheme===p[0]), onSelect: () => this.setTheme(p[0]) }));
     const themeAutoNote = 'Auto follows the calendar — now showing ' + ((this.THEMES[this.autoTheme()]||{}).label || 'Default') + '.';
+    const chimeOptions = [['auto','Match theme'],['woodsy','Woodsy'],['spooky','Spooky'],['sleigh','Sleigh bells'],['party','Party'],['classic','Classic'],['off','Off']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.chimePref===p[0]), onSelect: () => this.setChime(p[0]) }));
 
     // ---- per-drink 86 (take a single drink off the menu) ----
     const drinkSpiritOrder = (this.GROUPS.find(g=>g.key==='spirit')||{}).order || [];
@@ -1050,7 +1105,7 @@ class Component extends DCLogic {
       eightySixHidden: hiddenCount + ' drink' + (hiddenCount===1?'':'s') + ' hidden',
       drinkGroups: drinkGroups, drink86Note: drink86Count===0 ? 'All drinks on the menu.' : (drink86Count + ' drink' + (drink86Count===1?'':'s') + ' 86’d.'),
       hasMyDrinks: myDrinks.length>0, myDrinks: myDrinks,
-      logoSrc: logoSrc, themeOptions: themeOptions, themeAutoNote: themeAutoNote,
+      logoSrc: logoSrc, themeOptions: themeOptions, themeAutoNote: themeAutoNote, chimeOptions: chimeOptions,
       search: st.search, onSearch: (e) => this.onSearch(e),
       onSurprise: () => this.surprise(),
       onToggleFilters: () => this.toggleFilters(),
