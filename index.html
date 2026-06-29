@@ -199,7 +199,7 @@
     </sc-for>
   </main>
 
-  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="Staff" title="Staff" style="margin-left:6px;background:none;border:none;cursor:pointer;color:var(--ink-faint,#8A8474);opacity:.45;vertical-align:middle;padding:4px;line-height:0" style-hover="opacity:1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></button></footer>
+  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
 
   <sc-if value="{{ orderModalName }}" hint-placeholder-val="">
     <div data-chrome data-modalwrap onClick="{{ onCloseOrder }}" style="position:fixed;inset:0;z-index:60;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -399,7 +399,8 @@
     <div data-chrome data-modalwrap onClick="{{ onCloseGate }}" style="position:fixed;inset:0;z-index:62;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
       <div onClick="{{ stop }}" style="width:min(320px,100%);background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.45);padding:22px">
         <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);text-align:center">Staff only</div>
-        <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:6px 0 14px;color:var(--ink,#ECE7D7);text-align:center">The 86</h2>
+        <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:6px 0 8px;color:var(--ink,#ECE7D7);text-align:center">The 86</h2>
+        <p style="font-size:12.5px;line-height:1.5;color:var(--ink-soft,#B7B3A1);text-align:center;margin:0 0 15px">Staff stock list — mark what's out and those drinks drop off the menu for everyone.</p>
         <input type="password" inputmode="numeric" value="{{ gateInput }}" onChange="{{ onGateInput }}" placeholder="Passcode" autocomplete="off" style="width:100%;text-align:center;letter-spacing:.3em;font-family:Inter,sans-serif;font-size:18px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
         <sc-if value="{{ gateErr }}" hint-placeholder-val=""><div style="color:#CC7A6A;font-size:12.5px;text-align:center;margin-top:8px">Wrong passcode</div></sc-if>
         <div style="display:flex;gap:10px;margin-top:16px">
