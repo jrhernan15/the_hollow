@@ -710,14 +710,31 @@ class Component extends DCLogic {
   playChime(name){ try {
     const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
     const ctx = this._actx || (this._actx = new C()); if (ctx.state === 'suspended') ctx.resume();
-    const seqs = this.CHIMES(); const seq = seqs[name] || seqs.woodsy;
+    if (name === 'ghost'){ this._playGhost(ctx, ctx.currentTime + 0.03); return; }
+    const seqs = this.CHIMES(); const seq = seqs[name] || seqs.classic;
     let t = ctx.currentTime + 0.03;
     seq.forEach(n => { this._voice(ctx, t, n); t += (n.gap == null ? (n.dur || 0.25) : n.gap); });
     if (navigator.vibrate) navigator.vibrate(name === 'sleigh' ? [30,30,30,30,30,30] : [70,40,70]);
   } catch(e){} }
-  resolveChime(){ const pref = this.state.chimePref || 'auto'; if (pref === 'off') return null; if (pref === 'auto'){ return ({ herbarium:'woodsy', halloween:'spooky', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'woodsy'; } return pref; }
+  _noiseBuffer(ctx, dur){ const n = Math.floor(ctx.sampleRate * dur); const b = ctx.createBuffer(1, n, ctx.sampleRate); const d = b.getChannelData(0); for (let i=0;i<n;i++) d[i] = Math.random()*2-1; return b; }
+  _playGhost(ctx, t){
+    const dur = 1.5, N = 300, freq = new Float32Array(N);
+    for (let i=0;i<N;i++){ const tt = i/(N-1)*dur; freq[i] = 190 + 55*Math.sin(2*Math.PI*0.55*tt - Math.PI/2) + 6*Math.sin(2*Math.PI*5*tt); }
+    const o = ctx.createOscillator(); o.type = 'sawtooth';
+    try { o.frequency.setValueCurveAtTime(freq, t, dur); } catch(e){ o.frequency.setValueAtTime(190, t); }
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 650; lp.Q.value = 0.8;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.22, t + 0.28); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+    const ns = ctx.createBufferSource(); ns.buffer = this._noiseBuffer(ctx, dur + 0.1);
+    const nlp = ctx.createBiquadFilter(); nlp.type = 'lowpass'; nlp.frequency.value = 500; nlp.Q.value = 0.7;
+    const ng = ctx.createGain(); ng.gain.setValueAtTime(0.0001, t); ng.gain.exponentialRampToValueAtTime(0.06, t + 0.28); ng.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    ns.connect(nlp); nlp.connect(ng); ng.connect(ctx.destination);
+    o.start(t); ns.start(t); o.stop(t + dur + 0.05); ns.stop(t + dur + 0.05);
+    if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
+  }
+  resolveChime(){ const pref = this.state.chimePref || 'auto'; if (pref === 'off') return null; if (pref === 'auto'){ return ({ herbarium:'classic', halloween:'ghost', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'classic'; } return pref; }
   chime(){ const name = this.resolveChime(); if (name) this.playChime(name); }
-  setChime(name){ try { localStorage.setItem('hollow_chime', name); } catch(e){} this.unlockAudio(); this.setState({ chimePref: name }); if (name !== 'off'){ const themed = ({ herbarium:'woodsy', halloween:'spooky', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'woodsy'; this.playChime(name === 'auto' ? themed : name); } }
+  setChime(name){ try { localStorage.setItem('hollow_chime', name); } catch(e){} this.unlockAudio(); this.setState({ chimePref: name }); if (name !== 'off'){ const themed = ({ herbarium:'classic', halloween:'ghost', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'classic'; this.playChime(name === 'auto' ? themed : name); } }
   removeBatch(batchId){
     this.setState({ makeView: null });
     this.api('DELETE', '/api/rounds/' + batchId).then(() => this.refreshState()).catch(()=>{});
@@ -1039,7 +1056,7 @@ class Component extends DCLogic {
     const themeChip = (active) => ({ fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'6px 13px', cursor:'pointer', border:'1px solid '+(active?'var(--accent)':'var(--pill-line)'), background: active?'var(--accent)':'var(--field)', color: active?'var(--accent-ink)':'var(--ink-soft)' });
     const themeOptions = [['auto','Auto'],['herbarium','Default'],['halloween','Halloween'],['christmas','Christmas'],['birthday','Birthday']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.serverTheme===p[0]), onSelect: () => this.setTheme(p[0]) }));
     const themeAutoNote = 'Auto follows the calendar — now showing ' + ((this.THEMES[this.autoTheme()]||{}).label || 'Default') + '.';
-    const chimeOptions = [['auto','Match theme'],['woodsy','Woodsy'],['spooky','Spooky'],['sleigh','Sleigh bells'],['party','Party'],['classic','Classic'],['off','Off']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.chimePref===p[0]), onSelect: () => this.setChime(p[0]) }));
+    const chimeOptions = [['auto','Match theme'],['classic','Classic'],['ghost','Ghost'],['sleigh','Sleigh bells'],['party','Party'],['off','Off']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.chimePref===p[0]), onSelect: () => this.setChime(p[0]) }));
 
     // ---- per-drink 86 (take a single drink off the menu) ----
     const drinkSpiritOrder = (this.GROUPS.find(g=>g.key==='spirit')||{}).order || [];
