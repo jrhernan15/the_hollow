@@ -55,14 +55,50 @@ From any phone or laptop on the network, open `http://192.168.1.50/`.
 
 ### Nicer: a name instead of an IP
 
-Install mDNS so the NUC answers to `<hostname>.local`:
+mDNS (Avahi) makes the NUC answer to `<hostname>.local` automatically — that's
+where `nucrunner.local` comes from. Install it if it isn't already:
 
 ```bash
 sudo apt install -y avahi-daemon
-hostname           # e.g. prints "nuc"  ->  open http://nuc.local/
+hostname           # whatever this prints is your <hostname>.local
 ```
 
 Tip: set a **DHCP reservation** in your router so the NUC's IP never changes.
+
+## Give it a friendly name: `thehallow.local`
+
+You don't have to rename the machine. Publish an extra mDNS name that points at
+the NUC, so **both** `nucrunner.local` and `thehallow.local` work. The repo ships
+a tiny service for this in `deploy/`.
+
+```bash
+sudo apt install -y avahi-daemon avahi-utils
+sudo cp /srv/the_hollow/deploy/thehallow-mdns.sh /usr/local/bin/thehallow-mdns.sh
+sudo chmod +x /usr/local/bin/thehallow-mdns.sh
+sudo cp /srv/the_hollow/deploy/thehallow-mdns.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now thehallow-mdns.service
+systemctl status thehallow-mdns.service --no-pager   # should be "active (running)"
+```
+
+Now open **`http://thehallow.local/`** from any device. No Caddy change is needed —
+the Caddyfile listens on port 80 for every hostname.
+
+**Simpler alternative — rename the machine.** If this NUC is dedicated to the
+menu, just rename it and skip the alias service entirely:
+
+```bash
+sudo hostnamectl set-hostname thehallow      # then http://thehallow.local/
+```
+
+(Downside: `nucrunner.local`, and anything else pointing at that name like SSH,
+stops working.)
+
+### Heads up on `.local` support
+
+Apple devices, Windows, and most laptops resolve `.local` names fine. Some older
+Android phones don't support mDNS `.local` at all — on those, the NUC's IP (or a
+custom DNS entry in your router) is the fallback.
 
 ## Updating the menu later
 
