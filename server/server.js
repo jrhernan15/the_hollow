@@ -56,6 +56,8 @@ try {
 
 // The 86: ingredients currently marked out of stock (hides drinks that need them).
 db.exec(`CREATE TABLE IF NOT EXISTS eighty_six ( ingredient TEXT PRIMARY KEY, created_at TEXT NOT NULL DEFAULT (datetime('now')) );`);
+// Shared settings (e.g. the active theme).
+db.exec(`CREATE TABLE IF NOT EXISTS settings ( key TEXT PRIMARY KEY, value TEXT );`);
 
 const Q = {
   insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
@@ -80,12 +82,15 @@ const Q = {
   set86:   db.prepare("INSERT OR IGNORE INTO eighty_six (ingredient) VALUES (?)"),
   unset86: db.prepare("DELETE FROM eighty_six WHERE ingredient = ?"),
   clear86: db.prepare("DELETE FROM eighty_six"),
+  getSetting: db.prepare("SELECT value FROM settings WHERE key = ?"),
+  setSetting: db.prepare("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value"),
 };
 
 function getState() {
   const rail = Q.railTickets.all();
   const rounds = Q.allRounds.all().map((r) => ({ ...r, tickets: Q.roundTickets.all(r.id) }));
-  return { rail, rounds, eightySix: Q.all86.all().map((r) => r.ingredient) };
+  const themeRow = Q.getSetting.get("theme");
+  return { rail, rounds, eightySix: Q.all86.all().map((r) => r.ingredient), theme: (themeRow && themeRow.value) || "auto" };
 }
 
 /* ---- Server-Sent Events ---- */
@@ -185,6 +190,17 @@ const server = http.createServer(async (req, res) => {
       const id = Number(m[1]);
       // Remove = discard the round and its drinks entirely (not back to the rail).
       db.transaction(() => { Q.deleteRoundTickets.run(id); Q.deleteRound.run(id); })();
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+    if (pathname === "/api/theme" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      const valid = ["auto", "herbarium", "halloween", "christmas", "birthday"];
+      const t = String(b.theme || "");
+      if (!valid.includes(t)) return sendJSON(res, 400, { error: "bad theme" });
+      Q.setSetting.run("theme", t);
       broadcast();
       return sendJSON(res, 200, { ok: true });
     }

@@ -53,7 +53,7 @@
     <div style="display:flex;align-items:center;justify-content:center;gap:18px;width:100%;max-width:760px;margin:0 auto">
       <span style="flex:1;min-width:0;height:1px;background:linear-gradient(90deg,transparent,var(--div-line,#B9C6AC))" aria-hidden="true"></span>
       <svg viewBox="0 0 46 18" width="52" height="20" fill="none" stroke="var(--accent2,#AD7C44)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" style="flex:none;transform:scaleX(-1);opacity:.85" aria-hidden="true"><path d="M3 9 H32"/><path d="M30 9 Q24 1 16 4 Q22 8 30 9 Z"/><path d="M26 9 Q20 17 12 14 Q18 9 26 9 Z"/><path d="M32 9 q6 -1 9 -5"/><path d="M32 9 q6 1 9 5"/></svg>
-      <img src="assets/logo.png" alt="The Hollow — Hernandez House Bar · Cocktails · Est. 2026" style="width:min(248px,52vw);height:auto;display:block;flex:none;filter:drop-shadow(0 6px 18px rgba(20,18,12,.18))" onMouseDown="{{ onLogoDown }}" onMouseUp="{{ onLogoUp }}" onMouseLeave="{{ onLogoUp }}" onTouchStart="{{ onLogoDown }}" onTouchEnd="{{ onLogoUp }}">
+      <img src="{{ logoSrc }}" alt="The Hollow — Hernandez House Bar · Cocktails · Est. 2026" style="width:min(248px,52vw);height:auto;display:block;flex:none;filter:drop-shadow(0 6px 18px rgba(20,18,12,.18))" onMouseDown="{{ onLogoDown }}" onMouseUp="{{ onLogoUp }}" onMouseLeave="{{ onLogoUp }}" onTouchStart="{{ onLogoDown }}" onTouchEnd="{{ onLogoUp }}">
       <svg viewBox="0 0 46 18" width="52" height="20" fill="none" stroke="var(--accent2,#AD7C44)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" style="flex:none;opacity:.85" aria-hidden="true"><path d="M3 9 H32"/><path d="M30 9 Q24 1 16 4 Q22 8 30 9 Z"/><path d="M26 9 Q20 17 12 14 Q18 9 26 9 Z"/><path d="M32 9 q6 -1 9 -5"/><path d="M32 9 q6 1 9 5"/></svg>
       <span style="flex:1;min-width:0;height:1px;background:linear-gradient(90deg,var(--div-line,#B9C6AC),transparent)" aria-hidden="true"></span>
     </div>
@@ -426,6 +426,16 @@
           <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:10px;line-height:1.5">Uncheck anything you're out of — drinks that need it disappear from the menu for everyone. Optional items and garnishes don't count.</div>
         </header>
         <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:8px 16px 16px">
+          <div style="margin:6px 0 2px">
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:8px">Theme</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px">
+              <sc-for list="{{ themeOptions }}" as="th" hint-placeholder-count="5">
+                <button type="button" onClick="{{ th.onSelect }}" style="{{ th.style }}">{{ th.label }}</button>
+              </sc-for>
+            </div>
+            <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:8px;line-height:1.4">{{ themeAutoNote }}</div>
+          </div>
+          <div style="height:1px;background:var(--card-border,#2D3422);margin:14px 0 2px"></div>
           <sc-for list="{{ eightySixGroups }}" as="grp" hint-placeholder-count="1">
             <div style="margin-top:14px">
               <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:2px">{{ grp.label }}</div>
@@ -473,7 +483,7 @@ class Component extends DCLogic {
       orders: [], batches: [], ordersOpen: false, stationTab: 'queue',
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
-      eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false,
+      eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto',
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -482,9 +492,28 @@ class Component extends DCLogic {
     this.THEMES = {
       herbarium: {
         label:'Herbarium',
+        logo:'assets/logo.png',
         meta:{ radius:'16px', ornament:'sprig', leaf:true, index:false },
         light:{ bg:'#F7F4ED', bg2:'#EFEADF', card:'#FBF9F3', cardBorder:'#E8E4DC', ink:'#262420', inkSoft:'#5C584D', inkFaint:'#8A8474', accent:'#2F3D2C', accentInk:'#F4F1E6', accent2:'#AD7C44', line:'#DDD6C7', pillBg:'rgba(126,144,112,.08)', pillInk:'#4F6243', pillLine:'#B9C6AC', divLine:'#B9C6AC', shadow:'0 1px 2px rgba(40,36,28,.05),0 10px 26px rgba(40,36,28,.06)', field:'#FBF9F3', focus:'rgba(126,144,112,.28)', grain:'rgba(47,61,44,.018)' },
         dark:{ bg:'#13160F', bg2:'#1A1E14', card:'#1D2217', cardBorder:'#2D3422', ink:'#ECE7D7', inkSoft:'#B7B3A1', inkFaint:'#827E6D', accent:'#A6BB8E', accentInk:'#13160F', accent2:'#CFA267', line:'#2D3422', pillBg:'rgba(166,187,142,.10)', pillInk:'#B7C8A6', pillLine:'#3A4430', divLine:'#39432F', shadow:'0 1px 2px rgba(0,0,0,.4),0 14px 30px rgba(0,0,0,.35)', field:'#161A11', focus:'rgba(166,187,142,.22)', grain:'rgba(255,255,255,.014)' },
+      },
+      halloween: {
+        label:'Halloween', logo:'assets/logo-halloween.png',
+        meta:{ radius:'16px', ornament:'sprig', leaf:true, index:false },
+        light:{ bg:'#F6EEE2', bg2:'#EFE4D2', card:'#FBF6EC', cardBorder:'#E6D8C2', ink:'#2A2230', inkSoft:'#5A4E58', inkFaint:'#8C7E84', accent:'#B5531E', accentInk:'#FBF3E9', accent2:'#6B4A8A', line:'#E0D2BE', pillBg:'rgba(181,83,30,.10)', pillInk:'#8A3D14', pillLine:'#D9B48C', divLine:'#D2BE9E', shadow:'0 1px 2px rgba(40,30,20,.06),0 10px 26px rgba(40,30,20,.08)', field:'#FBF6EC', focus:'rgba(181,83,30,.26)', grain:'rgba(80,40,10,.02)' },
+        dark:{ bg:'#16121A', bg2:'#1E1824', card:'#221A2A', cardBorder:'#342A40', ink:'#F0E6DA', inkSoft:'#BBA9B3', inkFaint:'#8A7B85', accent:'#E07B2E', accentInk:'#16121A', accent2:'#B79AD6', line:'#342A40', pillBg:'rgba(224,123,46,.14)', pillInk:'#E8A06A', pillLine:'#46384F', divLine:'#43354D', shadow:'0 1px 2px rgba(0,0,0,.4),0 14px 30px rgba(0,0,0,.4)', field:'#1B1521', focus:'rgba(224,123,46,.24)', grain:'rgba(255,180,120,.015)' },
+      },
+      christmas: {
+        label:'Christmas', logo:'assets/logo-christmas.png',
+        meta:{ radius:'16px', ornament:'sprig', leaf:true, index:false },
+        light:{ bg:'#F4F1E6', bg2:'#EAE7D7', card:'#FBF9F0', cardBorder:'#D8DDC9', ink:'#20302A', inkSoft:'#4E5E55', inkFaint:'#84927F', accent:'#B22A2A', accentInk:'#FBF3EC', accent2:'#B08A2A', line:'#D8DDC9', pillBg:'rgba(46,125,70,.10)', pillInk:'#246039', pillLine:'#B3C6AB', divLine:'#BBC9AE', shadow:'0 1px 2px rgba(30,40,30,.06),0 10px 26px rgba(30,40,30,.08)', field:'#FBF9F0', focus:'rgba(178,42,42,.24)', grain:'rgba(20,60,40,.02)' },
+        dark:{ bg:'#0E1A12', bg2:'#122118', card:'#16281C', cardBorder:'#284530', ink:'#ECEAD6', inkSoft:'#AEBBA4', inkFaint:'#7C8B76', accent:'#E4443C', accentInk:'#0E1A12', accent2:'#E4BA5E', line:'#284530', pillBg:'rgba(120,190,140,.13)', pillInk:'#98D2AC', pillLine:'#34472D', divLine:'#2E4633', shadow:'0 1px 2px rgba(0,0,0,.4),0 14px 30px rgba(0,0,0,.4)', field:'#112017', focus:'rgba(228,68,60,.24)', grain:'rgba(255,255,255,.012)' },
+      },
+      birthday: {
+        label:'Birthday', logo:'assets/logo-birthday.png',
+        meta:{ radius:'16px', ornament:'sprig', leaf:true, index:false },
+        light:{ bg:'#FBF4F0', bg2:'#F3E9E6', card:'#FFFBF7', cardBorder:'#EBD9D6', ink:'#2C2230', inkSoft:'#5E5260', inkFaint:'#938490', accent:'#D4477E', accentInk:'#FFF4F8', accent2:'#1C8483', line:'#ECDCD8', pillBg:'rgba(43,177,176,.12)', pillInk:'#1C8483', pillLine:'#E2C3CC', divLine:'#E0CDD2', shadow:'0 1px 2px rgba(60,30,50,.06),0 10px 26px rgba(60,30,50,.08)', field:'#FFFBF7', focus:'rgba(212,71,126,.24)', grain:'rgba(120,40,80,.02)' },
+        dark:{ bg:'#161019', bg2:'#1E1722', card:'#231A28', cardBorder:'#362A3C', ink:'#F1E7EC', inkSoft:'#C0AEB8', inkFaint:'#8E7E88', accent:'#EC6AA0', accentInk:'#161019', accent2:'#4FD0CF', line:'#362A3C', pillBg:'rgba(79,208,207,.14)', pillInk:'#86DEDD', pillLine:'#463347', divLine:'#443349', shadow:'0 1px 2px rgba(0,0,0,.4),0 14px 30px rgba(0,0,0,.4)', field:'#1B1420', focus:'rgba(236,106,160,.24)', grain:'rgba(255,255,255,.012)' },
       },
     };
   }
@@ -529,7 +558,8 @@ class Component extends DCLogic {
     orders.sort((a, b) => b.ts - a.ts);
     const batches = rounds.map(r => ({ id:String(r.id), ts:this.toMs(r.created_at), status: (r.status === 'served' ? 'done' : 'making') }));
     batches.sort((a, b) => b.ts - a.ts);
-    this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [] });
+    const theme = (d && d.theme) || 'auto';
+    this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme) });
   }
 
   flashToast(msg, ms){ this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast:null }), ms||2000); }
@@ -604,6 +634,11 @@ class Component extends DCLogic {
   restockAll(){ this.setState({ eightySix: [] }); this.api('POST','/api/86/restock',{ code:'5352' }).then(()=>this.refreshState()).catch(()=>this.refreshState()); }
   onLogoDown(){ clearTimeout(this._logoT); this._logoT = setTimeout(()=>this.openEightySix(), 1500); }
   onLogoUp(){ clearTimeout(this._logoT); }
+
+  // ---- themes ----
+  autoTheme(){ try { const d=new Date(); const m=d.getMonth(); const day=d.getDate(); if (m===9) return 'halloween'; if (m===11 && day<=26) return 'christmas'; } catch(e){} return 'herbarium'; }
+  resolveTheme(t){ if (t==='auto') return this.autoTheme(); return this.THEMES[t] ? t : 'herbarium'; }
+  setTheme(t){ this.setState({ serverTheme: t, direction: this.resolveTheme(t) }); this.api('POST','/api/theme',{ theme:t, code:'5352' }).then(()=>this.refreshState()).catch(()=>{ this.flashToast('Could not save theme',2000); this.refreshState(); }); }
 
   setDirection(d){ this.setState({ direction: d }); }
   toggleDark(){ this.setState(s => ({ dark: !s.dark })); }
@@ -885,6 +920,11 @@ class Component extends DCLogic {
         onToggle: () => this.toggle86(n, inStock) }; }) }));
     const stockTotal = Object.keys(reqCount).length;
     const hiddenCount = st.cocktails.filter(c => !this.isAvailable(c)).length;
+    const themeDir = this.THEMES[st.direction] || this.THEMES.herbarium;
+    const logoSrc = themeDir.logo || 'assets/logo.png';
+    const themeChip = (active) => ({ fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'6px 13px', cursor:'pointer', border:'1px solid '+(active?'var(--accent)':'var(--pill-line)'), background: active?'var(--accent)':'var(--field)', color: active?'var(--accent-ink)':'var(--ink-soft)' });
+    const themeOptions = [['auto','Auto'],['herbarium','Default'],['halloween','Halloween'],['christmas','Christmas'],['birthday','Birthday']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.serverTheme===p[0]), onSelect: () => this.setTheme(p[0]) }));
+    const themeAutoNote = 'Auto follows the calendar — now showing ' + ((this.THEMES[this.autoTheme()]||{}).label || 'Default') + '.';
 
     return {
       appStyle,
@@ -926,6 +966,7 @@ class Component extends DCLogic {
       eightySixGroups: eightySixGroups, has86: st.eightySix.length>0, onRestockAll: () => this.restockAll(),
       eightySixStock: (stockTotal - st.eightySix.length) + ' of ' + stockTotal + ' in stock',
       eightySixHidden: hiddenCount + ' drink' + (hiddenCount===1?'':'s') + ' hidden',
+      logoSrc: logoSrc, themeOptions: themeOptions, themeAutoNote: themeAutoNote,
       search: st.search, onSearch: (e) => this.onSearch(e),
       onSurprise: () => this.surprise(),
       onToggleFilters: () => this.toggleFilters(),
