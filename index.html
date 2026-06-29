@@ -72,6 +72,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 5V3H3v2l8 9v5H6v2h12v-2h-5v-5l8-9zM7.43 7L5.66 5h12.69l-1.78 2H7.43z"></path></svg>
         <span data-blabel>The Pass</span><sc-if value="{{ hasOrders }}" hint-placeholder-val=""><span style="{{ ordersBadgeStyle }}">{{ ordersCount }}</span></sc-if>
       </button>
+      <button type="button" onClick="{{ onOpenSettings }}" title="Settings" aria-label="Settings" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:10px 12px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg><sc-if value="{{ hasMyName }}" hint-placeholder-val=""><span>{{ settingsName }}</span></sc-if></button>
     </div>
 
     <sc-if value="{{ hasMyDrinks }}" hint-placeholder-val="">
@@ -208,7 +209,7 @@
     </sc-for>
   </main>
 
-  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpenSettings }}" title="Settings" aria-label="Open settings" style="margin-left:9px;display:inline-flex;align-items:center;gap:5px;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>Settings</button> <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
+  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
 
   <sc-if value="{{ orderModalName }}" hint-placeholder-val="">
     <div data-chrome data-modalwrap onClick="{{ onCloseOrder }}" style="position:fixed;inset:0;z-index:60;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -627,6 +628,27 @@
     </div>
   </sc-if>
 
+  <sc-if value="{{ welcomeOpen }}" hint-placeholder-val="">
+    <div data-chrome data-modalwrap style="position:fixed;inset:0;z-index:64;background:rgba(12,11,8,.62);display:flex;align-items:center;justify-content:center;padding:20px">
+      <div onClick="{{ stop }}" style="width:min(380px,100%);background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.5);padding:24px 22px 20px;text-align:center">
+        <img src="{{ logoSrc }}" alt="The Hollow" style="width:124px;height:auto;margin:0 auto 4px;display:block;filter:drop-shadow(0 6px 18px rgba(20,18,12,.18))">
+        <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">Welcome to</div>
+        <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:24px;margin:3px 0 5px;color:var(--ink,#ECE7D7)">The Hollow</h2>
+        <p style="font-size:13px;line-height:1.5;color:var(--ink-soft,#B7B3A1);margin:0 0 16px">Set yourself up — or skip and dive into the menu.</p>
+        <input type="text" value="{{ welcomeName }}" onChange="{{ onWelcomeName }}" autocomplete="name" placeholder="Your name (optional)" style="width:100%;box-sizing:border-box;text-align:center;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:11px 13px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin:16px 0 7px">Appearance</div>
+        <div style="display:flex;gap:7px;justify-content:center">
+          <button type="button" onClick="{{ onSetLight }}" style="{{ appearanceLightStyle }}">Light</button>
+          <button type="button" onClick="{{ onSetDark }}" style="{{ appearanceDarkStyle }}">Dark</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button type="button" onClick="{{ onWelcomeSkip }}" style="flex:1;font-size:13px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px;cursor:pointer">Skip</button>
+          <button type="button" onClick="{{ onWelcomeSave }}" style="flex:1;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px;cursor:pointer">Save &amp; enter</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ showTop }}" hint-placeholder-val="">
     <button type="button" data-chrome onClick="{{ onScrollTop }}" aria-label="Back to top" style="position:fixed;right:18px;bottom:24px;z-index:50;width:46px;height:46px;border-radius:999px;border:1px solid var(--pill-line,#B9C6AC);background:var(--accent,#2F3D2C);color:var(--accent-ink,#F4F1E6);box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" style-hover="filter:brightness(1.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg></button>
   </sc-if>
@@ -654,7 +676,7 @@ class Component extends DCLogic {
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
       ledgerOpen: false, ledgerRows: [], ledgerNightStart: '', ledgerNow: '', ledgerScope: 'tonight',
-      settingsOpen: false, myName: '',
+      settingsOpen: false, myName: '', welcomeOpen: false, welcomeName: '',
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -700,6 +722,7 @@ class Component extends DCLogic {
     try { const cp = localStorage.getItem('hollow_chime'); if (cp) this.setState({ chimePref: cp }); } catch(e){}
     try { const dk = localStorage.getItem('hollow_dark'); if (dk != null) this.setState({ dark: dk === '1' }); } catch(e){}
     try { const nm = localStorage.getItem('hollow_name_v1'); if (nm) this.setState({ myName: nm }); } catch(e){}
+    try { if (!localStorage.getItem('hollow_welcomed') && !localStorage.getItem('hollow_name_v1')) this.setState({ welcomeOpen: true }); } catch(e){}
     this.refreshState();
     this.openStream();
     this._onScroll = () => { const v = (window.scrollY || window.pageYOffset || 0) > 400; if (v !== this.state.showTop) this.setState({ showTop: v }); };
@@ -894,6 +917,9 @@ class Component extends DCLogic {
   onMyName(e){ const v = (e.target.value || '').slice(0,60); this.setState({ myName: v }); try { localStorage.setItem('hollow_name_v1', v); } catch(_){} }
   setDark(v){ try { localStorage.setItem('hollow_dark', v ? '1' : '0'); } catch(_){} this.setState({ dark: !!v }); }
   resetMyData(){ try { if (!window.confirm('Clear this device’s saved name, preferences, and tab?')) return; } catch(_){} try { ['hollow_name_v1','hollow_chime','hollow_dark','hollow_mine_v1'].forEach(k => localStorage.removeItem(k)); } catch(_){} this._mine = []; this.setState({ myName:'', chimePref:'auto', dark:true, draftGuest:'' }); this.refreshState(); this.flashToast('Reset ✓', 1600); }
+  onWelcomeName(e){ this.setState({ welcomeName: (e.target.value || '').slice(0,60) }); }
+  welcomeSave(){ const v = (this.state.welcomeName || '').trim(); if (v){ this.setState({ myName: v }); try { localStorage.setItem('hollow_name_v1', v); } catch(_){} } try { localStorage.setItem('hollow_welcomed','1'); } catch(_){} this.setState({ welcomeOpen:false }); }
+  welcomeSkip(){ try { localStorage.setItem('hollow_welcomed','1'); } catch(_){} this.setState({ welcomeOpen:false }); }
   toggle86(ing, makeOut){ this.setState(s => { const set=new Set(s.eightySix); if (makeOut) set.add(ing); else set.delete(ing); return { eightySix:[...set] }; }); this.api('POST','/api/86',{ ingredient:ing, out:makeOut, code:'5352' }).then(()=>this.refreshState()).catch(()=>{ this.flashToast('Could not reach the bar',2000); this.refreshState(); }); }
   restockAll(){ this.setState({ eightySix: [] }); this.api('POST','/api/86/restock',{ code:'5352' }).then(()=>this.refreshState()).catch(()=>this.refreshState()); }
   onLogoDown(){ clearTimeout(this._logoT); this._logoT = setTimeout(()=>this.openEightySix(), 1500); }
@@ -969,7 +995,7 @@ class Component extends DCLogic {
     const dir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const pal = st.dark ? dir.dark : dir.light;
     try { document.documentElement.style.background = pal.bg; document.body.style.background = pal.bg; } catch(e){}
-    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.ledgerOpen || st.settingsOpen);
+    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.ledgerOpen || st.settingsOpen || st.welcomeOpen);
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
     const meta = dir.meta;
@@ -1278,8 +1304,10 @@ class Component extends DCLogic {
       darkIconPath: st.dark ? sunPath : moonPath,
       settingsOpen: st.settingsOpen, onOpenSettings: () => this.openSettings(), onCloseSettings: () => this.closeSettings(),
       myName: st.myName, onMyName: (e) => this.onMyName(e), noMyDrinks: myDrinks.length===0,
+      hasMyName: !!(st.myName && st.myName.trim()), settingsName: (st.myName||'').trim().split(/\s+/)[0] || '',
       appearanceLightStyle: themeChip(!st.dark), appearanceDarkStyle: themeChip(st.dark),
       onSetLight: () => this.setDark(false), onSetDark: () => this.setDark(true), onResetMyData: () => this.resetMyData(),
+      welcomeOpen: st.welcomeOpen, welcomeName: st.welcomeName, onWelcomeName: (e) => this.onWelcomeName(e), onWelcomeSave: () => this.welcomeSave(), onWelcomeSkip: () => this.welcomeSkip(),
       onToggleOrders: () => this.toggleOrders(),
       ordersOpen: st.ordersOpen, hasOrders: activeCount > 0, ordersCount: String(activeCount),
       ordersBadgeStyle, ordersSummary,
