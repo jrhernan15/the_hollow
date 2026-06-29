@@ -422,7 +422,7 @@ class Component extends DCLogic {
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
     };
     this.GROUPS = [
-      { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo'] },
+      { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
       { key:'tags',     label:'Flavor',   mode:'and', order:['Spirit-forward','Bitter','Sour/Tart','Sweet','Herbal','Floral','Citrus','Fruity','Refreshing/Long','Creamy/Rich'] },
     ];
     this.THEMES = {
@@ -662,7 +662,7 @@ class Component extends DCLogic {
     const totalCount = st.cocktails.length;
     const shownCount = visible.length;
 
-    const ICONS = { gin:1, bourbon:1, rye:1, tequila:1, rum:1, vodka:1, cognac:1, aperitivo:1 };
+    const ICONS = { gin:1, bourbon:1, rye:1, tequila:1, rum:1, vodka:1, cognac:1, aperitivo:1, thc:1 };
     let counter = 0;
     const mkCard = (c) => {
       counter++;
