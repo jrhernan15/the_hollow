@@ -67,6 +67,7 @@
         <input type="search" value="{{ search }}" onChange="{{ onSearch }}" autocomplete="off" placeholder="Search drinks or ingredients…" style="width:100%;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink,#262420);background:var(--field,#FBF9F3);border:1px solid var(--line,#DDD6C7);border-radius:11px;padding:11px 14px 11px 38px;outline:none;transition:border-color .15s ease,box-shadow .15s ease" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
       </div>
       <button type="button" data-surprise onClick="{{ onSurprise }}" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:10px 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><span style="font-size:13px">✦</span>Surprise me</button>
+      <button type="button" onClick="{{ onOpenLedger }}" title="The Ledger" aria-label="Open The Ledger" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:10px 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 13h4v7H4zm6-9h4v16h-4zm6 5h4v11h-4z"></path></svg>Ledger</button>
       <button type="button" onClick="{{ onToggleDark }}" title="Toggle dark mode" aria-label="Toggle dark mode" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;flex:none;border-radius:11px;border:1px solid var(--pill-line,#B9C6AC);background:var(--field,#FBF9F3);color:var(--ink-soft,#5C584D);cursor:pointer;font-size:16px;line-height:1" style-hover="border-color:var(--accent);color:var(--ink)"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="{{ darkIconPath }}"></path></svg></button>
       <button type="button" data-ordersbtn onClick="{{ onToggleOrders }}" title="The Pass" aria-label="Open The Pass" style="position:relative;font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:10px 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 5V3H3v2l8 9v5H6v2h12v-2h-5v-5l8-9zM7.43 7L5.66 5h12.69l-1.78 2H7.43z"></path></svg>
@@ -208,7 +209,7 @@
     </sc-for>
   </main>
 
-  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpenLedger }}" aria-label="The Ledger — drink stats" title="The Ledger" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The Ledger</button> <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
+  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
 
   <sc-if value="{{ orderModalName }}" hint-placeholder-val="">
     <div data-chrome data-modalwrap onClick="{{ onCloseOrder }}" style="position:fixed;inset:0;z-index:60;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -437,6 +438,7 @@
           <button type="button" onClick="{{ on86TabIng }}" style="{{ tab86IngStyle }}">Ingredients</button>
           <button type="button" onClick="{{ on86TabDrinks }}" style="{{ tab86DrinkStyle }}">Drinks</button>
           <button type="button" onClick="{{ on86TabTheme }}" style="{{ tab86ThemeStyle }}">Theme</button>
+          <button type="button" onClick="{{ on86TabLedger }}" style="{{ tab86LedgerStyle }}">Ledger</button>
         </div>
         <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:4px 16px 16px">
           <sc-if value="{{ tab86IsIng }}" hint-placeholder-val="{{ true }}">
@@ -487,6 +489,15 @@
                   <button type="button" onClick="{{ ch.onSelect }}" style="{{ ch.style }}">{{ ch.label }}</button>
                 </sc-for>
               </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tab86IsLedger }}" hint-placeholder-val="">
+            <div style="margin:10px 0 2px">
+              <div style="font-size:12.5px;color:var(--ink-soft,#B7B3A1);line-height:1.5;margin-bottom:14px">Controls for <b style="color:var(--ink,#ECE7D7)">The Ledger</b> — the public stats page.</div>
+              <button type="button" onClick="{{ onNewNight }}" style="width:100%;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:12px;cursor:pointer">Start a new night</button>
+              <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin:7px 2px 18px;line-height:1.45">Resets the “Tonight” tally to zero. All-time totals are kept.</div>
+              <button type="button" onClick="{{ onClearHistory }}" style="width:100%;font-size:13px;font-weight:600;color:#CC7A6A;background:transparent;border:1px solid #6E4A44;border-radius:11px;padding:12px;cursor:pointer">Clear all-time stats</button>
+              <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin:7px 2px 0;line-height:1.45">Erases the entire history for everyone. This cannot be undone.</div>
             </div>
           </sc-if>
         </div>
@@ -577,12 +588,6 @@
             <div style="text-align:center;color:var(--ink-faint,#827E6D);font-size:13.5px;line-height:1.6;padding:40px 16px">No drinks poured yet.<br>Mark a round <b style="color:var(--accent2,#CFA267)">Ready</b> on The Pass and it'll show up here.</div>
           </sc-if>
         </div>
-        <sc-if value="{{ ledgerStaff }}" hint-placeholder-val="">
-          <footer style="padding:12px 16px;border-top:1px solid var(--card-border,#2D3422);display:flex;gap:10px">
-            <button type="button" onClick="{{ onNewNight }}" style="flex:1;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px;cursor:pointer">Start a new night</button>
-            <button type="button" onClick="{{ onClearHistory }}" style="font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px 14px;cursor:pointer">Clear all-time</button>
-          </footer>
-        </sc-if>
       </aside>
     </div>
   </sc-if>
@@ -1264,10 +1269,10 @@ class Component extends DCLogic {
       onGateInput: (e) => this.onGateInput(e), onSubmitGate: () => this.submitGate(), onCloseGate: () => this.closeGate(),
       pantryOpen: st.pantryOpen, onClose86: () => this.close86(),
       eightySixGroups: eightySixGroups, has86: st.eightySix.length>0, onRestockAll: () => this.restockAll(),
-      tab86IsIng: st.eightySixTab==='ingredients', tab86IsDrinks: st.eightySixTab==='drinks', tab86IsTheme: st.eightySixTab==='theme',
-      tab86IngStyle: tabStyle(st.eightySixTab==='ingredients'), tab86DrinkStyle: tabStyle(st.eightySixTab==='drinks'), tab86ThemeStyle: tabStyle(st.eightySixTab==='theme'),
-      on86TabIng: () => this.set86Tab('ingredients'), on86TabDrinks: () => this.set86Tab('drinks'), on86TabTheme: () => this.set86Tab('theme'),
-      show86Footer: st.eightySix.length>0 && st.eightySixTab!=='theme',
+      tab86IsIng: st.eightySixTab==='ingredients', tab86IsDrinks: st.eightySixTab==='drinks', tab86IsTheme: st.eightySixTab==='theme', tab86IsLedger: st.eightySixTab==='ledger',
+      tab86IngStyle: tabStyle(st.eightySixTab==='ingredients'), tab86DrinkStyle: tabStyle(st.eightySixTab==='drinks'), tab86ThemeStyle: tabStyle(st.eightySixTab==='theme'), tab86LedgerStyle: tabStyle(st.eightySixTab==='ledger'),
+      on86TabIng: () => this.set86Tab('ingredients'), on86TabDrinks: () => this.set86Tab('drinks'), on86TabTheme: () => this.set86Tab('theme'), on86TabLedger: () => this.set86Tab('ledger'),
+      show86Footer: st.eightySix.length>0 && st.eightySixTab!=='theme' && st.eightySixTab!=='ledger',
       eightySixStock: (stockTotal - outIngredients) + ' of ' + stockTotal + ' in stock',
       eightySixHidden: hiddenCount + ' drink' + (hiddenCount===1?'':'s') + ' hidden',
       drinkGroups: drinkGroups, drink86Note: drink86Count===0 ? 'All drinks on the menu.' : (drink86Count + ' drink' + (drink86Count===1?'':'s') + ' 86’d.'),
