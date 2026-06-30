@@ -309,9 +309,19 @@
                   <span style="flex:1"></span>
                   <span style="{{ b.statusStyle }}">{{ b.statusLabel }}</span>
                 </div>
-                <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:16px;color:var(--ink,#ECE7D7);line-height:1.35;margin-top:7px">{{ b.summary }}</div>
-                <div style="display:flex;align-items:center;gap:9px;margin-top:6px;font-size:11.5px;color:var(--ink-faint,#827E6D)"><span>{{ b.countLabel }}</span><sc-if value="{{ b.hasFor }}" hint-placeholder-val=""><span style="width:3px;height:3px;border-radius:999px;background:var(--ink-faint,#827E6D)"></span><span style="color:var(--ink-soft,#B7B3A1)">{{ b.forLabel }}</span></sc-if></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+                <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.04em;color:var(--ink-faint,#827E6D);margin-top:7px">{{ b.headline }}</div>
+                <div style="margin-top:5px">
+                  <sc-for list="{{ b.lines }}" as="L" hint-placeholder-count="1">
+                    <div style="{{ L.lineStyle }}">
+                      <span style="{{ L.markStyle }}">{{ L.markChar }}</span>
+                      <span style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:15.5px;color:var(--ink,#ECE7D7)">{{ L.label }}</span>
+                      <span style="flex:1"></span>
+                      <sc-if value="{{ L.hasFor }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ L.forLabel }}</span></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:7px">{{ b.progressLabel }}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:11px">
                   <button type="button" onClick="{{ b.onOpen }}" style="font-size:12.5px;font-weight:600;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:999px;padding:7px 15px;cursor:pointer">Open &amp; make</button>
                   <span style="flex:1"></span>
                   <button type="button" onClick="{{ b.onRemove }}" aria-label="Remove round" style="font-size:12px;font-weight:600;color:var(--ink-faint,#827E6D);background:transparent;border:none;cursor:pointer;padding:5px 6px">Remove</button>
@@ -396,11 +406,11 @@
           <footer style="padding:12px 16px;border-top:1px solid var(--card-border,#2D3422);display:flex;gap:10px">
             <button type="button" onClick="{{ onMakeRemove }}" style="font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px 16px;cursor:pointer">Remove round</button>
             <span style="flex:1"></span>
-            <sc-if value="{{ makeCanReopen }}" hint-placeholder-val="">
+            <sc-if value="{{ makeAllMade }}" hint-placeholder-val="">
               <button type="button" onClick="{{ onMakeReopen }}" style="font-size:13px;font-weight:600;color:var(--accent,#A6BB8E);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px 18px;cursor:pointer">Reopen</button>
             </sc-if>
-            <sc-if value="{{ makeIsMaking }}" hint-placeholder-val="{{ true }}">
-              <button type="button" onClick="{{ onMakeMarkReady }}" style="font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent2,#CFA267);border:none;border-radius:11px;padding:11px 20px;cursor:pointer">Mark ready</button>
+            <sc-if value="{{ makeNotAllMade }}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{ onMakeMarkAll }}" style="font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent2,#CFA267);border:none;border-radius:11px;padding:11px 20px;cursor:pointer">Mark all ready</button>
             </sc-if>
           </footer>
         </sc-if>
@@ -793,19 +803,17 @@ class Component extends DCLogic {
   clearSelection(){ this.setState({ selected: {} }); }
   selectAllQueue(){ this.setState(s => { const sel = {}; s.orders.forEach(o => { if (!o.batchId) sel[o.id] = true; }); return { selected: sel }; }); }
 
-  // Fire selected rail tickets into rounds — one round per drink (same-drink batching).
+  // Fire the selected rail tickets together as one round (mixed drinks allowed).
   createBatch(){
     const sel = this.state.selected;
     const chosen = this.state.orders.filter(o => sel[o.id] && !o.batchId);
     if (!chosen.length) return;
-    const byDrink = {};
-    chosen.forEach(o => { (byDrink[o.drink] = byDrink[o.drink] || []).push(Number(o.id)); });
-    const groups = Object.keys(byDrink);
-    Promise.all(groups.map(d => this.api('POST', '/api/rounds', { ticketIds: byDrink[d] })))
+    const ids = chosen.map(o => Number(o.id));
+    this.api('POST', '/api/rounds', { ticketIds: ids })
       .then(() => this.refreshState())
       .catch(() => this.flashToast('Could not fire the round', 2200));
     this.setState({ selected:{}, stationTab:'batches' });
-    this.flashToast(groups.length > 1 ? 'Rounds fired ✓' : 'Round fired ✓', 1800);
+    this.flashToast('Round fired ✓', 1800);
   }
   makeOrderNow(id){
     const o = this.state.orders.find(x => x.id===id); if (!o || o.batchId) return;
@@ -815,7 +823,12 @@ class Component extends DCLogic {
   }
   openMake(kind, id){ this.setState({ makeView: { kind, id } }); }
   closeMake(){ this.setState({ makeView: null }); }
-  toggleMade(){ /* per-drink check-off not used for same-drink rounds */ }
+  toggleMade(roundId, drink, made){
+    this.unlockAudio();
+    this.api('POST', '/api/rounds/' + roundId + '/mark', { drink: drink, made: made })
+      .then(() => this.refreshState())
+      .catch(() => this.flashToast('Could not update the round', 2000));
+  }
   setBatchStatus(batchId, status){
     this.api('PATCH', '/api/rounds/' + batchId, { status: (status === 'done' ? 'served' : 'working') })
       .then(() => this.refreshState()).catch(() => this.flashToast('Could not update the round', 2000));
@@ -1134,20 +1147,28 @@ class Component extends DCLogic {
     });
     const selCount = Object.keys(st.selected).filter(id => queueOrders.some(o => o.id===id)).length;
 
+    const markStyle = (made) => ({ flex:'none', width:'17px', height:'17px', borderRadius:'999px', border:'1.5px solid '+(made?'var(--accent2)':'var(--pill-line)'), background: made?'var(--accent2)':'transparent', color:'var(--accent-ink)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'11px', lineHeight:1 });
     const batchList = st.batches.map(b => {
       const ords = st.orders.filter(o => o.batchId===b.id);
-      const agg = {}; ords.forEach(o => { agg[o.drink] = (agg[o.drink]||0) + o.qty; });
-      const drinks = Object.keys(agg);
-      const totalDrinks = drinks.reduce((a,d) => a + agg[d], 0);
-      const guests = ords.filter(o => o.guest && o.guest.trim()).map(o => o.guest.trim() + (o.qty>1 ? ' ×'+o.qty : ''));
-      const isDone = b.status === 'done';
+      const byDrink = {}; ords.forEach(o => { (byDrink[o.drink] = byDrink[o.drink] || []).push(o); });
+      const drinks = Object.keys(byDrink);
+      const totalDrinks = ords.reduce((a,o) => a + o.qty, 0);
+      const lines = drinks.map(d => {
+        const list = byDrink[d];
+        const qty = list.reduce((a,o)=>a+o.qty,0);
+        const gs = list.filter(o=>o.guest&&o.guest.trim()).map(o=>o.guest.trim()+(o.qty>1?' ×'+o.qty:''));
+        const made = list.every(o=>o.status==='up');
+        return { drink:d, label: qty + '× ' + d, forLabel: gs.join(', '), hasFor: gs.length>0, made, markStyle: markStyle(made), markChar: made?'✓':'', lineStyle:{ display:'flex', alignItems:'center', gap:'9px', padding:'3px 0', opacity: made?0.55:1 } };
+      });
+      const madeCount = lines.filter(l=>l.made).length;
+      const isReady = b.status==='up' || b.status==='done';
       return {
-        id:b.id, timeLabel: fmtTime(b.ts), title: 'Round · ' + fmtTime(b.ts),
-        summary: drinks.map(d => agg[d] + '× ' + d).join('  ·  '),
-        countLabel: totalDrinks + ' drink' + (totalDrinks===1?'':'s') + ' · ' + drinks.length + ' recipe' + (drinks.length===1?'':'s'),
-        forLabel: guests.length ? 'For ' + guests.join(', ') : '', hasFor: guests.length>0,
-        statusLabel: b.status==='done' ? 'Done' : (b.status==='up' ? 'Ready' : 'Making'), statusStyle: pill(b.status==='done' ? 'done' : (b.status==='up' ? 'up' : 'making')),
-        cardStyle: { background:'var(--card)', border:'1px solid var(--card-border)', borderRadius:'14px', padding:'13px 15px', opacity: (b.status==='up' || isDone) ? 0.66 : 1 },
+        id:b.id, timeLabel: fmtTime(b.ts),
+        headline: 'Round · ' + totalDrinks + ' drink' + (totalDrinks===1?'':'s'),
+        lines: lines,
+        progressLabel: madeCount + ' of ' + drinks.length + ' made',
+        statusLabel: isReady ? 'Ready' : 'Making', statusStyle: pill(isReady ? 'up' : 'making'),
+        cardStyle: { background:'var(--card)', border:'1px solid var(--card-border)', borderRadius:'14px', padding:'13px 15px', opacity: isReady ? 0.72 : 1 },
         onOpen: () => this.openMake('batch', b.id),
         onRemove: () => this.removeBatch(b.id),
       };
@@ -1170,20 +1191,21 @@ class Component extends DCLogic {
         if (b){ const ords = st.orders.filter(o => o.batchId===b.id);
           const agg = {}, notes = {}, forNames = {};
           ords.forEach(o => { agg[o.drink] = (agg[o.drink]||0) + o.qty; if (o.note){ (notes[o.drink] = notes[o.drink]||[]).push((o.guest?o.guest+': ':'') + o.note); } if (o.guest && o.guest.trim()){ (forNames[o.drink] = forNames[o.drink]||[]).push(o.guest.trim() + (o.qty>1?' ×'+o.qty:'')); } });
-          const lines = Object.keys(agg).map(d => { const c = byName[d]; const made = !!(b.made||{})[d]; return {
+          const lines = Object.keys(agg).map(d => { const c = byName[d]; const made = ords.filter(o=>o.drink===d).every(o=>o.status==='up'); return {
             key:b.id+'|'+d, drink:d, qtyLabel:'×'+agg[d], glass:c?c.glass:'', garnish:c?c.garnish:'',
             specRows: c ? rowsOf(scaleSpec(c.spec, agg[d])) : [], steps: c?c.steps:[],
-            notesList: notes[d]||[], hasNotes: !!(notes[d]&&notes[d].length), isBatchLine:false, made,
+            notesList: notes[d]||[], hasNotes: !!(notes[d]&&notes[d].length), isBatchLine:true, made,
             forLabel: (forNames[d]||[]).join(', '), hasFor: !!(forNames[d]&&forNames[d].length),
             checkMark: made ? '✓' : '',
-            boxStyle: { flex:'none', width:'24px', height:'24px', borderRadius:'7px', border:'1.5px solid ' + (made?'var(--accent)':'var(--pill-line)'), background: made?'var(--accent)':'transparent', color:'var(--accent-ink)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'15px', lineHeight:1, cursor:'pointer' },
-            lineStyle:{ background:'var(--card)', border:'1px solid var(--card-border)', borderRadius:'14px', padding:'15px 16px 14px', opacity: made?0.6:1 },
-            onToggleMade: () => this.toggleMade(b.id, d),
+            boxStyle: { flex:'none', width:'24px', height:'24px', borderRadius:'7px', border:'1.5px solid ' + (made?'var(--accent2)':'var(--pill-line)'), background: made?'var(--accent2)':'transparent', color:'var(--accent-ink)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'15px', lineHeight:1, cursor:'pointer' },
+            lineStyle:{ background:'var(--card)', border:'1px solid ' + (made?'var(--accent2)':'var(--card-border)'), borderRadius:'14px', padding:'15px 16px 14px', opacity: made?0.62:1 },
+            onToggleMade: () => this.toggleMade(b.id, d, !made),
           }; });
+          const allMade = lines.length>0 && lines.every(l=>l.made);
           makeData = { kind:'batch', id:b.id, title:'Round · ' + fmtTime(b.ts),
-            subtitle: lines.length + ' recipe' + (lines.length===1?'':'s') + ' · ' + ords.reduce((a,o)=>a+o.qty,0) + ' drinks',
-            isDone: b.status==='done', isMaking: b.status==='making', lines,
-            onMarkReady: () => this.setRoundStatus(b.id, 'up'),
+            subtitle: lines.filter(l=>l.made).length + ' of ' + lines.length + ' made · ' + ords.reduce((a,o)=>a+o.qty,0) + ' drink' + (ords.reduce((a,o)=>a+o.qty,0)===1?'':'s'),
+            allMade: allMade, lines,
+            onMarkAll: () => this.setRoundStatus(b.id, 'up'),
             onReopen: () => this.setRoundStatus(b.id, 'working'),
             onRemove: () => this.removeBatch(b.id) };
         }
@@ -1326,9 +1348,9 @@ class Component extends DCLogic {
       onClearDoneBatches: () => this.clearDoneBatches(), onClearAllOrders: () => this.clearAllOrders(),
       makeOpen: !!makeData, makeData, makeLines: makeData ? makeData.lines : [],
       makeTitle: makeData ? makeData.title : '', makeSubtitle: makeData ? makeData.subtitle : '',
-      makeIsBatch: makeData ? makeData.kind==='batch' : false, makeIsMaking: makeData ? !!makeData.isMaking : false, makeCanReopen: makeData ? (makeData.kind==='batch' && !makeData.isMaking) : false,
+      makeIsBatch: makeData ? makeData.kind==='batch' : false, makeAllMade: makeData ? !!makeData.allMade : false, makeNotAllMade: makeData ? (makeData.kind==='batch' && !makeData.allMade) : false,
       onCloseMake: () => this.closeMake(),
-      onMakeMarkReady: () => { if (makeData && makeData.onMarkReady) makeData.onMarkReady(); },
+      onMakeMarkAll: () => { if (makeData && makeData.onMarkAll) makeData.onMarkAll(); },
       onMakeReopen: () => { if (makeData && makeData.onReopen) makeData.onReopen(); },
       onMakeRemove: () => { if (makeData && makeData.onRemove) makeData.onRemove(); },
       orderModalName: st.orderModalName,

@@ -97,15 +97,23 @@ const Q = {
   nowStr:        db.prepare("SELECT strftime('%Y-%m-%d %H:%M:%f','now') AS t"),
   insertHistory: db.prepare("INSERT INTO history (drink, qty, guest, round_id) VALUES (?,?,?,?)"),
   historyRows:   db.prepare("SELECT drink, qty, guest, round_id, created_at FROM history ORDER BY created_at, id"),
-  historyHasRound: db.prepare("SELECT 1 FROM history WHERE round_id = ? LIMIT 1"),
+  historyHasRoundDrink:    db.prepare("SELECT 1 FROM history WHERE round_id = ? AND drink = ? LIMIT 1"),
+  deleteHistoryRoundDrink: db.prepare("DELETE FROM history WHERE round_id = ? AND drink = ?"),
+  deleteHistoryRound:      db.prepare("DELETE FROM history WHERE round_id = ?"),
   clearHistory:  db.prepare("DELETE FROM history"),
+  markDrinkUp:      db.prepare("UPDATE tickets SET status='up', updated_at=datetime('now') WHERE round_id = ? AND drink = ?"),
+  markDrinkWorking: db.prepare("UPDATE tickets SET status='working', updated_at=datetime('now') WHERE round_id = ? AND drink = ?"),
+  roundNotUpCount:  db.prepare("SELECT COUNT(*) AS n FROM tickets WHERE round_id = ? AND status != 'up'"),
+  roundDrinks:      db.prepare("SELECT DISTINCT drink FROM tickets WHERE round_id = ?"),
+  roundTixByDrink:  db.prepare("SELECT * FROM tickets WHERE round_id = ? AND drink = ?"),
 };
 
-// Log a round's drinks to the persistent Ledger exactly once (deduped by
-// round_id, so re-opening + re-readying a round never double-counts).
-function logRoundToHistory(roundId) {
-  if (Q.historyHasRound.get(roundId)) return;
-  const tix = Q.roundTickets.all(roundId);
+// Log one drink of a round to the Ledger exactly once (deduped by round_id +
+// drink, so re-checking the same drink never double-counts). One row per ticket
+// so each guest is preserved.
+function logRoundDrink(roundId, drink) {
+  if (Q.historyHasRoundDrink.get(roundId, drink)) return;
+  const tix = Q.roundTixByDrink.all(roundId, drink);
   db.transaction(() => {
     for (const t of tix) Q.insertHistory.run(t.drink, t.qty || 1, t.guest_name || null, roundId);
   })();
@@ -188,10 +196,9 @@ const server = http.createServer(async (req, res) => {
       const tix = ids.map((id) => Q.getTicket.get(id)).filter(Boolean);
       if (tix.length !== ids.length) return sendJSON(res, 400, { error: "some tickets not found" });
       if (tix.some((t) => t.status !== "rail")) return sendJSON(res, 409, { error: "all tickets must be on the rail" });
-      const drink = tix[0].drink;
-      if (tix.some((t) => t.drink !== drink)) return sendJSON(res, 409, { error: "a round must be all the same drink" });
+      // A round can hold mixed drinks (a table's order, made together).
       const fire = db.transaction(() => {
-        const rid = Q.insertRound.run(drink, tix.reduce((a, t) => a + (t.qty || 1), 0)).lastInsertRowid;
+        const rid = Q.insertRound.run(tix[0].drink, tix.reduce((a, t) => a + (t.qty || 1), 0)).lastInsertRowid;
         for (const t of tix) Q.fireTicket.run(rid, t.id);
         return rid;
       });
@@ -207,7 +214,23 @@ const server = http.createServer(async (req, res) => {
       const id = Number(m[1]);
       if (!Q.getRound.get(id)) return sendJSON(res, 404, { error: "round not found" });
       db.transaction(() => { Q.setRoundStat.run(status, id); Q.cascade.run(status, id); })();
-      if (status === "up") logRoundToHistory(id);   // poured → record it in the Ledger
+      if (status === "up") { for (const r of Q.roundDrinks.all(id)) logRoundDrink(id, r.drink); }   // poured → Ledger
+      else if (status === "working") { Q.deleteHistoryRound.run(id); }                              // reopened → un-log
+      broadcast();
+      return sendJSON(res, 200, { ...Q.getRound.get(id), tickets: Q.roundTickets.all(id) });
+    }
+
+    // Check off / un-check a single drink within a round (per-drink readiness).
+    if ((m = pathname.match(/^\/api\/rounds\/(\d+)\/mark$/)) && method === "POST") {
+      const b = await readBody(req);
+      const id = Number(m[1]);
+      const drink = str(b.drink, 80);
+      if (!Q.getRound.get(id)) return sendJSON(res, 404, { error: "round not found" });
+      if (!drink) return sendJSON(res, 400, { error: "drink required" });
+      if (b.made) { Q.markDrinkUp.run(id, drink); logRoundDrink(id, drink); }
+      else { Q.markDrinkWorking.run(id, drink); Q.deleteHistoryRoundDrink.run(id, drink); }
+      const allUp = Q.roundNotUpCount.get(id).n === 0;   // whole round ready once every drink is checked
+      Q.setRoundStat.run(allUp ? "up" : "working", id);
       broadcast();
       return sendJSON(res, 200, { ...Q.getRound.get(id), tickets: Q.roundTickets.all(id) });
     }
