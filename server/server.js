@@ -76,13 +76,24 @@ db.exec(`CREATE TABLE IF NOT EXISTS wall (
   created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
 );`);
 // Reactions: one per device (cid) per drink; tap to set/switch/clear.
+// Reactions ("The Verdict"): one row per device (cid) per drink per emoji — multi-select.
 db.exec(`CREATE TABLE IF NOT EXISTS reactions (
   cid        TEXT NOT NULL,
   drink      TEXT NOT NULL,
   emoji      TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now')),
-  PRIMARY KEY (cid, drink)
+  PRIMARY KEY (cid, drink, emoji)
 );`);
+// One-time migration: older DBs keyed reactions by (cid, drink) — one emoji per person.
+// Rebuild with emoji in the primary key so a person can pick more than one.
+{
+  const _ri = db.prepare("PRAGMA table_info(reactions)").all();
+  const _emoji = _ri.find((c) => c.name === "emoji");
+  if (!_emoji || _emoji.pk === 0) {
+    db.exec("DROP TABLE IF EXISTS reactions");
+    db.exec("CREATE TABLE reactions (cid TEXT NOT NULL, drink TEXT NOT NULL, emoji TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now')), PRIMARY KEY (cid, drink, emoji))");
+  }
+}
 
 const Q = {
   insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
@@ -122,8 +133,8 @@ const Q = {
   wallRows:   db.prepare("SELECT id, text, name, created_at FROM wall ORDER BY created_at DESC, id DESC"),
   deleteWall: db.prepare("DELETE FROM wall WHERE id = ?"),
   clearWall:  db.prepare("DELETE FROM wall"),
-  setReaction:    db.prepare("INSERT INTO reactions (cid, drink, emoji) VALUES (?,?,?) ON CONFLICT(cid,drink) DO UPDATE SET emoji=excluded.emoji, created_at=strftime('%Y-%m-%d %H:%M:%f','now')"),
-  clearReaction:  db.prepare("DELETE FROM reactions WHERE cid = ? AND drink = ?"),
+  setReaction:    db.prepare("INSERT OR IGNORE INTO reactions (cid, drink, emoji) VALUES (?,?,?)"),
+  clearReaction:  db.prepare("DELETE FROM reactions WHERE cid = ? AND drink = ? AND emoji = ?"),
   reactionCounts: db.prepare("SELECT drink, emoji, COUNT(*) AS n FROM reactions GROUP BY drink, emoji"),
   clearReactions: db.prepare("DELETE FROM reactions"),
   markDrinkUp:      db.prepare("UPDATE tickets SET status='up', updated_at=datetime('now') WHERE round_id = ? AND drink = ?"),
@@ -420,8 +431,8 @@ const server = http.createServer(async (req, res) => {
     if (pathname === "/api/reactions" && method === "POST") {
       const b = await readBody(req);
       const cid = str(b.cid, 40), drink = str(b.drink, 80), emoji = str(b.emoji, 16);
-      if (!cid || !drink) return sendJSON(res, 400, { error: "cid and drink required" });
-      if (emoji) Q.setReaction.run(cid, drink, emoji); else Q.clearReaction.run(cid, drink);
+      if (!cid || !drink || !emoji) return sendJSON(res, 400, { error: "cid, drink, emoji required" });
+      if (b.on) Q.setReaction.run(cid, drink, emoji); else Q.clearReaction.run(cid, drink, emoji);
       broadcast();
       return sendJSON(res, 200, { ok: true });
     }

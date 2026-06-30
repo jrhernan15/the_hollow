@@ -109,11 +109,9 @@
                   <span style="{{ md.style }}">{{ md.drink }} · {{ md.label }}</span>
                 </sc-if>
                 <sc-if value="{{ md.ready }}" hint-placeholder-val="">
-                  <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--accent2,#CFA267);background:rgba(207,162,103,.12);border-radius:999px;padding:4px 7px 4px 12px">
-                    <span style="font-size:11.5px;font-weight:700;color:var(--accent2,#CFA267);white-space:nowrap">{{ md.drink }} up — rate it</span>
-                    <sc-for list="{{ md.reactions }}" as="rx" hint-placeholder-count="5">
-                      <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
-                    </sc-for>
+                  <span style="display:inline-flex;align-items:center;gap:7px;flex-wrap:wrap;border:1px solid var(--accent2,#CFA267);background:rgba(207,162,103,.12);border-radius:999px;padding:4px 6px 4px 12px">
+                    <span style="font-size:11.5px;font-weight:700;color:var(--accent2,#CFA267);white-space:nowrap">{{ md.drink }} up</span>
+                    <button type="button" onClick="{{ md.verdict.onOpen }}" style="font-size:11px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent2,#CFA267);border:none;border-radius:999px;padding:3px 11px;cursor:pointer;white-space:nowrap">{{ md.verdict.label }}</button>
                   </span>
                 </sc-if>
                 <button type="button" onClick="{{ md.onDismiss }}" aria-label="Dismiss" style="flex:none;width:18px;height:18px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-faint,#827E6D);font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center">×</button>
@@ -121,11 +119,9 @@
             </sc-for>
             <sc-for list="{{ myPastPours }}" as="md" hint-placeholder-count="1">
               <span style="display:inline-flex;align-items:center;gap:4px">
-                <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--card-border,#2D3422);background:var(--card,#1D2217);border-radius:999px;padding:4px 7px 4px 12px">
-                  <span style="font-size:11.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);white-space:nowrap">{{ md.drink }} · rate</span>
-                  <sc-for list="{{ md.reactions }}" as="rx" hint-placeholder-count="5">
-                    <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
-                  </sc-for>
+                <span style="display:inline-flex;align-items:center;gap:7px;flex-wrap:wrap;border:1px solid var(--card-border,#2D3422);background:var(--card,#1D2217);border-radius:999px;padding:4px 6px 4px 12px">
+                  <span style="font-size:11.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);white-space:nowrap">{{ md.drink }}</span>
+                  <button type="button" onClick="{{ md.verdict.onOpen }}" style="font-size:11px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:3px 11px;cursor:pointer;white-space:nowrap">{{ md.verdict.label }}</button>
                 </span>
                 <button type="button" onClick="{{ md.onDismiss }}" aria-label="Dismiss" style="flex:none;width:18px;height:18px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-faint,#827E6D);font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center">×</button>
               </span>
@@ -254,11 +250,10 @@
               <p style="font-size:13px;color:var(--ink-soft,#5C584D);font-style:italic;line-height:1.55;margin:0">{{ c.history }}</p>
             </div>
             <div style="margin-top:14px;font-size:12px;color:var(--ink-soft,#5C584D);background:var(--pill-bg,rgba(126,144,112,.08));border-left:2.5px solid var(--accent,#2F3D2C);border-radius:0 8px 8px 0;padding:9px 12px;line-height:1.5"><b style="color:var(--accent,#2F3D2C);font-weight:600">Source note —</b> {{ c.note }}</div>
-            <div style="margin-top:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2,#AD7C44);font-weight:600">Rate it</span>
-              <sc-for list="{{ c.reactions }}" as="rx" hint-placeholder-count="5">
-                <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:12px;color:var(--ink-soft,#5C584D);font-variant-numeric:tabular-nums">{{ rx.count }}</span></sc-if></button>
-              </sc-for>
+            <div style="margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2,#AD7C44);font-weight:600">The Verdict</span>
+              <sc-for list="{{ c.verdict.tally }}" as="t" hint-placeholder-count="0"><span style="font-size:15px;line-height:1">{{ t.emoji }}<span style="font-size:11px;color:var(--ink-faint,#827E6D);margin-left:2px;vertical-align:1px">{{ t.count }}</span></span></sc-for>
+              <button type="button" onClick="{{ c.verdict.onOpen }}" style="font-size:12px;font-weight:600;color:var(--accent2,#AD7C44);background:none;border:1px solid var(--accent2,#AD7C44);border-radius:999px;padding:4px 13px;cursor:pointer">{{ c.verdict.label }}</button>
             </div>
           </div>
         </article>
@@ -755,10 +750,9 @@
                     <span style="font-size:14px;color:var(--ink,#ECE7D7)">{{ p.drink }}</span>
                     <span style="font-size:11px;color:var(--ink-faint,#827E6D)">{{ p.time }}</span>
                   </div>
-                  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">
-                    <sc-for list="{{ p.reactions }}" as="rx" hint-placeholder-count="5">
-                      <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:12px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
-                    </sc-for>
+                  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:9px">
+                    <sc-for list="{{ p.verdict.tally }}" as="t" hint-placeholder-count="0"><span style="font-size:15px;line-height:1">{{ t.emoji }}<span style="font-size:11px;color:var(--ink-faint,#827E6D);margin-left:2px;vertical-align:1px">{{ t.count }}</span></span></sc-for>
+                    <button type="button" onClick="{{ p.verdict.onOpen }}" style="font-size:11.5px;font-weight:600;color:var(--accent2,#CFA267);background:none;border:1px solid var(--accent2,#CFA267);border-radius:999px;padding:4px 12px;cursor:pointer">{{ p.verdict.label }}</button>
                   </div>
                 </div>
               </sc-for>
@@ -831,6 +825,29 @@
     <button type="button" data-chrome onClick="{{ onScrollTop }}" aria-label="Back to top" style="position:fixed;right:18px;bottom:24px;z-index:50;width:46px;height:46px;border-radius:999px;border:1px solid var(--pill-line,#B9C6AC);background:var(--accent,#2F3D2C);color:var(--accent-ink,#F4F1E6);box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" style-hover="filter:brightness(1.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg></button>
   </sc-if>
 
+  <sc-if value="{{ verdictOpen }}" hint-placeholder-val="">
+    <div data-chrome onClick="{{ onCloseVerdict }}" style="position:fixed;inset:0;z-index:68;background:rgba(12,11,8,.55);display:flex;align-items:flex-end;justify-content:center">
+      <div onClick="{{ stop }}" style="width:min(460px,100%);background:var(--bg2,#1A1E14);border:1px solid var(--card-border,#2D3422);border-bottom:none;border-radius:18px 18px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.4);padding:16px 16px calc(20px + env(safe-area-inset-bottom))">
+        <div style="width:36px;height:4px;border-radius:999px;background:var(--card-border,#2D3422);margin:0 auto 14px"></div>
+        <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:20px;color:var(--ink,#ECE7D7);text-align:center">{{ verdictTitle }}</div>
+        <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);text-align:center;margin-top:3px">Tap all that fit — they're not either/or</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px">
+          <sc-for list="{{ verdictOptions }}" as="o" hint-placeholder-count="5">
+            <button type="button" onClick="{{ o.onTap }}" style="{{ o.tileStyle }}">
+              <span style="font-size:23px;line-height:1">{{ o.emoji }}</span>
+              <span style="{{ o.labelStyle }}">{{ o.label }}</span>
+              <span style="font-size:11px;color:var(--ink-faint,#827E6D)">{{ o.count }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px">
+          <span style="font-size:11.5px;color:var(--ink-faint,#827E6D)">{{ verdictPicks }}</span>
+          <button type="button" onClick="{{ onCloseVerdict }}" style="font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:10px;padding:8px 22px;cursor:pointer">Done</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ bartenderAlert }}" hint-placeholder-val="">
     <div data-chrome onClick="{{ onOpenOrdersFromAlert }}" style="position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:72;background:var(--accent2,#CFA267);color:#13160F;padding:13px 20px;border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.34);font-size:13.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;width:min(440px,calc(100vw - 24px));box-sizing:border-box">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path></svg>
@@ -862,7 +879,7 @@ class Component extends DCLogic {
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
       ledgerOpen: false, ledgerRows: [], ledgerNightStart: '', ledgerNow: '', ledgerScope: 'tonight',
       settingsOpen: false, myName: '', welcomeOpen: false, welcomeName: '', confirm: null,
-      bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false,
+      bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false, verdictDrink: null,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
       bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
     };
@@ -1182,13 +1199,17 @@ class Component extends DCLogic {
   setBookScope(s){ this.setState({ bookScope:s, wallScope:s, ledgerScope:s }); }
   _cid(){ let c=null; try { c = localStorage.getItem('hollow_cid'); if (!c){ c = 'c' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); localStorage.setItem('hollow_cid', c); } } catch(e){ c = this.__cid || (this.__cid = 'c' + Math.random().toString(36).slice(2)); } return c; }
   react(drink, emoji){
-    let myRx = {}; try { myRx = JSON.parse(localStorage.getItem('hollow_reactions') || '{}') || {}; } catch(e){}
-    const next = (myRx[drink] === emoji) ? '' : emoji;
-    if (next) myRx[drink] = next; else delete myRx[drink];
-    try { localStorage.setItem('hollow_reactions', JSON.stringify(myRx)); } catch(e){}
+    let m = {}; try { m = JSON.parse(localStorage.getItem('hollow_reactions') || '{}') || {}; } catch(e){}
+    if (typeof m[drink] === 'string') m[drink] = m[drink] ? { [m[drink]]: true } : {};   // migrate old single value
+    if (!m[drink] || typeof m[drink] !== 'object') m[drink] = {};
+    const on = !m[drink][emoji];
+    if (on) m[drink][emoji] = true; else delete m[drink][emoji];
+    try { localStorage.setItem('hollow_reactions', JSON.stringify(m)); } catch(e){}
     this.forceUpdate();
-    this.api('POST', '/api/reactions', { cid: this._cid(), drink: drink, emoji: next }).then(() => this.refreshState()).catch(()=>{});
+    this.api('POST', '/api/reactions', { cid: this._cid(), drink: drink, emoji: emoji, on: on }).then(() => this.refreshState()).catch(()=>{});
   }
+  openVerdict(drink){ this.setState({ verdictDrink: drink }); }
+  closeVerdict(){ this.setState({ verdictDrink: null }); }
   fetchHistory(){ fetch('/api/history').then(r=>r.json()).then(d=>{ this.setState({ ledgerRows: Array.isArray(d.rows)?d.rows:[], ledgerNightStart: d.nightStart||'', ledgerNow: d.now||'' }); }).catch(()=>{}); }
   newNight(){ this.api('POST','/api/history/new-night',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not start a new night',2000)); }
   clearHistory(){ try { if (!window.confirm('Clear all-time stats? This erases the whole history and cannot be undone.')) return; } catch(e){} this.api('POST','/api/history/clear',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not clear stats',2000)); }
@@ -1275,7 +1296,7 @@ class Component extends DCLogic {
     const dir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const pal = st.dark ? dir.dark : dir.light;
     try { document.documentElement.style.background = pal.bg; document.body.style.background = pal.bg; } catch(e){}
-    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.bookOpen || st.settingsOpen || st.welcomeOpen || st.confirm);
+    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.bookOpen || st.settingsOpen || st.welcomeOpen || st.confirm || st.verdictDrink);
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
     const meta = dir.meta;
@@ -1347,12 +1368,15 @@ class Component extends DCLogic {
 
     const ICONS = { gin:1, bourbon:1, rye:1, tequila:1, rum:1, vodka:1, cognac:1, aperitivo:1, thc:1 };
     let counter = 0;
-    const REMOJI = ['🔥','👍','🥴','💀','💩'];
-    let myRx = {}; try { myRx = JSON.parse(localStorage.getItem('hollow_reactions') || '{}') || {}; } catch(e){}
-    const reactionRow = (drink) => { const counts = (st.reactions && st.reactions[drink]) || {}; const mine = myRx[drink]; return REMOJI.map(em => { const active = mine===em; const n = counts[em]||0; return {
-      key: drink+'|'+em, emoji: em, count: String(n), hasCount: n>0, active,
-      style: { display:'inline-flex', alignItems:'center', gap:'4px', fontSize:'15px', lineHeight:1, border:'1px solid '+(active?'var(--accent2)':'var(--pill-line)'), background: active?'rgba(207,162,103,.18)':'transparent', borderRadius:'999px', padding:'4px 9px', cursor:'pointer' },
-      onTap: () => this.react(drink, em) }; }); };
+    const VERDICT = [['🔥','Fire'],['👍','Solid'],['🥴','Woozy'],['💀','Wrecked'],['💩','Nope']];
+    let myReax = {}; try { myReax = JSON.parse(localStorage.getItem('hollow_reactions') || '{}') || {}; } catch(e){}
+    { let _ch=false; Object.keys(myReax).forEach(d => { if (typeof myReax[d] === 'string') { myReax[d] = myReax[d] ? { [myReax[d]]: true } : {}; _ch=true; } if (!myReax[d] || typeof myReax[d] !== 'object') myReax[d] = {}; }); if (_ch) { try { localStorage.setItem('hollow_reactions', JSON.stringify(myReax)); } catch(e){} } }
+    const verdictFor = (drink) => {
+      const counts = (st.reactions && st.reactions[drink]) || {};
+      const tally = VERDICT.filter(v => (counts[v[0]]||0) > 0).map(v => ({ emoji: v[0], count: String(counts[v[0]]) }));
+      const mineN = Object.keys(myReax[drink] || {}).length;
+      return { onOpen: () => this.openVerdict(drink), tally: tally, hasTally: tally.length>0, label: mineN>0 ? 'Your verdict' : 'How was it?' };
+    };
 
     const mkCard = (c) => {
       counter++;
@@ -1376,7 +1400,7 @@ class Component extends DCLogic {
         rootStyle, detailStyle, signStyle, iconStyle,
         onToggle: () => this.toggleOpen(c.name),
         onOrder: () => this.openOrder(c.name),
-        reactions: reactionRow(c.name),
+        verdict: verdictFor(c.name),
         onKey: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggleOpen(c.name); } },
       };
     };
@@ -1546,11 +1570,11 @@ class Component extends DCLogic {
     // ---- your drinks (per-phone live status strip) ----
     const myLabel = (s) => s==='up' ? 'Ready!' : (s==='working' ? 'Making' : 'On the rail');
     const myPill = (s) => { const up=s==='up', work=s==='working'; return { fontSize:'12px', fontWeight:600, padding:'4px 11px', borderRadius:'999px', whiteSpace:'nowrap', border:'1px solid '+(up?'var(--accent2)':'var(--pill-line)'), background: up?'var(--accent2)':(work?'var(--pill-bg)':'var(--field)'), color: up?'var(--accent-ink)':(work?'var(--pill-ink)':'var(--ink-soft)') }; };
-    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served').sort((a,b)=>a.ts-b.ts).map(o => ({ id: o.id, drink: o.drink + (o.qty>1?' ×'+o.qty:''), name: o.drink, label: myLabel(o.status), style: myPill(o.status), ready: o.status==='up', notReady: o.status!=='up', reactions: o.status==='up' ? reactionRow(o.drink) : [], onDismiss: () => this.dismissTicket(o.id) }));
+    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served').sort((a,b)=>a.ts-b.ts).map(o => ({ id: o.id, drink: o.drink + (o.qty>1?' ×'+o.qty:''), name: o.drink, label: myLabel(o.status), style: myPill(o.status), ready: o.status==='up', notReady: o.status!=='up', verdict: verdictFor(o.drink), onDismiss: () => this.dismissTicket(o.id) }));
     const stripDrinks = myDrinks.filter(d => !st.dismissedTix[d.id]);
     const nightMs = st.serverNightStart ? this.toMs(st.serverNightStart) : 0;
     const _liveNames = {}; st.orders.forEach(o => { if (o.mine && o.status !== 'served') _liveNames[o.drink] = true; });
-    const myPastPours = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs) && !_liveNames[p.drink] && !(st.dismissedPours[p.drink] != null && (p.ts||0) <= st.dismissedPours[p.drink])).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, reactions: reactionRow(p.drink), onDismiss: () => this.dismissPour(p.drink, p.ts) }));
+    const myPastPours = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs) && !_liveNames[p.drink] && !(st.dismissedPours[p.drink] != null && (p.ts||0) <= st.dismissedPours[p.drink])).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, verdict: verdictFor(p.drink), onDismiss: () => this.dismissPour(p.drink, p.ts) }));
     const passArmed = !!st.bartenderMode;
     const passBtnStyle = { position:'relative', fontSize:'13px', fontWeight:600, borderRadius:'11px', padding:'0 14px', cursor:'pointer', whiteSpace:'nowrap', display:'inline-flex', alignItems:'center', gap:'7px', color: passArmed ? 'var(--accent2)' : 'var(--accent)', background: passArmed ? 'rgba(207,162,103,.12)' : 'var(--field)', border: passArmed ? '1px solid var(--accent2)' : '1px solid var(--pill-line)' };
     const outIngredients = st.eightySix.filter(n => n.indexOf('drink:') !== 0).length;
@@ -1624,7 +1648,23 @@ class Component extends DCLogic {
       canDelete: wallStaff, onDelete: () => this.deleteWallPost(p.id) }; });
     const bookTabStyle = (on) => ({ fontFamily:"'Inter',sans-serif", fontSize:'14.5px', fontWeight: on?600:500, color: on ? 'var(--ink)' : 'var(--ink-faint)', background:'transparent', border:'none', borderBottom: on ? '2px solid var(--accent)' : '2px solid transparent', padding:'0 1px 6px', cursor:'pointer', lineHeight:'1' });
     const bookScopeStyle = (on) => ({ fontFamily:"'Inter',sans-serif", fontSize:'11.5px', fontWeight:600, color: on ? 'var(--accent-ink)' : 'var(--ink-soft)', background: on ? 'var(--accent)' : 'transparent', border:'none', borderRadius:'999px', padding:'4px 11px', cursor:'pointer' });
-    const myPourCards = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs)).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, time: fmtTime(p.ts), reactions: reactionRow(p.drink) }));
+    const myPourCards = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs)).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, time: fmtTime(p.ts), verdict: verdictFor(p.drink) }));
+
+    const _vd = st.verdictDrink;
+    let verdictTitle = '', verdictOptions = [], verdictPicks = '';
+    if (_vd) {
+      const _vc = (st.reactions && st.reactions[_vd]) || {};
+      const _vm = myReax[_vd] || {};
+      const _base = { display:'flex', flexDirection:'column', alignItems:'center', gap:'5px', borderRadius:'12px', padding:'12px 3px', cursor:'pointer' };
+      verdictTitle = 'How was the ' + _vd + '?';
+      verdictOptions = VERDICT.map(v => { const em=v[0], label=v[1]; const mine=!!_vm[em]; const n=_vc[em]||0; return {
+        emoji: em, label: label, count: String(n),
+        tileStyle: Object.assign({}, _base, mine ? { background:'rgba(207,162,103,.13)', border:'1.5px solid var(--accent2)' } : { background:'var(--card)', border:'1px solid var(--card-border)' }),
+        labelStyle: { fontSize:'11px', fontWeight:600, color: mine ? 'var(--accent2)' : 'var(--ink)' },
+        onTap: () => this.react(_vd, em) }; });
+      const _picks = VERDICT.filter(v => _vm[v[0]]).map(v => v[1]);
+      verdictPicks = _picks.length ? ('You picked ' + _picks.join(' + ')) : 'Tap all that fit';
+    }
 
     return {
       appStyle,
@@ -1645,6 +1685,7 @@ class Component extends DCLogic {
       welcomeOpen: st.welcomeOpen, welcomeName: st.welcomeName, onWelcomeName: (e) => this.onWelcomeName(e), onWelcomeSave: () => this.welcomeSave(), onWelcomeSkip: () => this.welcomeSkip(),
       confirmOpen: !!st.confirm, confirmTitle: st.confirm ? st.confirm.title : '', confirmBody: st.confirm ? st.confirm.body : '', confirmLabel: st.confirm ? st.confirm.label : 'Confirm',
       onCloseConfirm: () => this.closeConfirm(), onDoConfirm: () => this.doConfirm(),
+      verdictOpen: !!st.verdictDrink, verdictTitle: verdictTitle, verdictOptions: verdictOptions, verdictPicks: verdictPicks, onCloseVerdict: () => this.closeVerdict(),
       bartenderMode: st.bartenderMode, onToggleBartender: () => this.toggleBartender(),
       bartenderArmed: passArmed, passBtnStyle: passBtnStyle, passTitle: passArmed ? 'The Pass · on duty' : 'The Pass',
       bartenderRibbon: passArmed && !st.bmBannerDismissed, onDismissRibbon: () => this.dismissRibbon(), onTurnOffBartender: () => this.toggleBartender(),
