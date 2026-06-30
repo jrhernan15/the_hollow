@@ -21,6 +21,8 @@
   input[type=search]::-webkit-search-cancel-button{cursor:pointer;}
   [data-toolbar] > button{height:40px;}
   @keyframes hollowPulse{0%{box-shadow:0 0 0 0 var(--accent);}100%{box-shadow:0 0 0 10px transparent;}}
+  .bmdot{width:7px;height:7px;border-radius:50%;background:var(--accent2,#CFA267);flex:none;animation:bmPulse 1.9s ease-out infinite;}
+  @keyframes bmPulse{0%{box-shadow:0 0 0 0 rgba(207,162,103,.5);}70%{box-shadow:0 0 0 6px rgba(207,162,103,0);}100%{box-shadow:0 0 0 0 rgba(207,162,103,0);}}
 
   @media (max-width: 600px){
     [data-header]{padding-top:22px !important;}
@@ -75,13 +77,23 @@
         <input type="search" value="{{ search }}" onChange="{{ onSearch }}" autocomplete="off" placeholder="Search drinks or ingredients…" style="width:100%;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink,#262420);background:var(--field,#FBF9F3);border:1px solid var(--line,#DDD6C7);border-radius:11px;padding:11px 14px 11px 38px;outline:none;transition:border-color .15s ease,box-shadow .15s ease" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
       </div>
       <button type="button" data-surprise onClick="{{ onSurprise }}" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 12px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18zm0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9z"></path></svg>Surprise me</button>
-      <button type="button" data-ordersbtn onClick="{{ onToggleOrders }}" title="The Pass" aria-label="Open The Pass" style="position:relative;font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent)">
+      <button type="button" data-ordersbtn onClick="{{ onToggleOrders }}" title="{{ passTitle }}" aria-label="Open The Pass" style="{{ passBtnStyle }}" style-hover="border-color:var(--accent)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 5V3H3v2l8 9v5H6v2h12v-2h-5v-5l8-9zM7.43 7L5.66 5h12.69l-1.78 2H7.43z"></path></svg>
-        <span data-blabel>The Pass</span><sc-if value="{{ hasOrders }}" hint-placeholder-val=""><span style="{{ ordersBadgeStyle }}">{{ ordersCount }}</span></sc-if>
+        <span data-blabel>The Pass</span><sc-if value="{{ hasOrders }}" hint-placeholder-val=""><span style="{{ ordersBadgeStyle }}">{{ ordersCount }}</span></sc-if><sc-if value="{{ bartenderArmed }}" hint-placeholder-val=""><span class="bmdot" aria-hidden="true"></span></sc-if>
       </button>
       <button type="button" data-ledgerbtn onClick="{{ onOpenBook }}" title="The Book" aria-label="Open The Book" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zM21 18.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"></path></svg><span data-llabel>The Book</span></button>
       <button type="button" data-settingsbtn onClick="{{ onOpenSettings }}" title="Settings" aria-label="Settings" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg><sc-if value="{{ hasMyName }}" hint-placeholder-val=""><span data-slabel>{{ settingsName }}</span></sc-if></button>
     </div>
+
+    <sc-if value="{{ bartenderRibbon }}" hint-placeholder-val="">
+      <div style="max-width:1180px;margin:0 auto;padding:0 18px 10px">
+        <div style="display:flex;align-items:center;gap:9px;background:rgba(207,162,103,.1);border:1px solid rgba(207,162,103,.32);border-radius:11px;padding:8px 12px">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true" style="flex:none;color:var(--accent2,#CFA267)"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path></svg>
+          <span style="flex:1;font-size:12.5px;color:var(--accent2,#CFA267)"><b style="font-weight:700">Bartender mode on</b> — you'll be pinged when a new order comes in</span>
+          <button type="button" onClick="{{ onDismissRibbon }}" aria-label="Dismiss" style="flex:none;background:none;border:none;color:var(--ink-faint,#827E6D);font-size:17px;line-height:1;cursor:pointer;padding:0 2px">×</button>
+        </div>
+      </div>
+    </sc-if>
 
     <sc-if value="{{ hasStrip }}" hint-placeholder-val="">
       <div style="max-width:1180px;margin:0 auto;padding:0 18px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -288,6 +300,13 @@
             </div>
             <button type="button" onClick="{{ onToggleOrders }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
           </div>
+          <sc-if value="{{ bartenderArmed }}" hint-placeholder-val="">
+            <div style="display:flex;align-items:center;gap:9px;margin-top:11px;background:rgba(207,162,103,.1);border:1px solid rgba(207,162,103,.3);border-radius:10px;padding:7px 11px">
+              <span class="bmdot" aria-hidden="true"></span>
+              <span style="flex:1;font-size:12px;color:var(--accent2,#CFA267)">On duty · alerting you to new orders</span>
+              <button type="button" onClick="{{ onTurnOffBartender }}" style="flex:none;font-size:11.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:none;border:1px solid var(--card-border,#2D3422);border-radius:8px;padding:4px 10px;cursor:pointer">Turn off</button>
+            </div>
+          </sc-if>
           <div style="display:flex;gap:20px;margin-top:14px;border-bottom:1px solid var(--card-border,#2D3422)">
             <button type="button" onClick="{{ onTabQueue }}" style="{{ queueTabStyle }}">{{ queueTabLabel }}</button>
             <button type="button" onClick="{{ onTabBatches }}" style="{{ batchTabStyle }}">{{ batchTabLabel }}</button>
@@ -830,7 +849,7 @@ class Component extends DCLogic {
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
       ledgerOpen: false, ledgerRows: [], ledgerNightStart: '', ledgerNow: '', ledgerScope: 'tonight',
       settingsOpen: false, myName: '', welcomeOpen: false, welcomeName: '', confirm: null,
-      bartenderMode: false, bartenderAlert: null,
+      bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
       bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
     };
@@ -878,6 +897,7 @@ class Component extends DCLogic {
     try { const cp = localStorage.getItem('hollow_chime'); if (cp) this.setState({ chimePref: cp }); } catch(e){}
     try { const dk = localStorage.getItem('hollow_dark'); if (dk != null) this.setState({ dark: dk === '1' }); } catch(e){}
     try { this.setState({ bartenderMode: localStorage.getItem('hollow_bartender') === '1' }); } catch(e){}
+    try { this.setState({ bmBannerDismissed: localStorage.getItem('hollow_bm_banner_dismissed') === '1' }); } catch(e){}
     try { this.setState({ myPours: JSON.parse(localStorage.getItem('hollow_myorders_v1') || '[]') || [] }); } catch(e){}
     try { const nm = localStorage.getItem('hollow_name_v1'); if (nm) this.setState({ myName: nm }); } catch(e){}
     try { if (!localStorage.getItem('hollow_welcomed') && !localStorage.getItem('hollow_name_v1')) this.setState({ welcomeOpen: true }); } catch(e){}
@@ -1123,7 +1143,8 @@ class Component extends DCLogic {
   closeGate(){ this.setState({ pantryGate:false, gateErr:false }); }
   close86(){ this.setState({ pantryOpen:false }); }
   set86Tab(t){ this.setState({ eightySixTab: t }); }
-  toggleBartender(){ this.setState(s => { const on = !s.bartenderMode; try { localStorage.setItem('hollow_bartender', on ? '1' : '0'); } catch(e){} if (on) this.unlockAudio(); return { bartenderMode: on, bartenderAlert: on ? s.bartenderAlert : null }; }); }
+  toggleBartender(){ this.setState(s => { const on = !s.bartenderMode; try { localStorage.setItem('hollow_bartender', on ? '1' : '0'); } catch(e){} if (on){ this.unlockAudio(); try { localStorage.removeItem('hollow_bm_banner_dismissed'); } catch(e){} } return { bartenderMode: on, bartenderAlert: on ? s.bartenderAlert : null, bmBannerDismissed: on ? false : s.bmBannerDismissed }; }); }
+  dismissRibbon(){ try { localStorage.setItem('hollow_bm_banner_dismissed', '1'); } catch(e){} this.setState({ bmBannerDismissed: true }); }
   bartenderPing(tickets){ try { this.unlockAudio(); this.playChime('classic'); if (navigator.vibrate) navigator.vibrate([120,60,120]); } catch(e){} const t = tickets[0]; const extra = tickets.length>1 ? (' +'+(tickets.length-1)+' more') : ''; const txt = (t.qty>1?t.qty+'× ':'') + t.drink + (t.guest_name ? ' · ' + t.guest_name : '') + extra; this.setState({ bartenderAlert: txt }); clearTimeout(this._baT); this._baT = setTimeout(() => this.setState({ bartenderAlert: null }), 7000); }
   openOrdersFromAlert(){ this.setState({ bartenderAlert: null, ordersOpen: true, stationTab: 'queue' }); }
   openLedger(){ this.fetchHistory(); this.setState({ ledgerOpen:true, ledgerScope:'tonight' }); }
@@ -1510,6 +1531,8 @@ class Component extends DCLogic {
     const nightMs = st.serverNightStart ? this.toMs(st.serverNightStart) : 0;
     const _liveNames = {}; st.orders.forEach(o => { if (o.mine && o.status !== 'served') _liveNames[o.drink] = true; });
     const myPastPours = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs) && !_liveNames[p.drink]).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, reactions: reactionRow(p.drink) }));
+    const passArmed = !!st.bartenderMode;
+    const passBtnStyle = { position:'relative', fontSize:'13px', fontWeight:600, borderRadius:'11px', padding:'0 14px', cursor:'pointer', whiteSpace:'nowrap', display:'inline-flex', alignItems:'center', gap:'7px', color: passArmed ? 'var(--accent2)' : 'var(--accent)', background: passArmed ? 'rgba(207,162,103,.12)' : 'var(--field)', border: passArmed ? '1px solid var(--accent2)' : '1px solid var(--pill-line)' };
     const outIngredients = st.eightySix.filter(n => n.indexOf('drink:') !== 0).length;
 
     // ---- The Ledger (drink stats) ----
@@ -1603,6 +1626,8 @@ class Component extends DCLogic {
       confirmOpen: !!st.confirm, confirmTitle: st.confirm ? st.confirm.title : '', confirmBody: st.confirm ? st.confirm.body : '', confirmLabel: st.confirm ? st.confirm.label : 'Confirm',
       onCloseConfirm: () => this.closeConfirm(), onDoConfirm: () => this.doConfirm(),
       bartenderMode: st.bartenderMode, onToggleBartender: () => this.toggleBartender(),
+      bartenderArmed: passArmed, passBtnStyle: passBtnStyle, passTitle: passArmed ? 'The Pass · on duty' : 'The Pass',
+      bartenderRibbon: passArmed && !st.bmBannerDismissed, onDismissRibbon: () => this.dismissRibbon(), onTurnOffBartender: () => this.toggleBartender(),
       bartenderPillStyle: st.bartenderMode ? { fontSize:'11.5px', fontWeight:600, color:'var(--accent-ink)', background:'var(--accent)', borderRadius:'999px', padding:'4px 13px' } : { fontSize:'11.5px', fontWeight:600, color:'var(--ink-faint)', background:'transparent', border:'1px solid var(--pill-line)', borderRadius:'999px', padding:'4px 13px' },
       bartenderPillLabel: st.bartenderMode ? 'On' : 'Off',
       bartenderAlert: st.bartenderAlert, onOpenOrdersFromAlert: () => this.openOrdersFromAlert(),
