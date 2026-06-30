@@ -789,7 +789,7 @@ class Component extends DCLogic {
     const name = (this.state.draftGuest || '').trim();
     const note = (this.state.draftNote || '').trim();
     const qty = this.state.draftQty || 1;
-    this.unlockAudio();
+    this.unlockAudio(); this.preloadChime();
     this.api('POST', '/api/tickets', { drink: drink, name: name, notes: note, qty: qty })
       .then(t => { try { this._mine = (this._mine || []).concat(t.id); localStorage.setItem('hollow_mine_v1', JSON.stringify(this._mine)); } catch(e){} this.refreshState(); })
       .catch(() => this.flashToast('Could not reach the bar — try again', 2400));
@@ -877,6 +877,7 @@ class Component extends DCLogic {
     (n.partials || []).forEach(p => { const po = ctx.createOscillator(), pg = ctx.createGain(); po.type = 'sine'; po.frequency.value = n.f * p[0]; pg.gain.setValueAtTime(0.0001, t); pg.gain.exponentialRampToValueAtTime(g0 * p[1], t + (n.atk || 0.008)); pg.gain.exponentialRampToValueAtTime(0.0001, t + dur * (p[2] || 1)); po.connect(pg); pg.connect(ctx.destination); po.start(t); po.stop(t + dur + 0.03); });
   }
   playChime(name){ try {
+    if (this.FILESOUNDS()[name]){ this.playFile(name); return; }
     const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
     const ctx = this._actx || (this._actx = new C()); if (ctx.state === 'suspended') ctx.resume();
     if (name === 'ghost'){ this._playGhost(ctx, ctx.currentTime + 0.03); return; }
@@ -885,6 +886,43 @@ class Component extends DCLogic {
     seq.forEach(n => { this._voice(ctx, t, n); t += (n.gap == null ? (n.dur || 0.25) : n.gap); });
     if (navigator.vibrate) navigator.vibrate(name === 'sleigh' ? [30,30,30,30,30,30] : [70,40,70]);
   } catch(e){} }
+  // Recorded notification sounds (vendored in assets/sounds/, played through the
+  // same unlocked AudioContext so they fire on background 'ready' events).
+  FILESOUNDS(){ return {
+    cricket:      { src:'assets/sounds/cricket.m4a', fadeIn:0.03, fadeOut:0.10, vol:0.90 },
+    jingle:       { src:'assets/sounds/jingle-bells.m4a', fadeIn:0.30, fadeOut:0.55, vol:0.90 },
+    partyhorn:    { src:'assets/sounds/universfield-birthday-party-horn-250238.mp3', fadeIn:0.02, fadeOut:0.12, vol:0.85 },
+    whisper:      { src:'assets/sounds/imagne_impossible-horror-scary-human-whisper-ghost-05-257014.mp3', fadeIn:0.06, fadeOut:0.25, vol:0.92 },
+    hoot:         { src:'assets/sounds/short-hoot.m4a', fadeIn:0.03, fadeOut:0.12, vol:0.90 },
+    scarystrings: { src:'assets/sounds/universfield-scary-string-tension-454849.mp3', fadeIn:0.06, fadeOut:0.30, vol:0.90 },
+    happybday:    { src:'assets/sounds/universfield-happy-birthday-242244.mp3', fadeIn:0.03, fadeOut:0.20, vol:0.90 },
+  }; }
+  _audioCtx(){ try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; const ctx = this._actx || (this._actx = new C()); if (ctx.state === 'suspended') ctx.resume(); return ctx; } catch(e){ return null; } }
+  _loadBuffer(name){
+    const def = this.FILESOUNDS()[name]; const ctx = this._audioCtx(); if (!def || !ctx) return Promise.resolve(null);
+    this._buffers = this._buffers || {}; this._loading = this._loading || {};
+    if (this._buffers[name]) return Promise.resolve(this._buffers[name]);
+    if (this._loading[name]) return this._loading[name];
+    const p = fetch(def.src).then(r => r.arrayBuffer()).then(ab => new Promise((res, rej) => ctx.decodeAudioData(ab, res, rej)))
+      .then(buf => { this._buffers[name] = buf; return buf; }).catch(() => null);
+    this._loading[name] = p; return p;
+  }
+  playFile(name){
+    const def = this.FILESOUNDS()[name]; const ctx = this._audioCtx(); if (!def || !ctx) return;
+    this._loadBuffer(name).then(buf => { if (!buf) return; try {
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const g = ctx.createGain(); src.connect(g); g.connect(ctx.destination);
+      const t0 = ctx.currentTime, dur = buf.duration, vol = (def.vol == null ? 0.9 : def.vol);
+      const fi = Math.min(def.fadeIn || 0.02, dur * 0.45), fo = Math.min(def.fadeOut || 0.05, dur * 0.45);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(vol, t0 + fi);
+      g.gain.setValueAtTime(vol, t0 + Math.max(fi, dur - fo));
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      src.start(t0);
+      if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+    } catch(e){} });
+  }
+  preloadChime(){ try { const name = this.resolveChime(); if (name && this.FILESOUNDS()[name]) this._loadBuffer(name); } catch(e){} }
   _noiseBuffer(ctx, dur){ const n = Math.floor(ctx.sampleRate * dur); const b = ctx.createBuffer(1, n, ctx.sampleRate); const d = b.getChannelData(0); for (let i=0;i<n;i++) d[i] = Math.random()*2-1; return b; }
   _playGhost(ctx, t){
     const dur = 1.5, N = 300, freq = new Float32Array(N);
@@ -901,9 +939,9 @@ class Component extends DCLogic {
     o.start(t); ns.start(t); o.stop(t + dur + 0.05); ns.stop(t + dur + 0.05);
     if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
   }
-  resolveChime(){ const pref = this.state.chimePref || 'auto'; if (pref === 'off') return null; if (pref === 'auto'){ return ({ herbarium:'classic', halloween:'ghost', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'classic'; } return pref; }
+  resolveChime(){ const pref = this.state.chimePref || 'auto'; if (pref === 'off') return null; if (pref === 'auto'){ return ({ herbarium:'cricket', halloween:'whisper', christmas:'jingle', birthday:'partyhorn' })[this.state.direction] || 'cricket'; } return pref; }
   chime(){ const name = this.resolveChime(); if (name) this.playChime(name); }
-  setChime(name){ try { localStorage.setItem('hollow_chime', name); } catch(e){} this.unlockAudio(); this.setState({ chimePref: name }); if (name !== 'off'){ const themed = ({ herbarium:'classic', halloween:'ghost', christmas:'sleigh', birthday:'party' })[this.state.direction] || 'classic'; this.playChime(name === 'auto' ? themed : name); } }
+  setChime(name){ try { localStorage.setItem('hollow_chime', name); } catch(e){} this.unlockAudio(); this.setState({ chimePref: name }); if (name !== 'off'){ const themed = ({ herbarium:'cricket', halloween:'whisper', christmas:'jingle', birthday:'partyhorn' })[this.state.direction] || 'cricket'; this.playChime(name === 'auto' ? themed : name); } }
   removeBatch(batchId){
     this.setState({ makeView: null });
     this.api('DELETE', '/api/rounds/' + batchId).then(() => this.refreshState()).catch(()=>{});
@@ -1248,7 +1286,7 @@ class Component extends DCLogic {
     const themeChip = (active) => ({ fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'6px 13px', cursor:'pointer', border:'1px solid '+(active?'var(--accent)':'var(--pill-line)'), background: active?'var(--accent)':'var(--field)', color: active?'var(--accent-ink)':'var(--ink-soft)' });
     const themeOptions = [['auto','Auto'],['herbarium','Default'],['halloween','Halloween'],['christmas','Christmas'],['birthday','Birthday']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.serverTheme===p[0]), onSelect: () => this.setTheme(p[0]) }));
     const themeAutoNote = 'Auto follows the calendar — now showing ' + ((this.THEMES[this.autoTheme()]||{}).label || 'Default') + '.';
-    const chimeOptions = [['auto','Match theme'],['classic','Classic'],['ghost','Ghost'],['sleigh','Sleigh bells'],['party','Party'],['off','Off']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.chimePref===p[0]), onSelect: () => this.setChime(p[0]) }));
+    const chimeOptions = [['auto','Match theme'],['cricket','Cricket'],['jingle','Jingle bells'],['partyhorn','Party horn'],['whisper','Ghostly whisper'],['hoot','Owl hoot'],['scarystrings','Scary strings'],['happybday','Happy birthday'],['off','Off']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.chimePref===p[0]), onSelect: () => this.setChime(p[0]) }));
     const sunPath = 'M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z';
     const moonPath = 'M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z';
 
