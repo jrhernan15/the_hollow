@@ -891,11 +891,11 @@ class Component extends DCLogic {
   FILESOUNDS(){ return {
     cricket:      { src:'assets/sounds/cricket.m4a', fadeIn:0.03, fadeOut:0.10, vol:0.90 },
     jingle:       { src:'assets/sounds/jingle-bells.m4a', fadeIn:0.30, fadeOut:0.55, vol:0.90 },
-    partyhorn:    { src:'assets/sounds/universfield-birthday-party-horn-250238.mp3', fadeIn:0.02, fadeOut:0.12, vol:0.85 },
-    whisper:      { src:'assets/sounds/imagne_impossible-horror-scary-human-whisper-ghost-05-257014.mp3', fadeIn:0.06, fadeOut:0.25, vol:0.92 },
-    hoot:         { src:'assets/sounds/short-hoot.m4a', fadeIn:0.03, fadeOut:0.12, vol:0.90 },
-    scarystrings: { src:'assets/sounds/universfield-scary-string-tension-454849.mp3', fadeIn:0.06, fadeOut:0.30, vol:0.90 },
-    happybday:    { src:'assets/sounds/universfield-happy-birthday-242244.mp3', fadeIn:0.03, fadeOut:0.20, vol:0.90 },
+    partyhorn:    { src:'assets/sounds/party-horn.mp3', fadeIn:0.02, fadeOut:0.12, vol:0.85 },
+    whisper:      { src:'assets/sounds/ghost-whisper.mp3', fadeIn:0.06, fadeOut:0.25, vol:0.92 },
+    hoot:         { src:'assets/sounds/owl-hoot.m4a', fadeIn:0.03, fadeOut:0.12, vol:0.90 },
+    scarystrings: { src:'assets/sounds/scary-strings.mp3', fadeIn:0.06, fadeOut:0.30, vol:0.90 },
+    happybday:    { src:'assets/sounds/happy-birthday.mp3', fadeIn:0.03, fadeOut:0.20, vol:0.90 },
   }; }
   _audioCtx(){ try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; const ctx = this._actx || (this._actx = new C()); if (ctx.state === 'suspended') ctx.resume(); return ctx; } catch(e){ return null; } }
   _loadBuffer(name){
