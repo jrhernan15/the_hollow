@@ -87,7 +87,17 @@
       <div style="max-width:1180px;margin:0 auto;padding:0 18px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--ink-faint,#8A8474);white-space:nowrap">Your drinks</span>
         <sc-for list="{{ myDrinks }}" as="md" hint-placeholder-count="1">
-          <span style="{{ md.style }}">{{ md.drink }} · {{ md.label }}</span>
+          <sc-if value="{{ md.notReady }}" hint-placeholder-val="{{ true }}">
+            <span style="{{ md.style }}">{{ md.drink }} · {{ md.label }}</span>
+          </sc-if>
+          <sc-if value="{{ md.ready }}" hint-placeholder-val="">
+            <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--accent2,#CFA267);background:rgba(207,162,103,.12);border-radius:999px;padding:4px 7px 4px 12px">
+              <span style="font-size:11.5px;font-weight:700;color:var(--accent2,#CFA267);white-space:nowrap">{{ md.drink }} up — rate it</span>
+              <sc-for list="{{ md.reactions }}" as="rx" hint-placeholder-count="5">
+                <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
+              </sc-for>
+            </span>
+          </sc-if>
         </sc-for>
       </div>
     </sc-if>
@@ -211,6 +221,12 @@
               <p style="font-size:13px;color:var(--ink-soft,#5C584D);font-style:italic;line-height:1.55;margin:0">{{ c.history }}</p>
             </div>
             <div style="margin-top:14px;font-size:12px;color:var(--ink-soft,#5C584D);background:var(--pill-bg,rgba(126,144,112,.08));border-left:2.5px solid var(--accent,#2F3D2C);border-radius:0 8px 8px 0;padding:9px 12px;line-height:1.5"><b style="color:var(--accent,#2F3D2C);font-weight:600">Source note —</b> {{ c.note }}</div>
+            <div style="margin-top:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2,#AD7C44);font-weight:600">Rate it</span>
+              <sc-for list="{{ c.reactions }}" as="rx" hint-placeholder-count="5">
+                <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:12px;color:var(--ink-soft,#5C584D);font-variant-numeric:tabular-nums">{{ rx.count }}</span></sc-if></button>
+              </sc-for>
+            </div>
           </div>
         </article>
       </sc-for>
@@ -574,6 +590,23 @@
               <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-top:5px">Guests</div>
             </div>
           </div>
+          <sc-if value="{{ ledgerHasFave }}" hint-placeholder-val="">
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 6px">Crowd · reactions right now</div>
+            <div style="display:flex;gap:9px">
+              <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--accent2,#CFA267);border-radius:14px;padding:12px 13px">
+                <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">🔥 Crowd favorite</div>
+                <div style="font-family:'Fraunces',Georgia,serif;font-size:18px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerFave }}</div>
+                <div style="font-size:11.5px;color:var(--accent2,#CFA267);margin-top:2px">{{ ledgerFaveN }} reactions</div>
+              </div>
+              <sc-if value="{{ ledgerHasPoop }}" hint-placeholder-val="">
+                <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:12px 13px">
+                  <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">The 💩 award</div>
+                  <div style="font-family:'Fraunces',Georgia,serif;font-size:18px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerPoop }}</div>
+                  <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:2px">{{ ledgerPoopN }} × 💩</div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
           <sc-if value="{{ hasLedger }}" hint-placeholder-val="{{ true }}">
             <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">Most ordered</div>
             <sc-for list="{{ ledgerTop }}" as="d" hint-placeholder-count="4">
@@ -776,7 +809,7 @@ class Component extends DCLogic {
       search: '', sort: 'spirit',
       filters: { spirit: [], tags: [], build: [], glass: [], occasion: [] },
       open: {}, filtersOpen: true, highlight: null,
-      orders: [], batches: [], ordersOpen: false, stationTab: 'queue',
+      orders: [], batches: [], reactions: {}, ordersOpen: false, stationTab: 'queue',
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
@@ -872,7 +905,7 @@ class Component extends DCLogic {
     this._prevMine = cur;
     if (justReady) this.chime();
     const theme = (d && d.theme) || 'auto';
-    this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme) });
+    this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme), reactions: (d && d.reactions) || {} });
     if (this.state.ledgerOpen) this.fetchHistory();   // keep stats live while open
     if (this.state.wallOpen) this.fetchWall();
   }
@@ -1078,6 +1111,15 @@ class Component extends DCLogic {
   fetchWall(){ fetch('/api/wall').then(r=>r.json()).then(d=>{ this.setState({ wallPosts: Array.isArray(d.posts)?d.posts:[], wallNightStart: d.nightStart||'' }); }).catch(()=>{}); }
   postWall(){ const text = (this.state.wallDraft || '').trim(); if (!text) return; this.api('POST','/api/wall',{ text:text, name:(this.state.myName||'').trim() }).then(()=>{ this.setState({ wallDraft:'' }); this.fetchWall(); }).catch(()=>this.flashToast('Could not post your note',2000)); }
   deleteWallPost(id){ this.api('POST','/api/wall/remove',{ id:id, code:'5352' }).then(()=>this.fetchWall()).catch(()=>this.flashToast('Could not remove it',2000)); }
+  _cid(){ let c=null; try { c = localStorage.getItem('hollow_cid'); if (!c){ c = 'c' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); localStorage.setItem('hollow_cid', c); } } catch(e){ c = this.__cid || (this.__cid = 'c' + Math.random().toString(36).slice(2)); } return c; }
+  react(drink, emoji){
+    let myRx = {}; try { myRx = JSON.parse(localStorage.getItem('hollow_reactions') || '{}') || {}; } catch(e){}
+    const next = (myRx[drink] === emoji) ? '' : emoji;
+    if (next) myRx[drink] = next; else delete myRx[drink];
+    try { localStorage.setItem('hollow_reactions', JSON.stringify(myRx)); } catch(e){}
+    this.forceUpdate();
+    this.api('POST', '/api/reactions', { cid: this._cid(), drink: drink, emoji: next }).then(() => this.refreshState()).catch(()=>{});
+  }
   fetchHistory(){ fetch('/api/history').then(r=>r.json()).then(d=>{ this.setState({ ledgerRows: Array.isArray(d.rows)?d.rows:[], ledgerNightStart: d.nightStart||'', ledgerNow: d.now||'' }); }).catch(()=>{}); }
   newNight(){ this.api('POST','/api/history/new-night',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not start a new night',2000)); }
   clearHistory(){ try { if (!window.confirm('Clear all-time stats? This erases the whole history and cannot be undone.')) return; } catch(e){} this.api('POST','/api/history/clear',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not clear stats',2000)); }
@@ -1236,6 +1278,13 @@ class Component extends DCLogic {
 
     const ICONS = { gin:1, bourbon:1, rye:1, tequila:1, rum:1, vodka:1, cognac:1, aperitivo:1, thc:1 };
     let counter = 0;
+    const REMOJI = ['🔥','👍','🥴','💀','💩'];
+    let myRx = {}; try { myRx = JSON.parse(localStorage.getItem('hollow_reactions') || '{}') || {}; } catch(e){}
+    const reactionRow = (drink) => { const counts = (st.reactions && st.reactions[drink]) || {}; const mine = myRx[drink]; return REMOJI.map(em => { const active = mine===em; const n = counts[em]||0; return {
+      key: drink+'|'+em, emoji: em, count: String(n), hasCount: n>0, active,
+      style: { display:'inline-flex', alignItems:'center', gap:'4px', fontSize:'15px', lineHeight:1, border:'1px solid '+(active?'var(--accent2)':'var(--pill-line)'), background: active?'rgba(207,162,103,.18)':'transparent', borderRadius:'999px', padding:'4px 9px', cursor:'pointer' },
+      onTap: () => this.react(drink, em) }; }); };
+
     const mkCard = (c) => {
       counter++;
       const ikey = (c.spirit || '').toLowerCase();
@@ -1258,6 +1307,7 @@ class Component extends DCLogic {
         rootStyle, detailStyle, signStyle, iconStyle,
         onToggle: () => this.toggleOpen(c.name),
         onOrder: () => this.openOrder(c.name),
+        reactions: reactionRow(c.name),
         onKey: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggleOpen(c.name); } },
       };
     };
@@ -1427,7 +1477,7 @@ class Component extends DCLogic {
     // ---- your drinks (per-phone live status strip) ----
     const myLabel = (s) => s==='up' ? 'Ready!' : (s==='working' ? 'Making' : 'On the rail');
     const myPill = (s) => { const up=s==='up', work=s==='working'; return { fontSize:'12px', fontWeight:600, padding:'4px 11px', borderRadius:'999px', whiteSpace:'nowrap', border:'1px solid '+(up?'var(--accent2)':'var(--pill-line)'), background: up?'var(--accent2)':(work?'var(--pill-bg)':'var(--field)'), color: up?'var(--accent-ink)':(work?'var(--pill-ink)':'var(--ink-soft)') }; };
-    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served').sort((a,b)=>a.ts-b.ts).map(o => ({ drink: o.drink + (o.qty>1?' ×'+o.qty:''), label: myLabel(o.status), style: myPill(o.status) }));
+    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served').sort((a,b)=>a.ts-b.ts).map(o => ({ drink: o.drink + (o.qty>1?' ×'+o.qty:''), name: o.drink, label: myLabel(o.status), style: myPill(o.status), ready: o.status==='up', notReady: o.status!=='up', reactions: o.status==='up' ? reactionRow(o.drink) : [] }));
     const outIngredients = st.eightySix.filter(n => n.indexOf('drink:') !== 0).length;
 
     // ---- The Ledger (drink stats) ----
@@ -1437,7 +1487,7 @@ class Component extends DCLogic {
     const lgOz = (a) => { const r=lgAmt(a); return /^oz\b/.test(r.unit) ? r.n : 0; };
     const fmtOz = (v) => { const r = Math.round(v*10)/10; return (Math.abs(r-Math.round(r))<0.05 ? String(Math.round(r)) : String(r)); };
     const lgBar = (frac, col) => ({ width: Math.max(5, Math.round((frac||0)*100)) + '%', height:'6px', borderRadius:'999px', background: col, marginTop:'5px' });
-    let ledgerVals = { hasLedger:false, ledgerEmpty:false, ledgerTotalDrinks:'0', ledgerTotalOz:'0', ledgerGuestCount:'0', ledgerKinds:'0', ledgerSince:'', ledgerTop:[], ledgerOz:[], ledgerSupers:[], ledgerFeed:[], ledgerStaff:false };
+    let ledgerVals = { hasLedger:false, ledgerEmpty:false, ledgerTotalDrinks:'0', ledgerTotalOz:'0', ledgerGuestCount:'0', ledgerKinds:'0', ledgerSince:'', ledgerTop:[], ledgerOz:[], ledgerSupers:[], ledgerFeed:[], ledgerStaff:false, hasFave:false, ledgerFave:'', ledgerFaveN:'0', hasPoop:false, ledgerPoop:'', ledgerPoopN:'0' };
     if (st.ledgerOpen){
       const allRows = st.ledgerRows || [];
       const ns = st.ledgerNightStart || '';
@@ -1471,11 +1521,14 @@ class Component extends DCLogic {
       }
       const feed = rows.slice().sort((a,b)=>this.toMs(b.created_at)-this.toMs(a.created_at)).slice(0,40).map(r=>({ drink: r.drink + ((r.qty||1)>1?' ×'+r.qty:''), guest:(r.guest && String(r.guest).trim()) || 'House', time: fmtTime(this.toMs(r.created_at)) }));
       let lgStaff=false; try { lgStaff = localStorage.getItem('hollow_86_ok')==='1'; } catch(e){}
+      const rxAll = st.reactions || {}; let faveDrink='', faveN=0, poopDrink='', poopN=0;
+      Object.keys(rxAll).forEach(d => { const c=rxAll[d]; const total=Object.keys(c).reduce((a,e)=>a+(c[e]||0),0); if(total>faveN){faveN=total;faveDrink=d;} const p=c['💩']||0; if(p>poopN){poopN=p;poopDrink=d;} });
       ledgerVals = {
         hasLedger: rows.length>0, ledgerEmpty: rows.length===0,
         ledgerTotalDrinks: String(totalDrinks), ledgerTotalOz: fmtOz(totalOz), ledgerGuestCount: String(gArr.length), ledgerKinds: String(topArr.length),
         ledgerSince: (st.ledgerScope!=='all' && ns) ? ('Tonight · since ' + fmtTime(this.toMs(ns))) : 'All-time totals',
         ledgerTop, ledgerOz, ledgerSupers: sup, ledgerFeed: feed, ledgerStaff: lgStaff,
+        hasFave: faveN>0, ledgerFave: faveDrink, ledgerFaveN: String(faveN), hasPoop: poopN>0, ledgerPoop: poopDrink, ledgerPoopN: String(poopN),
       };
     }
 
@@ -1504,6 +1557,7 @@ class Component extends DCLogic {
       ledgerTotalDrinks: ledgerVals.ledgerTotalDrinks, ledgerTotalOz: ledgerVals.ledgerTotalOz, ledgerGuestCount: ledgerVals.ledgerGuestCount, ledgerKinds: ledgerVals.ledgerKinds,
       ledgerSince: ledgerVals.ledgerSince, hasLedger: ledgerVals.hasLedger, ledgerEmpty: ledgerVals.ledgerEmpty, ledgerStaff: ledgerVals.ledgerStaff,
       ledgerTop: ledgerVals.ledgerTop, ledgerOz: ledgerVals.ledgerOz, ledgerSupers: ledgerVals.ledgerSupers, ledgerFeed: ledgerVals.ledgerFeed,
+      ledgerHasFave: ledgerVals.hasFave, ledgerFave: ledgerVals.ledgerFave, ledgerFaveN: ledgerVals.ledgerFaveN, ledgerHasPoop: ledgerVals.hasPoop, ledgerPoop: ledgerVals.ledgerPoop, ledgerPoopN: ledgerVals.ledgerPoopN,
       darkIconPath: st.dark ? sunPath : moonPath,
       settingsOpen: st.settingsOpen, onOpenSettings: () => this.openSettings(), onCloseSettings: () => this.closeSettings(),
       myName: st.myName, onMyName: (e) => this.onMyName(e), noMyDrinks: myDrinks.length===0,

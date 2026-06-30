@@ -75,6 +75,14 @@ db.exec(`CREATE TABLE IF NOT EXISTS wall (
   name       TEXT,
   created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
 );`);
+// Reactions: one per device (cid) per drink; tap to set/switch/clear.
+db.exec(`CREATE TABLE IF NOT EXISTS reactions (
+  cid        TEXT NOT NULL,
+  drink      TEXT NOT NULL,
+  emoji      TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now')),
+  PRIMARY KEY (cid, drink)
+);`);
 
 const Q = {
   insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
@@ -114,6 +122,10 @@ const Q = {
   wallRows:   db.prepare("SELECT id, text, name, created_at FROM wall ORDER BY created_at DESC, id DESC"),
   deleteWall: db.prepare("DELETE FROM wall WHERE id = ?"),
   clearWall:  db.prepare("DELETE FROM wall"),
+  setReaction:    db.prepare("INSERT INTO reactions (cid, drink, emoji) VALUES (?,?,?) ON CONFLICT(cid,drink) DO UPDATE SET emoji=excluded.emoji, created_at=strftime('%Y-%m-%d %H:%M:%f','now')"),
+  clearReaction:  db.prepare("DELETE FROM reactions WHERE cid = ? AND drink = ?"),
+  reactionCounts: db.prepare("SELECT drink, emoji, COUNT(*) AS n FROM reactions GROUP BY drink, emoji"),
+  clearReactions: db.prepare("DELETE FROM reactions"),
   markDrinkUp:      db.prepare("UPDATE tickets SET status='up', updated_at=datetime('now') WHERE round_id = ? AND drink = ?"),
   markDrinkWorking: db.prepare("UPDATE tickets SET status='working', updated_at=datetime('now') WHERE round_id = ? AND drink = ?"),
   roundNotUpCount:  db.prepare("SELECT COUNT(*) AS n FROM tickets WHERE round_id = ? AND status != 'up'"),
@@ -174,7 +186,9 @@ function getState() {
   const rail = Q.railTickets.all();
   const rounds = Q.allRounds.all().map((r) => ({ ...r, tickets: Q.roundTickets.all(r.id) }));
   const themeRow = Q.getSetting.get("theme");
-  return { rail, rounds, eightySix: Q.all86.all().map((r) => r.ingredient), theme: (themeRow && themeRow.value) || "auto" };
+  const reactions = {};
+  for (const r of Q.reactionCounts.all()) { (reactions[r.drink] = reactions[r.drink] || {})[r.emoji] = r.n; }
+  return { rail, rounds, eightySix: Q.all86.all().map((r) => r.ingredient), theme: (themeRow && themeRow.value) || "auto", reactions };
 }
 
 /* ---- Server-Sent Events ---- */
@@ -360,6 +374,8 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
       Q.setSetting.run("night_start", Q.nowStr.get().t);
+      Q.clearReactions.run();   // fresh favorite race for the new night
+      broadcast();
       return sendJSON(res, 200, { ok: true, nightStart: Q.nowStr.get().t });
     }
     if (pathname === "/api/history/clear" && method === "POST") {
@@ -367,6 +383,7 @@ const server = http.createServer(async (req, res) => {
       if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
       Q.clearHistory.run();
       Q.clearWall.run();
+      Q.clearReactions.run();
       Q.setSetting.run("night_start", Q.nowStr.get().t);
       broadcast();
       return sendJSON(res, 200, { ok: true });
@@ -391,6 +408,16 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
       Q.deleteWall.run(Number(b.id));
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+    // ---- Reactions ----
+    if (pathname === "/api/reactions" && method === "POST") {
+      const b = await readBody(req);
+      const cid = str(b.cid, 40), drink = str(b.drink, 80), emoji = str(b.emoji, 16);
+      if (!cid || !drink) return sendJSON(res, 400, { error: "cid and drink required" });
+      if (emoji) Q.setReaction.run(cid, drink, emoji); else Q.clearReaction.run(cid, drink);
       broadcast();
       return sendJSON(res, 200, { ok: true });
     }
