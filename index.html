@@ -97,9 +97,9 @@
 
     <sc-if value="{{ hasStrip }}" hint-placeholder-val="">
       <div style="max-width:1180px;margin:0 auto;padding:0 18px 11px">
-        <button type="button" onClick="{{ onToggleStrip }}" aria-label="Toggle your drinks" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0;margin:0 0 9px;cursor:pointer">
+        <button type="button" onClick="{{ onToggleStrip }}" aria-label="Toggle your drinks" style="display:inline-flex;align-items:center;gap:9px;background:none;border:none;padding:0;margin:0 0 9px;cursor:pointer">
           <span style="font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--ink-faint,#8A8474);white-space:nowrap">Your drinks · {{ stripCount }}</span>
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true" style="{{ stripChevronStyle }}"><path d="M7 10l5 5 5-5z"></path></svg>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink-soft,#B7B3A1);background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:3px 9px 3px 11px">{{ stripToggleLabel }}<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true" style="{{ stripChevronStyle }}"><path d="M7 10l5 5 5-5z"></path></svg></span>
         </button>
         <sc-if value="{{ stripExpanded }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -1702,7 +1702,8 @@ class Component extends DCLogic {
       drinkGroups: drinkGroups, drink86Note: drink86Count===0 ? 'All drinks on the menu.' : (drink86Count + ' drink' + (drink86Count===1?'':'s') + ' 86’d.'),
       hasMyDrinks: myDrinks.length>0, myDrinks: myDrinks, myPastPours: myPastPours, hasPastPours: myPastPours.length>0, hasStrip: (myDrinks.length>0 || myPastPours.length>0),
       stripExpanded: !st.stripCollapsed, onToggleStrip: () => this.toggleStrip(), stripCount: String(myDrinks.length + myPastPours.length),
-      stripChevronStyle: { transition:'transform .2s ease', transform: st.stripCollapsed ? 'rotate(-90deg)' : 'none', color:'var(--ink-faint,#8A8474)', flex:'none' },
+      stripToggleLabel: st.stripCollapsed ? 'Show' : 'Hide',
+      stripChevronStyle: { transition:'transform .2s ease', transform: st.stripCollapsed ? 'rotate(-90deg)' : 'none', flex:'none' },
       logoSrc: logoSrc, themeOptions: themeOptions, themeAutoNote: themeAutoNote, chimeGroups: chimeGroups,
       search: st.search, onSearch: (e) => this.onSearch(e),
       onSurprise: () => this.surprise(),
