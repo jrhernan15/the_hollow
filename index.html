@@ -96,29 +96,42 @@
     </sc-if>
 
     <sc-if value="{{ hasStrip }}" hint-placeholder-val="">
-      <div style="max-width:1180px;margin:0 auto;padding:0 18px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--ink-faint,#8A8474);white-space:nowrap">Your drinks</span>
-        <sc-for list="{{ myDrinks }}" as="md" hint-placeholder-count="1">
-          <sc-if value="{{ md.notReady }}" hint-placeholder-val="{{ true }}">
-            <span style="{{ md.style }}">{{ md.drink }} · {{ md.label }}</span>
-          </sc-if>
-          <sc-if value="{{ md.ready }}" hint-placeholder-val="">
-            <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--accent2,#CFA267);background:rgba(207,162,103,.12);border-radius:999px;padding:4px 7px 4px 12px">
-              <span style="font-size:11.5px;font-weight:700;color:var(--accent2,#CFA267);white-space:nowrap">{{ md.drink }} up — rate it</span>
-              <sc-for list="{{ md.reactions }}" as="rx" hint-placeholder-count="5">
-                <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
-              </sc-for>
-            </span>
-          </sc-if>
-        </sc-for>
-        <sc-for list="{{ myPastPours }}" as="md" hint-placeholder-count="1">
-          <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--card-border,#2D3422);background:var(--card,#1D2217);border-radius:999px;padding:4px 7px 4px 12px">
-            <span style="font-size:11.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);white-space:nowrap">{{ md.drink }} · rate</span>
-            <sc-for list="{{ md.reactions }}" as="rx" hint-placeholder-count="5">
-              <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
+      <div style="max-width:1180px;margin:0 auto;padding:0 18px 11px">
+        <button type="button" onClick="{{ onToggleStrip }}" aria-label="Toggle your drinks" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0;margin:0 0 9px;cursor:pointer">
+          <span style="font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--ink-faint,#8A8474);white-space:nowrap">Your drinks · {{ stripCount }}</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true" style="{{ stripChevronStyle }}"><path d="M7 10l5 5 5-5z"></path></svg>
+        </button>
+        <sc-if value="{{ stripExpanded }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ myDrinks }}" as="md" hint-placeholder-count="1">
+              <span style="display:inline-flex;align-items:center;gap:4px">
+                <sc-if value="{{ md.notReady }}" hint-placeholder-val="{{ true }}">
+                  <span style="{{ md.style }}">{{ md.drink }} · {{ md.label }}</span>
+                </sc-if>
+                <sc-if value="{{ md.ready }}" hint-placeholder-val="">
+                  <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--accent2,#CFA267);background:rgba(207,162,103,.12);border-radius:999px;padding:4px 7px 4px 12px">
+                    <span style="font-size:11.5px;font-weight:700;color:var(--accent2,#CFA267);white-space:nowrap">{{ md.drink }} up — rate it</span>
+                    <sc-for list="{{ md.reactions }}" as="rx" hint-placeholder-count="5">
+                      <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
+                    </sc-for>
+                  </span>
+                </sc-if>
+                <button type="button" onClick="{{ md.onDismiss }}" aria-label="Dismiss" style="flex:none;width:18px;height:18px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-faint,#827E6D);font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center">×</button>
+              </span>
             </sc-for>
-          </span>
-        </sc-for>
+            <sc-for list="{{ myPastPours }}" as="md" hint-placeholder-count="1">
+              <span style="display:inline-flex;align-items:center;gap:4px">
+                <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border:1px solid var(--card-border,#2D3422);background:var(--card,#1D2217);border-radius:999px;padding:4px 7px 4px 12px">
+                  <span style="font-size:11.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);white-space:nowrap">{{ md.drink }} · rate</span>
+                  <sc-for list="{{ md.reactions }}" as="rx" hint-placeholder-count="5">
+                    <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:11.5px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
+                  </sc-for>
+                </span>
+                <button type="button" onClick="{{ md.onDismiss }}" aria-label="Dismiss" style="flex:none;width:18px;height:18px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-faint,#827E6D);font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center">×</button>
+              </span>
+            </sc-for>
+          </div>
+        </sc-if>
       </div>
     </sc-if>
 
@@ -843,7 +856,7 @@ class Component extends DCLogic {
       search: '', sort: 'spirit',
       filters: { spirit: [], tags: [], build: [], glass: [], occasion: [] },
       open: {}, filtersOpen: true, highlight: null,
-      orders: [], batches: [], reactions: {}, myPours: [], serverNightStart: '', ordersOpen: false, stationTab: 'queue',
+      orders: [], batches: [], reactions: {}, myPours: [], serverNightStart: '', stripCollapsed: false, dismissedTix: {}, ordersOpen: false, stationTab: 'queue',
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
@@ -899,6 +912,8 @@ class Component extends DCLogic {
     try { this.setState({ bartenderMode: localStorage.getItem('hollow_bartender') === '1' }); } catch(e){}
     try { this.setState({ bmBannerDismissed: localStorage.getItem('hollow_bm_banner_dismissed') === '1' }); } catch(e){}
     try { this.setState({ myPours: JSON.parse(localStorage.getItem('hollow_myorders_v1') || '[]') || [] }); } catch(e){}
+    try { this.setState({ stripCollapsed: localStorage.getItem('hollow_strip_collapsed') === '1' }); } catch(e){}
+    try { this.setState({ dismissedTix: JSON.parse(localStorage.getItem('hollow_dismissed_tix_v1') || '{}') || {} }); } catch(e){}
     try { const nm = localStorage.getItem('hollow_name_v1'); if (nm) this.setState({ myName: nm }); } catch(e){}
     try { if (!localStorage.getItem('hollow_welcomed') && !localStorage.getItem('hollow_name_v1')) this.setState({ welcomeOpen: true }); } catch(e){}
     this.refreshState();
@@ -965,6 +980,9 @@ class Component extends DCLogic {
     this.flashToast('Sent to the bar ✓', 2200);
   }
 
+  toggleStrip(){ this.setState(s => { const c = !s.stripCollapsed; try { localStorage.setItem('hollow_strip_collapsed', c ? '1' : '0'); } catch(e){} return { stripCollapsed: c }; }); }
+  dismissTicket(id){ this.setState(s => { const d = Object.assign({}, s.dismissedTix); d[id] = true; try { localStorage.setItem('hollow_dismissed_tix_v1', JSON.stringify(d)); } catch(e){} return { dismissedTix: d }; }); }
+  dismissPour(drink){ const arr = (this.state.myPours || []).filter(x => x && x.drink !== drink); try { localStorage.setItem('hollow_myorders_v1', JSON.stringify(arr)); } catch(e){} this.setState({ myPours: arr }); }
   _recordMyOrder(drink){
     if (!drink) return;
     let arr = []; try { arr = JSON.parse(localStorage.getItem('hollow_myorders_v1') || '[]') || []; } catch(e){}
@@ -1527,10 +1545,10 @@ class Component extends DCLogic {
     // ---- your drinks (per-phone live status strip) ----
     const myLabel = (s) => s==='up' ? 'Ready!' : (s==='working' ? 'Making' : 'On the rail');
     const myPill = (s) => { const up=s==='up', work=s==='working'; return { fontSize:'12px', fontWeight:600, padding:'4px 11px', borderRadius:'999px', whiteSpace:'nowrap', border:'1px solid '+(up?'var(--accent2)':'var(--pill-line)'), background: up?'var(--accent2)':(work?'var(--pill-bg)':'var(--field)'), color: up?'var(--accent-ink)':(work?'var(--pill-ink)':'var(--ink-soft)') }; };
-    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served').sort((a,b)=>a.ts-b.ts).map(o => ({ drink: o.drink + (o.qty>1?' ×'+o.qty:''), name: o.drink, label: myLabel(o.status), style: myPill(o.status), ready: o.status==='up', notReady: o.status!=='up', reactions: o.status==='up' ? reactionRow(o.drink) : [] }));
+    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served' && !st.dismissedTix[o.id]).sort((a,b)=>a.ts-b.ts).map(o => ({ drink: o.drink + (o.qty>1?' ×'+o.qty:''), name: o.drink, label: myLabel(o.status), style: myPill(o.status), ready: o.status==='up', notReady: o.status!=='up', reactions: o.status==='up' ? reactionRow(o.drink) : [], onDismiss: () => this.dismissTicket(o.id) }));
     const nightMs = st.serverNightStart ? this.toMs(st.serverNightStart) : 0;
     const _liveNames = {}; st.orders.forEach(o => { if (o.mine && o.status !== 'served') _liveNames[o.drink] = true; });
-    const myPastPours = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs) && !_liveNames[p.drink]).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, reactions: reactionRow(p.drink) }));
+    const myPastPours = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs) && !_liveNames[p.drink]).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, reactions: reactionRow(p.drink), onDismiss: () => this.dismissPour(p.drink) }));
     const passArmed = !!st.bartenderMode;
     const passBtnStyle = { position:'relative', fontSize:'13px', fontWeight:600, borderRadius:'11px', padding:'0 14px', cursor:'pointer', whiteSpace:'nowrap', display:'inline-flex', alignItems:'center', gap:'7px', color: passArmed ? 'var(--accent2)' : 'var(--accent)', background: passArmed ? 'rgba(207,162,103,.12)' : 'var(--field)', border: passArmed ? '1px solid var(--accent2)' : '1px solid var(--pill-line)' };
     const outIngredients = st.eightySix.filter(n => n.indexOf('drink:') !== 0).length;
@@ -1683,6 +1701,8 @@ class Component extends DCLogic {
       eightySixHidden: hiddenCount + ' drink' + (hiddenCount===1?'':'s') + ' hidden',
       drinkGroups: drinkGroups, drink86Note: drink86Count===0 ? 'All drinks on the menu.' : (drink86Count + ' drink' + (drink86Count===1?'':'s') + ' 86’d.'),
       hasMyDrinks: myDrinks.length>0, myDrinks: myDrinks, myPastPours: myPastPours, hasPastPours: myPastPours.length>0, hasStrip: (myDrinks.length>0 || myPastPours.length>0),
+      stripExpanded: !st.stripCollapsed, onToggleStrip: () => this.toggleStrip(), stripCount: String(myDrinks.length + myPastPours.length),
+      stripChevronStyle: { transition:'transform .2s ease', transform: st.stripCollapsed ? 'rotate(-90deg)' : 'none', color:'var(--ink-faint,#8A8474)', flex:'none' },
       logoSrc: logoSrc, themeOptions: themeOptions, themeAutoNote: themeAutoNote, chimeGroups: chimeGroups,
       search: st.search, onSearch: (e) => this.onSearch(e),
       onSurprise: () => this.surprise(),
