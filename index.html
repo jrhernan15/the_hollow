@@ -74,7 +74,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-faint,#8A8474);pointer-events:none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         <input type="search" value="{{ search }}" onChange="{{ onSearch }}" autocomplete="off" placeholder="Search drinks or ingredients…" style="width:100%;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink,#262420);background:var(--field,#FBF9F3);border:1px solid var(--line,#DDD6C7);border-radius:11px;padding:11px 14px 11px 38px;outline:none;transition:border-color .15s ease,box-shadow .15s ease" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
       </div>
-      <button type="button" data-surprise onClick="{{ onSurprise }}" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 12px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px" style-hover="border-color:var(--accent);background:var(--bg2)"><span style="font-size:13px">✦</span>Surprise me</button>
+      <button type="button" data-surprise onClick="{{ onSurprise }}" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 12px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18zm0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9z"></path></svg>Surprise me</button>
       <button type="button" data-ordersbtn onClick="{{ onToggleOrders }}" title="The Pass" aria-label="Open The Pass" style="position:relative;font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 5V3H3v2l8 9v5H6v2h12v-2h-5v-5l8-9zM7.43 7L5.66 5h12.69l-1.78 2H7.43z"></path></svg>
         <span data-blabel>The Pass</span><sc-if value="{{ hasOrders }}" hint-placeholder-val=""><span style="{{ ordersBadgeStyle }}">{{ ordersCount }}</span></sc-if>
@@ -280,7 +280,7 @@
             </div>
             <button type="button" onClick="{{ onToggleOrders }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
           </div>
-          <div style="display:flex;gap:4px;margin-top:13px;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:11px;padding:4px">
+          <div style="display:flex;gap:20px;margin-top:14px;border-bottom:1px solid var(--card-border,#2D3422)">
             <button type="button" onClick="{{ onTabQueue }}" style="{{ queueTabStyle }}">{{ queueTabLabel }}</button>
             <button type="button" onClick="{{ onTabBatches }}" style="{{ batchTabStyle }}">{{ batchTabLabel }}</button>
           </div>
@@ -490,7 +490,7 @@
           <div style="flex:1"><div style="font-size:14px;color:var(--ink,#ECE7D7)">Bartender mode</div><div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:1px">Alert this device when a new order comes in</div></div>
           <span style="{{ bartenderPillStyle }}">{{ bartenderPillLabel }}</span>
         </button>
-        <div style="display:flex;gap:6px;padding:12px 16px 4px;border-bottom:1px solid var(--card-border,#2D3422)">
+        <div style="display:flex;gap:20px;padding:13px 18px 0;border-bottom:1px solid var(--card-border,#2D3422)">
           <button type="button" onClick="{{ on86TabIng }}" style="{{ tab86IngStyle }}">Ingredients</button>
           <button type="button" onClick="{{ on86TabDrinks }}" style="{{ tab86DrinkStyle }}">Drinks</button>
           <button type="button" onClick="{{ on86TabTheme }}" style="{{ tab86ThemeStyle }}">Theme</button>
@@ -564,8 +564,7 @@
         <header style="padding:16px 18px 12px;border-bottom:1px solid var(--card-border,#2D3422)">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
             <div>
-              <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">The party · the night</div>
-              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:2px 0 0;color:var(--ink,#ECE7D7)">The Book</h2>
+              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:0;color:var(--ink,#ECE7D7)">The Book</h2>
             </div>
             <button type="button" onClick="{{ onCloseBook }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
           </div>
@@ -707,6 +706,24 @@
           <sc-if value="{{ noMyDrinks }}" hint-placeholder-val="">
             <div style="font-size:13px;color:var(--ink-faint,#827E6D);line-height:1.5">Nothing on the board yet — once you order, your drinks show here until they're served.</div>
           </sc-if>
+          <sc-if value="{{ hasMyPours }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:16px 0 8px">Your pours · rate anytime</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ myPourCards }}" as="p" hint-placeholder-count="2">
+                <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:12px;padding:10px 12px">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+                    <span style="font-size:14px;color:var(--ink,#ECE7D7)">{{ p.drink }}</span>
+                    <span style="font-size:11px;color:var(--ink-faint,#827E6D)">{{ p.time }}</span>
+                  </div>
+                  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">
+                    <sc-for list="{{ p.reactions }}" as="rx" hint-placeholder-count="5">
+                      <button type="button" onClick="{{ rx.onTap }}" style="{{ rx.style }}">{{ rx.emoji }}<sc-if value="{{ rx.hasCount }}" hint-placeholder-val=""><span style="font-size:12px;color:var(--ink-soft,#B7B3A1)">{{ rx.count }}</span></sc-if></button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
 
           <div style="height:1px;background:var(--card-border,#2D3422);margin:18px 0 0"></div>
           <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:14px 0 8px">Appearance</div>
@@ -775,7 +792,7 @@
   </sc-if>
 
   <sc-if value="{{ bartenderAlert }}" hint-placeholder-val="">
-    <div data-chrome onClick="{{ onOpenOrdersFromAlert }}" style="position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:72;background:var(--accent2,#CFA267);color:#13160F;padding:11px 18px;border-radius:999px;box-shadow:0 12px 34px rgba(0,0,0,.34);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:9px;cursor:pointer;max-width:92vw">
+    <div data-chrome onClick="{{ onOpenOrdersFromAlert }}" style="position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:72;background:var(--accent2,#CFA267);color:#13160F;padding:13px 20px;border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.34);font-size:13.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;width:min(440px,calc(100vw - 24px));box-sizing:border-box">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path></svg>
       <span>New order · {{ bartenderAlert }}</span>
     </div>
@@ -799,7 +816,7 @@ class Component extends DCLogic {
       search: '', sort: 'spirit',
       filters: { spirit: [], tags: [], build: [], glass: [], occasion: [] },
       open: {}, filtersOpen: true, highlight: null,
-      orders: [], batches: [], reactions: {}, ordersOpen: false, stationTab: 'queue',
+      orders: [], batches: [], reactions: {}, myPours: [], ordersOpen: false, stationTab: 'queue',
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
@@ -853,6 +870,7 @@ class Component extends DCLogic {
     try { const cp = localStorage.getItem('hollow_chime'); if (cp) this.setState({ chimePref: cp }); } catch(e){}
     try { const dk = localStorage.getItem('hollow_dark'); if (dk != null) this.setState({ dark: dk === '1' }); } catch(e){}
     try { this.setState({ bartenderMode: localStorage.getItem('hollow_bartender') === '1' }); } catch(e){}
+    try { this.setState({ myPours: JSON.parse(localStorage.getItem('hollow_myorders_v1') || '[]') || [] }); } catch(e){}
     try { const nm = localStorage.getItem('hollow_name_v1'); if (nm) this.setState({ myName: nm }); } catch(e){}
     try { if (!localStorage.getItem('hollow_welcomed') && !localStorage.getItem('hollow_name_v1')) this.setState({ welcomeOpen: true }); } catch(e){}
     this.refreshState();
@@ -913,12 +931,21 @@ class Component extends DCLogic {
     const qty = this.state.draftQty || 1;
     this.unlockAudio(); this.preloadChime();
     this.api('POST', '/api/tickets', { drink: drink, name: name, notes: note, qty: qty })
-      .then(t => { try { this._mine = (this._mine || []).concat(t.id); localStorage.setItem('hollow_mine_v1', JSON.stringify(this._mine)); } catch(e){} this.refreshState(); })
+      .then(t => { try { this._mine = (this._mine || []).concat(t.id); localStorage.setItem('hollow_mine_v1', JSON.stringify(this._mine)); } catch(e){} this._recordMyOrder(drink); this.refreshState(); })
       .catch(() => this.flashToast('Could not reach the bar — try again', 2400));
     this.setState({ orderModalName: null, draftGuest: this.state.myName || '' });
     this.flashToast('Sent to the bar ✓', 2200);
   }
 
+  _recordMyOrder(drink){
+    if (!drink) return;
+    let arr = []; try { arr = JSON.parse(localStorage.getItem('hollow_myorders_v1') || '[]') || []; } catch(e){}
+    arr = arr.filter(x => x && x.drink !== drink);
+    arr.unshift({ drink: drink, ts: Date.now() });
+    if (arr.length > 40) arr = arr.slice(0, 40);
+    try { localStorage.setItem('hollow_myorders_v1', JSON.stringify(arr)); } catch(e){}
+    this.setState({ myPours: arr });
+  }
   toggleOrders(){ this.setState(s => ({ ordersOpen: !s.ordersOpen, makeView:null })); }
   setTab(t){ this.setState({ stationTab: t }); }
   toggleSelect(id){ this.setState(s => { const sel = Object.assign({}, s.selected); if (sel[id]) delete sel[id]; else sel[id] = true; return { selected: sel }; }); }
@@ -1414,7 +1441,7 @@ class Component extends DCLogic {
     const activeCount = queueOrders.length + st.orders.filter(o => { if (!o.batchId) return false; const b = st.batches.find(x=>x.id===o.batchId); return b && b.status==='working'; }).length;
     const ordersSummary = (queueOrders.length + ' on the rail · ' + st.batches.length + ' round' + (st.batches.length===1?'':'s'));
     const ordersBadgeStyle = { minWidth:'18px', height:'18px', padding:'0 5px', borderRadius:'999px', backgroundColor: activeCount ? 'var(--accent)' : 'var(--ink-faint)', color:'var(--accent-ink)', fontSize:'11px', fontWeight:700, display:'inline-flex', alignItems:'center', justifyContent:'center', fontVariantNumeric:'tabular-nums' };
-    const tabStyle = (active) => ({ flex:1, textAlign:'center', fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, letterSpacing:'.02em', padding:'8px 10px', borderRadius:'9px', cursor:'pointer', border:'none', backgroundColor: active ? 'var(--accent)' : 'transparent', color: active ? 'var(--accent-ink)' : 'var(--ink-soft)' });
+    const tabStyle = (active) => ({ fontFamily:"'Inter',sans-serif", fontSize:'14.5px', fontWeight: active?600:500, color: active ? 'var(--ink)' : 'var(--ink-faint)', background:'transparent', border:'none', borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent', padding:'0 2px 9px', cursor:'pointer', lineHeight:'1', whiteSpace:'nowrap' });
 
     // ---- The 86 (stock board) ----
     const clean86 = (s) => String(s||'').replace(/\s*\([^)]*\)/g, '').trim();
@@ -1543,6 +1570,7 @@ class Component extends DCLogic {
       canDelete: wallStaff, onDelete: () => this.deleteWallPost(p.id) }; });
     const bookTabStyle = (on) => ({ fontFamily:"'Inter',sans-serif", fontSize:'14.5px', fontWeight: on?600:500, color: on ? 'var(--ink)' : 'var(--ink-faint)', background:'transparent', border:'none', borderBottom: on ? '2px solid var(--accent)' : '2px solid transparent', padding:'0 1px 6px', cursor:'pointer', lineHeight:'1' });
     const bookScopeStyle = (on) => ({ fontFamily:"'Inter',sans-serif", fontSize:'11.5px', fontWeight:600, color: on ? 'var(--accent-ink)' : 'var(--ink-soft)', background: on ? 'var(--accent)' : 'transparent', border:'none', borderRadius:'999px', padding:'4px 11px', cursor:'pointer' });
+    const myPourCards = (st.myPours || []).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, time: fmtTime(p.ts), reactions: reactionRow(p.drink) }));
 
     return {
       appStyle,
@@ -1569,6 +1597,7 @@ class Component extends DCLogic {
       bartenderAlert: st.bartenderAlert, onOpenOrdersFromAlert: () => this.openOrdersFromAlert(),
       wallDraft: st.wallDraft, onWallDraft: (e) => this.onWallDraft(e), onPostWall: () => this.postWall(),
       wallNotes: wallNotes, hasWall: wallNotes.length>0, wallEmpty: wallNotes.length===0,
+      myPourCards: myPourCards, hasMyPours: myPourCards.length>0,
       bookOpen: st.bookOpen, onOpenBook: () => this.openBook(), onCloseBook: () => this.closeBook(),
       bookTabWall: st.bookTab==='wall', bookTabLedger: st.bookTab==='ledger',
       bookWallTabStyle: bookTabStyle(st.bookTab==='wall'), bookLedgerTabStyle: bookTabStyle(st.bookTab==='ledger'),
