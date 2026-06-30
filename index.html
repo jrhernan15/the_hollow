@@ -103,7 +103,7 @@
         </button>
         <sc-if value="{{ stripExpanded }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <sc-for list="{{ myDrinks }}" as="md" hint-placeholder-count="1">
+            <sc-for list="{{ stripDrinks }}" as="md" hint-placeholder-count="1">
               <span style="display:inline-flex;align-items:center;gap:4px">
                 <sc-if value="{{ md.notReady }}" hint-placeholder-val="{{ true }}">
                   <span style="{{ md.style }}">{{ md.drink }} · {{ md.label }}</span>
@@ -856,7 +856,7 @@ class Component extends DCLogic {
       search: '', sort: 'spirit',
       filters: { spirit: [], tags: [], build: [], glass: [], occasion: [] },
       open: {}, filtersOpen: true, highlight: null,
-      orders: [], batches: [], reactions: {}, myPours: [], serverNightStart: '', stripCollapsed: false, dismissedTix: {}, ordersOpen: false, stationTab: 'queue',
+      orders: [], batches: [], reactions: {}, myPours: [], serverNightStart: '', stripCollapsed: false, dismissedTix: {}, dismissedPours: {}, ordersOpen: false, stationTab: 'queue',
       selected: {}, makeView: null, orderModalName: null,
       draftGuest: '', draftQty: 1, draftNote: '', toast: null, showTop: false,
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
@@ -914,6 +914,7 @@ class Component extends DCLogic {
     try { this.setState({ myPours: JSON.parse(localStorage.getItem('hollow_myorders_v1') || '[]') || [] }); } catch(e){}
     try { this.setState({ stripCollapsed: localStorage.getItem('hollow_strip_collapsed') === '1' }); } catch(e){}
     try { this.setState({ dismissedTix: JSON.parse(localStorage.getItem('hollow_dismissed_tix_v1') || '{}') || {} }); } catch(e){}
+    try { this.setState({ dismissedPours: JSON.parse(localStorage.getItem('hollow_dismissed_pours_v1') || '{}') || {} }); } catch(e){}
     try { const nm = localStorage.getItem('hollow_name_v1'); if (nm) this.setState({ myName: nm }); } catch(e){}
     try { if (!localStorage.getItem('hollow_welcomed') && !localStorage.getItem('hollow_name_v1')) this.setState({ welcomeOpen: true }); } catch(e){}
     this.refreshState();
@@ -982,7 +983,7 @@ class Component extends DCLogic {
 
   toggleStrip(){ this.setState(s => { const c = !s.stripCollapsed; try { localStorage.setItem('hollow_strip_collapsed', c ? '1' : '0'); } catch(e){} return { stripCollapsed: c }; }); }
   dismissTicket(id){ this.setState(s => { const d = Object.assign({}, s.dismissedTix); d[id] = true; try { localStorage.setItem('hollow_dismissed_tix_v1', JSON.stringify(d)); } catch(e){} return { dismissedTix: d }; }); }
-  dismissPour(drink){ const arr = (this.state.myPours || []).filter(x => x && x.drink !== drink); try { localStorage.setItem('hollow_myorders_v1', JSON.stringify(arr)); } catch(e){} this.setState({ myPours: arr }); }
+  dismissPour(drink, ts){ this.setState(s => { const d = Object.assign({}, s.dismissedPours); d[drink] = (ts != null ? ts : Date.now()); try { localStorage.setItem('hollow_dismissed_pours_v1', JSON.stringify(d)); } catch(e){} return { dismissedPours: d }; }); }
   _recordMyOrder(drink){
     if (!drink) return;
     let arr = []; try { arr = JSON.parse(localStorage.getItem('hollow_myorders_v1') || '[]') || []; } catch(e){}
@@ -1545,10 +1546,11 @@ class Component extends DCLogic {
     // ---- your drinks (per-phone live status strip) ----
     const myLabel = (s) => s==='up' ? 'Ready!' : (s==='working' ? 'Making' : 'On the rail');
     const myPill = (s) => { const up=s==='up', work=s==='working'; return { fontSize:'12px', fontWeight:600, padding:'4px 11px', borderRadius:'999px', whiteSpace:'nowrap', border:'1px solid '+(up?'var(--accent2)':'var(--pill-line)'), background: up?'var(--accent2)':(work?'var(--pill-bg)':'var(--field)'), color: up?'var(--accent-ink)':(work?'var(--pill-ink)':'var(--ink-soft)') }; };
-    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served' && !st.dismissedTix[o.id]).sort((a,b)=>a.ts-b.ts).map(o => ({ drink: o.drink + (o.qty>1?' ×'+o.qty:''), name: o.drink, label: myLabel(o.status), style: myPill(o.status), ready: o.status==='up', notReady: o.status!=='up', reactions: o.status==='up' ? reactionRow(o.drink) : [], onDismiss: () => this.dismissTicket(o.id) }));
+    const myDrinks = st.orders.filter(o => o.mine && o.status !== 'served').sort((a,b)=>a.ts-b.ts).map(o => ({ id: o.id, drink: o.drink + (o.qty>1?' ×'+o.qty:''), name: o.drink, label: myLabel(o.status), style: myPill(o.status), ready: o.status==='up', notReady: o.status!=='up', reactions: o.status==='up' ? reactionRow(o.drink) : [], onDismiss: () => this.dismissTicket(o.id) }));
+    const stripDrinks = myDrinks.filter(d => !st.dismissedTix[d.id]);
     const nightMs = st.serverNightStart ? this.toMs(st.serverNightStart) : 0;
     const _liveNames = {}; st.orders.forEach(o => { if (o.mine && o.status !== 'served') _liveNames[o.drink] = true; });
-    const myPastPours = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs) && !_liveNames[p.drink]).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, reactions: reactionRow(p.drink), onDismiss: () => this.dismissPour(p.drink) }));
+    const myPastPours = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs) && !_liveNames[p.drink] && !(st.dismissedPours[p.drink] != null && (p.ts||0) <= st.dismissedPours[p.drink])).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, reactions: reactionRow(p.drink), onDismiss: () => this.dismissPour(p.drink, p.ts) }));
     const passArmed = !!st.bartenderMode;
     const passBtnStyle = { position:'relative', fontSize:'13px', fontWeight:600, borderRadius:'11px', padding:'0 14px', cursor:'pointer', whiteSpace:'nowrap', display:'inline-flex', alignItems:'center', gap:'7px', color: passArmed ? 'var(--accent2)' : 'var(--accent)', background: passArmed ? 'rgba(207,162,103,.12)' : 'var(--field)', border: passArmed ? '1px solid var(--accent2)' : '1px solid var(--pill-line)' };
     const outIngredients = st.eightySix.filter(n => n.indexOf('drink:') !== 0).length;
@@ -1700,8 +1702,8 @@ class Component extends DCLogic {
       eightySixStock: (stockTotal - outIngredients) + ' of ' + stockTotal + ' in stock',
       eightySixHidden: hiddenCount + ' drink' + (hiddenCount===1?'':'s') + ' hidden',
       drinkGroups: drinkGroups, drink86Note: drink86Count===0 ? 'All drinks on the menu.' : (drink86Count + ' drink' + (drink86Count===1?'':'s') + ' 86’d.'),
-      hasMyDrinks: myDrinks.length>0, myDrinks: myDrinks, myPastPours: myPastPours, hasPastPours: myPastPours.length>0, hasStrip: (myDrinks.length>0 || myPastPours.length>0),
-      stripExpanded: !st.stripCollapsed, onToggleStrip: () => this.toggleStrip(), stripCount: String(myDrinks.length + myPastPours.length),
+      hasMyDrinks: myDrinks.length>0, myDrinks: myDrinks, stripDrinks: stripDrinks, myPastPours: myPastPours, hasPastPours: myPastPours.length>0, hasStrip: (stripDrinks.length>0 || myPastPours.length>0),
+      stripExpanded: !st.stripCollapsed, onToggleStrip: () => this.toggleStrip(), stripCount: String(stripDrinks.length + myPastPours.length),
       stripToggleLabel: st.stripCollapsed ? 'Show' : 'Hide',
       stripChevronStyle: { transition:'transform .2s ease', transform: st.stripCollapsed ? 'rotate(-90deg)' : 'none', flex:'none' },
       logoSrc: logoSrc, themeOptions: themeOptions, themeAutoNote: themeAutoNote, chimeGroups: chimeGroups,
