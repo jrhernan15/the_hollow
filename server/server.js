@@ -68,6 +68,13 @@ db.exec(`CREATE TABLE IF NOT EXISTS history (
   round_id   INTEGER,
   created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
 );`);
+// The Wall: short party notes / toasts. Persists; "tonight" is a created_at filter.
+db.exec(`CREATE TABLE IF NOT EXISTS wall (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  text       TEXT    NOT NULL,
+  name       TEXT,
+  created_at TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f','now'))
+);`);
 
 const Q = {
   insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
@@ -103,6 +110,10 @@ const Q = {
   deleteHistoryRoundDrink: db.prepare("DELETE FROM history WHERE round_id = ? AND drink = ?"),
   deleteHistoryRound:      db.prepare("DELETE FROM history WHERE round_id = ?"),
   clearHistory:  db.prepare("DELETE FROM history"),
+  insertWall: db.prepare("INSERT INTO wall (text, name) VALUES (?, ?)"),
+  wallRows:   db.prepare("SELECT id, text, name, created_at FROM wall ORDER BY created_at DESC, id DESC"),
+  deleteWall: db.prepare("DELETE FROM wall WHERE id = ?"),
+  clearWall:  db.prepare("DELETE FROM wall"),
   markDrinkUp:      db.prepare("UPDATE tickets SET status='up', updated_at=datetime('now') WHERE round_id = ? AND drink = ?"),
   markDrinkWorking: db.prepare("UPDATE tickets SET status='working', updated_at=datetime('now') WHERE round_id = ? AND drink = ?"),
   roundNotUpCount:  db.prepare("SELECT COUNT(*) AS n FROM tickets WHERE round_id = ? AND status != 'up'"),
@@ -355,7 +366,32 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
       Q.clearHistory.run();
+      Q.clearWall.run();
       Q.setSetting.run("night_start", Q.nowStr.get().t);
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+
+    // ---- The Wall (party notes) ----
+    if (pathname === "/api/wall" && method === "GET") {
+      const ns = Q.getSetting.get("night_start");
+      const manual = (ns && ns.value) || "";
+      const auto = lastResetUTC(new Date());
+      return sendJSON(res, 200, { posts: Q.wallRows.all(), nightStart: (manual && manual > auto) ? manual : auto });
+    }
+    if (pathname === "/api/wall" && method === "POST") {
+      const b = await readBody(req);
+      const text = str(b.text, 180);
+      if (!text) return sendJSON(res, 400, { error: "text required" });
+      Q.insertWall.run(text, str(b.name, 60));
+      broadcast();
+      return sendJSON(res, 201, { ok: true });
+    }
+    if (pathname === "/api/wall/remove" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      Q.deleteWall.run(Number(b.id));
+      broadcast();
       return sendJSON(res, 200, { ok: true });
     }
 

@@ -217,7 +217,7 @@
     </sc-for>
   </main>
 
-  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
+  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpenWall }}" aria-label="The Wall" title="The Wall" style="margin-left:9px;display:inline-flex;align-items:center;gap:5px;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"></path></svg>The Wall</button> <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
 
   <sc-if value="{{ orderModalName }}" hint-placeholder-val="">
     <div data-chrome data-modalwrap onClick="{{ onCloseOrder }}" style="position:fixed;inset:0;z-index:60;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -617,6 +617,46 @@
     </div>
   </sc-if>
 
+  <sc-if value="{{ wallOpen }}" hint-placeholder-val="">
+    <div data-chrome onClick="{{ onCloseWall }}" style="position:fixed;inset:0;z-index:58;background:rgba(12,11,8,.5);display:flex;justify-content:flex-end">
+      <aside onClick="{{ stop }}" style="width:min(520px,100%);height:100%;background:var(--bg2,#1A1E14);border-left:1px solid var(--card-border,#2D3422);box-shadow:-12px 0 48px rgba(0,0,0,.35);display:flex;flex-direction:column">
+        <header style="padding:16px 18px 12px;border-bottom:1px solid var(--card-border,#2D3422)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div><div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">The party</div><h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:2px 0 0;color:var(--ink,#ECE7D7)">The Wall</h2></div>
+            <button type="button" onClick="{{ onCloseWall }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px">
+            <button type="button" onClick="{{ onWallTonight }}" style="{{ wallTonightStyle }}">Tonight</button>
+            <button type="button" onClick="{{ onWallAll }}" style="{{ wallAllStyle }}">All-time</button>
+          </div>
+        </header>
+        <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:14px 16px 16px">
+          <div style="display:flex;gap:8px">
+            <input type="text" value="{{ wallDraft }}" onChange="{{ onWallDraft }}" placeholder="Leave a toast…" style="flex:1;box-sizing:border-box;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:11px 13px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
+            <button type="button" onClick="{{ onPostWall }}" style="flex:none;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:0 18px;cursor:pointer">Post</button>
+          </div>
+          <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin:7px 2px 0">Signed with your name from Settings.</div>
+          <sc-if value="{{ hasWall }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+              <sc-for list="{{ wallNotes }}" as="w" hint-placeholder-count="3">
+                <div style="{{ w.noteStyle }}">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                    <div style="font-size:13.5px;line-height:1.45;color:var(--ink,#ECE7D7);flex:1">{{ w.text }}</div>
+                    <sc-if value="{{ w.canDelete }}" hint-placeholder-val=""><button type="button" onClick="{{ w.onDelete }}" aria-label="Remove note" style="flex:none;background:transparent;border:none;color:#CC7A6A;cursor:pointer;font-size:15px;line-height:1;padding:0 2px">×</button></sc-if>
+                  </div>
+                  <div style="{{ w.nameStyle }}">— {{ w.who }} <span style="color:var(--ink-faint,#827E6D)">· {{ w.time }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ wallEmpty }}" hint-placeholder-val="">
+            <div style="text-align:center;color:var(--ink-faint,#827E6D);font-size:13.5px;line-height:1.6;padding:40px 16px">No notes yet.<br>Leave the first toast of the night.</div>
+          </sc-if>
+        </div>
+      </aside>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ settingsOpen }}" hint-placeholder-val="">
     <div data-chrome onClick="{{ onCloseSettings }}" style="position:fixed;inset:0;z-index:58;background:rgba(12,11,8,.5);display:flex;justify-content:flex-end">
       <aside onClick="{{ stop }}" style="width:min(460px,100%);height:100%;background:var(--bg2,#1A1E14);border-left:1px solid var(--card-border,#2D3422);box-shadow:-12px 0 48px rgba(0,0,0,.35);display:flex;flex-direction:column">
@@ -743,6 +783,7 @@ class Component extends DCLogic {
       ledgerOpen: false, ledgerRows: [], ledgerNightStart: '', ledgerNow: '', ledgerScope: 'tonight',
       settingsOpen: false, myName: '', welcomeOpen: false, welcomeName: '', confirm: null,
       bartenderMode: false, bartenderAlert: null,
+      wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -833,6 +874,7 @@ class Component extends DCLogic {
     const theme = (d && d.theme) || 'auto';
     this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme) });
     if (this.state.ledgerOpen) this.fetchHistory();   // keep stats live while open
+    if (this.state.wallOpen) this.fetchWall();
   }
 
   flashToast(msg, ms){ this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast:null }), ms||2000); }
@@ -1029,6 +1071,13 @@ class Component extends DCLogic {
   openLedger(){ this.fetchHistory(); this.setState({ ledgerOpen:true, ledgerScope:'tonight' }); }
   closeLedger(){ this.setState({ ledgerOpen:false }); }
   setLedgerScope(s){ this.setState({ ledgerScope:s }); }
+  openWall(){ this.fetchWall(); this.setState({ wallOpen:true, wallScope:'tonight' }); }
+  closeWall(){ this.setState({ wallOpen:false }); }
+  setWallScope(s){ this.setState({ wallScope:s }); }
+  onWallDraft(e){ this.setState({ wallDraft: (e.target.value || '').slice(0,180) }); }
+  fetchWall(){ fetch('/api/wall').then(r=>r.json()).then(d=>{ this.setState({ wallPosts: Array.isArray(d.posts)?d.posts:[], wallNightStart: d.nightStart||'' }); }).catch(()=>{}); }
+  postWall(){ const text = (this.state.wallDraft || '').trim(); if (!text) return; this.api('POST','/api/wall',{ text:text, name:(this.state.myName||'').trim() }).then(()=>{ this.setState({ wallDraft:'' }); this.fetchWall(); }).catch(()=>this.flashToast('Could not post your note',2000)); }
+  deleteWallPost(id){ this.api('POST','/api/wall/remove',{ id:id, code:'5352' }).then(()=>this.fetchWall()).catch(()=>this.flashToast('Could not remove it',2000)); }
   fetchHistory(){ fetch('/api/history').then(r=>r.json()).then(d=>{ this.setState({ ledgerRows: Array.isArray(d.rows)?d.rows:[], ledgerNightStart: d.nightStart||'', ledgerNow: d.now||'' }); }).catch(()=>{}); }
   newNight(){ this.api('POST','/api/history/new-night',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not start a new night',2000)); }
   clearHistory(){ try { if (!window.confirm('Clear all-time stats? This erases the whole history and cannot be undone.')) return; } catch(e){} this.api('POST','/api/history/clear',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not clear stats',2000)); }
@@ -1115,7 +1164,7 @@ class Component extends DCLogic {
     const dir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const pal = st.dark ? dir.dark : dir.light;
     try { document.documentElement.style.background = pal.bg; document.body.style.background = pal.bg; } catch(e){}
-    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.ledgerOpen || st.settingsOpen || st.welcomeOpen || st.confirm);
+    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.ledgerOpen || st.settingsOpen || st.welcomeOpen || st.confirm || st.wallOpen);
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
     const meta = dir.meta;
@@ -1430,6 +1479,22 @@ class Component extends DCLogic {
       };
     }
 
+    // ---- The Wall ----
+    const wallTints = [
+      { bg:'rgba(166,187,142,.13)', bd:'rgba(166,187,142,.28)', nm:'var(--accent)' },
+      { bg:'var(--card)', bd:'var(--card-border)', nm:'var(--accent2)' },
+      { bg:'rgba(207,162,103,.13)', bd:'rgba(207,162,103,.28)', nm:'var(--accent2)' },
+    ];
+    const wallTilts = [-1.5, 1.2, -1, 1.6, -0.8, 1.3];
+    let wallStaff = false; try { wallStaff = localStorage.getItem('hollow_86_ok') === '1'; } catch(e){}
+    const wallAll = st.wallPosts || [];
+    const wallFiltered = (st.wallScope === 'all') ? wallAll : wallAll.filter(p => String(p.created_at) >= (st.wallNightStart || ''));
+    const wallNotes = wallFiltered.map((p, i) => { const t = wallTints[i % wallTints.length]; return {
+      id: p.id, text: p.text, who: (p.name && String(p.name).trim()) || 'Anonymous', time: fmtTime(this.toMs(p.created_at)),
+      noteStyle: { background:t.bg, border:'1px solid '+t.bd, borderRadius:'12px', padding:'11px 13px', transform:'rotate('+wallTilts[i % wallTilts.length]+'deg)' },
+      nameStyle: { color:t.nm, fontSize:'12px', marginTop:'6px' },
+      canDelete: wallStaff, onDelete: () => this.deleteWallPost(p.id) }; });
+
     return {
       appStyle,
       ledgerOpen: st.ledgerOpen, onOpenLedger: () => this.openLedger(), onCloseLedger: () => this.closeLedger(),
@@ -1452,6 +1517,11 @@ class Component extends DCLogic {
       bartenderPillStyle: st.bartenderMode ? { fontSize:'11.5px', fontWeight:600, color:'var(--accent-ink)', background:'var(--accent)', borderRadius:'999px', padding:'4px 13px' } : { fontSize:'11.5px', fontWeight:600, color:'var(--ink-faint)', background:'transparent', border:'1px solid var(--pill-line)', borderRadius:'999px', padding:'4px 13px' },
       bartenderPillLabel: st.bartenderMode ? 'On' : 'Off',
       bartenderAlert: st.bartenderAlert, onOpenOrdersFromAlert: () => this.openOrdersFromAlert(),
+      wallOpen: st.wallOpen, onOpenWall: () => this.openWall(), onCloseWall: () => this.closeWall(),
+      wallTonightStyle: tabStyle(st.wallScope!=='all'), wallAllStyle: tabStyle(st.wallScope==='all'),
+      onWallTonight: () => this.setWallScope('tonight'), onWallAll: () => this.setWallScope('all'),
+      wallDraft: st.wallDraft, onWallDraft: (e) => this.onWallDraft(e), onPostWall: () => this.postWall(),
+      wallNotes: wallNotes, hasWall: wallNotes.length>0, wallEmpty: wallNotes.length===0,
       onToggleOrders: () => this.toggleOrders(),
       ordersOpen: st.ordersOpen, hasOrders: activeCount > 0, ordersCount: String(activeCount),
       ordersBadgeStyle, ordersSummary,
