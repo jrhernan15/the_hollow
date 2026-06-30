@@ -1707,7 +1707,7 @@ class Component extends DCLogic {
       stationTab: st.stationTab, stationIsQueue: st.stationTab==='queue', stationIsBatches: st.stationTab==='batches',
       queueTabStyle: tabStyle(st.stationTab==='queue'), batchTabStyle: tabStyle(st.stationTab==='batches'),
       onTabQueue: () => this.setTab('queue'), onTabBatches: () => this.setTab('batches'),
-      queueTabLabel: 'On the Rail (' + queueOrders.length + ')', batchTabLabel: 'Rounds (' + st.batches.length + ')',
+      queueTabLabel: 'The Rail (' + queueOrders.length + ')', batchTabLabel: 'The Rounds (' + st.batches.length + ')',
       queueList, noQueue: queueOrders.length===0, hasQueue: queueOrders.length>0, batchList, noBatches: st.batches.length===0,
       hasSelection: selCount>0, selectionLabel: selCount + ' selected',
       onClearSelection: () => this.clearSelection(), onSelectAll: () => this.selectAllQueue(), onCreateBatch: () => this.createBatch(),
