@@ -79,7 +79,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 5V3H3v2l8 9v5H6v2h12v-2h-5v-5l8-9zM7.43 7L5.66 5h12.69l-1.78 2H7.43z"></path></svg>
         <span data-blabel>The Pass</span><sc-if value="{{ hasOrders }}" hint-placeholder-val=""><span style="{{ ordersBadgeStyle }}">{{ ordersCount }}</span></sc-if>
       </button>
-      <button type="button" data-ledgerbtn onClick="{{ onOpenLedger }}" title="The Ledger" aria-label="Open The Ledger" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 13h4v7H4zm6-9h4v16h-4zm6 5h4v11h-4z"></path></svg><span data-llabel>Ledger</span></button>
+      <button type="button" data-ledgerbtn onClick="{{ onOpenBook }}" title="The Book" aria-label="Open The Book" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zM21 18.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"></path></svg><span data-llabel>The Book</span></button>
       <button type="button" data-settingsbtn onClick="{{ onOpenSettings }}" title="Settings" aria-label="Settings" style="font-size:13px;font-weight:600;color:var(--accent,#2F3D2C);background:var(--field,#FBF9F3);border:1px solid var(--pill-line,#B9C6AC);border-radius:11px;padding:0 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px" style-hover="border-color:var(--accent);background:var(--bg2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg><sc-if value="{{ hasMyName }}" hint-placeholder-val=""><span data-slabel>{{ settingsName }}</span></sc-if></button>
     </div>
 
@@ -233,7 +233,7 @@
     </sc-for>
   </main>
 
-  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpenWall }}" aria-label="The Wall" title="The Wall" style="margin-left:9px;display:inline-flex;align-items:center;gap:5px;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M4 4h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"></path></svg>The Wall</button> <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
+  <footer data-chrome style="max-width:1180px;margin:10px auto 50px;padding:24px;text-align:center;color:var(--ink-faint,#8A8474);font-size:12.5px;letter-spacing:.04em;border-top:1px solid var(--card-border,#E8E4DC)">{{ footerText }} <button type="button" onClick="{{ onOpen86 }}" aria-label="The 86 — staff stock list" title="The 86" style="margin-left:9px;display:inline-flex;align-items:center;vertical-align:middle;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent2,#AD7C44);background:none;border:1.5px solid var(--accent2,#AD7C44);border-radius:999px;padding:3px 11px;cursor:pointer;opacity:.85" style-hover="opacity:1;background:var(--pill-bg,rgba(126,144,112,.08))">The 86</button></footer>
 
   <sc-if value="{{ orderModalName }}" hint-placeholder-val="">
     <div data-chrome data-modalwrap onClick="{{ onCloseOrder }}" style="position:fixed;inset:0;z-index:60;background:rgba(12,11,8,.55);display:flex;align-items:center;justify-content:center;padding:20px">
@@ -558,24 +558,68 @@
     </div>
   </sc-if>
 
-  <sc-if value="{{ ledgerOpen }}" hint-placeholder-val="">
-    <div data-chrome onClick="{{ onCloseLedger }}" style="position:fixed;inset:0;z-index:58;background:rgba(12,11,8,.5);display:flex;justify-content:flex-end">
+  <sc-if value="{{ bookOpen }}" hint-placeholder-val="">
+    <div data-chrome onClick="{{ onCloseBook }}" style="position:fixed;inset:0;z-index:58;background:rgba(12,11,8,.5);display:flex;justify-content:flex-end">
       <aside onClick="{{ stop }}" style="width:min(560px,100%);height:100%;background:var(--bg2,#1A1E14);border-left:1px solid var(--card-border,#2D3422);box-shadow:-12px 0 48px rgba(0,0,0,.35);display:flex;flex-direction:column">
         <header style="padding:16px 18px 12px;border-bottom:1px solid var(--card-border,#2D3422)">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
             <div>
-              <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">The bar · by the numbers</div>
-              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:2px 0 0;color:var(--ink,#ECE7D7)">The Ledger</h2>
-              <div style="font-size:12px;color:var(--ink-faint,#827E6D);margin-top:3px">{{ ledgerSince }}</div>
+              <div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">The party · the night</div>
+              <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:2px 0 0;color:var(--ink,#ECE7D7)">The Book</h2>
             </div>
-            <button type="button" onClick="{{ onCloseLedger }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
+            <button type="button" onClick="{{ onCloseBook }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
           </div>
-          <div style="display:flex;gap:6px;margin-top:12px">
-            <button type="button" onClick="{{ onLedgerTonight }}" style="{{ ledgerTonightStyle }}">Tonight</button>
-            <button type="button" onClick="{{ onLedgerAll }}" style="{{ ledgerAllStyle }}">All-time</button>
+          <div style="display:flex;gap:6px;margin-top:13px">
+            <button type="button" onClick="{{ onBookWall }}" style="{{ bookWallTabStyle }}">The Wall</button>
+            <button type="button" onClick="{{ onBookLedger }}" style="{{ bookLedgerTabStyle }}">The Ledger</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button type="button" onClick="{{ onBookTonight }}" style="{{ bookTonightStyle }}">Tonight</button>
+            <button type="button" onClick="{{ onBookAll }}" style="{{ bookAllStyle }}">All-time</button>
           </div>
         </header>
         <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:14px 16px 16px">
+          <sc-if value="{{ bookTabWall }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:8px">
+              <input type="text" value="{{ wallDraft }}" onChange="{{ onWallDraft }}" placeholder="Leave a toast…" style="flex:1;box-sizing:border-box;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:11px 13px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
+              <button type="button" onClick="{{ onPostWall }}" style="flex:none;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:0 18px;cursor:pointer">Post</button>
+            </div>
+            <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin:7px 2px 0">Signed with your name from Settings.</div>
+            <sc-if value="{{ ledgerHasFave }}" hint-placeholder-val="">
+              <div style="display:flex;gap:9px;margin-top:14px">
+                <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--accent2,#CFA267);border-radius:14px;padding:11px 13px">
+                  <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">🔥 Crowd favorite</div>
+                  <div style="font-family:'Fraunces',Georgia,serif;font-size:17px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerFave }}</div>
+                  <div style="font-size:11.5px;color:var(--accent2,#CFA267);margin-top:2px">{{ ledgerFaveN }} reactions</div>
+                </div>
+                <sc-if value="{{ ledgerHasPoop }}" hint-placeholder-val="">
+                  <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:11px 13px">
+                    <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">The 💩 award</div>
+                    <div style="font-family:'Fraunces',Georgia,serif;font-size:17px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerPoop }}</div>
+                    <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:2px">{{ ledgerPoopN }} × 💩</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasWall }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+                <sc-for list="{{ wallNotes }}" as="w" hint-placeholder-count="3">
+                  <div style="{{ w.noteStyle }}">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                      <div style="font-size:13.5px;line-height:1.45;color:var(--ink,#ECE7D7);flex:1">{{ w.text }}</div>
+                      <sc-if value="{{ w.canDelete }}" hint-placeholder-val=""><button type="button" onClick="{{ w.onDelete }}" aria-label="Remove note" style="flex:none;background:transparent;border:none;color:#CC7A6A;cursor:pointer;font-size:15px;line-height:1;padding:0 2px">×</button></sc-if>
+                    </div>
+                    <div style="{{ w.nameStyle }}">— {{ w.who }} <span style="color:var(--ink-faint,#827E6D)">· {{ w.time }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ wallEmpty }}" hint-placeholder-val="">
+              <div style="text-align:center;color:var(--ink-faint,#827E6D);font-size:13.5px;line-height:1.6;padding:40px 16px">No notes yet.<br>Leave the first toast of the night.</div>
+            </sc-if>
+          </sc-if>
+          <sc-if value="{{ bookTabLedger }}" hint-placeholder-val="">
+          <div style="font-size:12px;color:var(--ink-faint,#827E6D);margin:0 2px 12px">{{ ledgerSince }}</div>
           <div style="display:flex;gap:9px">
             <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:13px 8px;text-align:center">
               <div style="font-family:'Fraunces',Georgia,serif;font-size:27px;color:var(--ink,#ECE7D7);line-height:1">{{ ledgerTotalDrinks }}</div>
@@ -590,23 +634,6 @@
               <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-top:5px">Guests</div>
             </div>
           </div>
-          <sc-if value="{{ ledgerHasFave }}" hint-placeholder-val="">
-            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 6px">Crowd · reactions right now</div>
-            <div style="display:flex;gap:9px">
-              <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--accent2,#CFA267);border-radius:14px;padding:12px 13px">
-                <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">🔥 Crowd favorite</div>
-                <div style="font-family:'Fraunces',Georgia,serif;font-size:18px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerFave }}</div>
-                <div style="font-size:11.5px;color:var(--accent2,#CFA267);margin-top:2px">{{ ledgerFaveN }} reactions</div>
-              </div>
-              <sc-if value="{{ ledgerHasPoop }}" hint-placeholder-val="">
-                <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:12px 13px">
-                  <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">The 💩 award</div>
-                  <div style="font-family:'Fraunces',Georgia,serif;font-size:18px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerPoop }}</div>
-                  <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:2px">{{ ledgerPoopN }} × 💩</div>
-                </div>
-              </sc-if>
-            </div>
-          </sc-if>
           <sc-if value="{{ hasLedger }}" hint-placeholder-val="{{ true }}">
             <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:20px 0 4px">Most ordered</div>
             <sc-for list="{{ ledgerTop }}" as="d" hint-placeholder-count="4">
@@ -645,45 +672,6 @@
           <sc-if value="{{ ledgerEmpty }}" hint-placeholder-val="">
             <div style="text-align:center;color:var(--ink-faint,#827E6D);font-size:13.5px;line-height:1.6;padding:40px 16px">No drinks poured yet.<br>Mark a round <b style="color:var(--accent2,#CFA267)">Ready</b> on The Pass and it'll show up here.</div>
           </sc-if>
-        </div>
-      </aside>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ wallOpen }}" hint-placeholder-val="">
-    <div data-chrome onClick="{{ onCloseWall }}" style="position:fixed;inset:0;z-index:58;background:rgba(12,11,8,.5);display:flex;justify-content:flex-end">
-      <aside onClick="{{ stop }}" style="width:min(520px,100%);height:100%;background:var(--bg2,#1A1E14);border-left:1px solid var(--card-border,#2D3422);box-shadow:-12px 0 48px rgba(0,0,0,.35);display:flex;flex-direction:column">
-        <header style="padding:16px 18px 12px;border-bottom:1px solid var(--card-border,#2D3422)">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-            <div><div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">The party</div><h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;margin:2px 0 0;color:var(--ink,#ECE7D7)">The Wall</h2></div>
-            <button type="button" onClick="{{ onCloseWall }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
-          </div>
-          <div style="display:flex;gap:6px;margin-top:12px">
-            <button type="button" onClick="{{ onWallTonight }}" style="{{ wallTonightStyle }}">Tonight</button>
-            <button type="button" onClick="{{ onWallAll }}" style="{{ wallAllStyle }}">All-time</button>
-          </div>
-        </header>
-        <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:14px 16px 16px">
-          <div style="display:flex;gap:8px">
-            <input type="text" value="{{ wallDraft }}" onChange="{{ onWallDraft }}" placeholder="Leave a toast…" style="flex:1;box-sizing:border-box;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:11px 13px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
-            <button type="button" onClick="{{ onPostWall }}" style="flex:none;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:0 18px;cursor:pointer">Post</button>
-          </div>
-          <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin:7px 2px 0">Signed with your name from Settings.</div>
-          <sc-if value="{{ hasWall }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
-              <sc-for list="{{ wallNotes }}" as="w" hint-placeholder-count="3">
-                <div style="{{ w.noteStyle }}">
-                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-                    <div style="font-size:13.5px;line-height:1.45;color:var(--ink,#ECE7D7);flex:1">{{ w.text }}</div>
-                    <sc-if value="{{ w.canDelete }}" hint-placeholder-val=""><button type="button" onClick="{{ w.onDelete }}" aria-label="Remove note" style="flex:none;background:transparent;border:none;color:#CC7A6A;cursor:pointer;font-size:15px;line-height:1;padding:0 2px">×</button></sc-if>
-                  </div>
-                  <div style="{{ w.nameStyle }}">— {{ w.who }} <span style="color:var(--ink-faint,#827E6D)">· {{ w.time }}</span></div>
-                </div>
-              </sc-for>
-            </div>
-          </sc-if>
-          <sc-if value="{{ wallEmpty }}" hint-placeholder-val="">
-            <div style="text-align:center;color:var(--ink-faint,#827E6D);font-size:13.5px;line-height:1.6;padding:40px 16px">No notes yet.<br>Leave the first toast of the night.</div>
           </sc-if>
         </div>
       </aside>
@@ -817,6 +805,7 @@ class Component extends DCLogic {
       settingsOpen: false, myName: '', welcomeOpen: false, welcomeName: '', confirm: null,
       bartenderMode: false, bartenderAlert: null,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
+      bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -906,8 +895,7 @@ class Component extends DCLogic {
     if (justReady) this.chime();
     const theme = (d && d.theme) || 'auto';
     this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme), reactions: (d && d.reactions) || {} });
-    if (this.state.ledgerOpen) this.fetchHistory();   // keep stats live while open
-    if (this.state.wallOpen) this.fetchWall();
+    if (this.state.bookOpen){ if (this.state.bookTab === 'wall') this.fetchWall(); else this.fetchHistory(); }
   }
 
   flashToast(msg, ms){ this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast:null }), ms||2000); }
@@ -1111,6 +1099,10 @@ class Component extends DCLogic {
   fetchWall(){ fetch('/api/wall').then(r=>r.json()).then(d=>{ this.setState({ wallPosts: Array.isArray(d.posts)?d.posts:[], wallNightStart: d.nightStart||'' }); }).catch(()=>{}); }
   postWall(){ const text = (this.state.wallDraft || '').trim(); if (!text) return; this.api('POST','/api/wall',{ text:text, name:(this.state.myName||'').trim() }).then(()=>{ this.setState({ wallDraft:'' }); this.fetchWall(); }).catch(()=>this.flashToast('Could not post your note',2000)); }
   deleteWallPost(id){ this.api('POST','/api/wall/remove',{ id:id, code:'5352' }).then(()=>this.fetchWall()).catch(()=>this.flashToast('Could not remove it',2000)); }
+  openBook(){ this.fetchWall(); this.fetchHistory(); this.setState({ bookOpen:true, bookTab:'wall' }); }
+  closeBook(){ this.setState({ bookOpen:false }); }
+  setBookTab(t){ this.setState({ bookTab:t }); if (t==='wall') this.fetchWall(); else this.fetchHistory(); }
+  setBookScope(s){ this.setState({ bookScope:s, wallScope:s, ledgerScope:s }); }
   _cid(){ let c=null; try { c = localStorage.getItem('hollow_cid'); if (!c){ c = 'c' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); localStorage.setItem('hollow_cid', c); } } catch(e){ c = this.__cid || (this.__cid = 'c' + Math.random().toString(36).slice(2)); } return c; }
   react(drink, emoji){
     let myRx = {}; try { myRx = JSON.parse(localStorage.getItem('hollow_reactions') || '{}') || {}; } catch(e){}
@@ -1206,7 +1198,7 @@ class Component extends DCLogic {
     const dir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const pal = st.dark ? dir.dark : dir.light;
     try { document.documentElement.style.background = pal.bg; document.body.style.background = pal.bg; } catch(e){}
-    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.ledgerOpen || st.settingsOpen || st.welcomeOpen || st.confirm || st.wallOpen);
+    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.bookOpen || st.settingsOpen || st.welcomeOpen || st.confirm);
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
     const meta = dir.meta;
@@ -1488,7 +1480,7 @@ class Component extends DCLogic {
     const fmtOz = (v) => { const r = Math.round(v*10)/10; return (Math.abs(r-Math.round(r))<0.05 ? String(Math.round(r)) : String(r)); };
     const lgBar = (frac, col) => ({ width: Math.max(5, Math.round((frac||0)*100)) + '%', height:'6px', borderRadius:'999px', background: col, marginTop:'5px' });
     let ledgerVals = { hasLedger:false, ledgerEmpty:false, ledgerTotalDrinks:'0', ledgerTotalOz:'0', ledgerGuestCount:'0', ledgerKinds:'0', ledgerSince:'', ledgerTop:[], ledgerOz:[], ledgerSupers:[], ledgerFeed:[], ledgerStaff:false, hasFave:false, ledgerFave:'', ledgerFaveN:'0', hasPoop:false, ledgerPoop:'', ledgerPoopN:'0' };
-    if (st.ledgerOpen){
+    if (st.bookOpen){
       const allRows = st.ledgerRows || [];
       const ns = st.ledgerNightStart || '';
       const rows = (st.ledgerScope === 'all') ? allRows : allRows.filter(r => String(r.created_at) >= ns);
@@ -1547,6 +1539,9 @@ class Component extends DCLogic {
       noteStyle: { background:t.bg, border:'1px solid '+t.bd, borderRadius:'12px', padding:'11px 13px', transform:'rotate('+wallTilts[i % wallTilts.length]+'deg)' },
       nameStyle: { color:t.nm, fontSize:'12px', marginTop:'6px' },
       canDelete: wallStaff, onDelete: () => this.deleteWallPost(p.id) }; });
+    const bigTab = (on) => on
+      ? { flex:'1', textAlign:'center', fontFamily:"'Inter',sans-serif", fontSize:'13px', fontWeight:600, color:'var(--accent-ink)', background:'var(--accent)', border:'none', borderRadius:'9px', padding:'8px', cursor:'pointer' }
+      : { flex:'1', textAlign:'center', fontFamily:"'Inter',sans-serif", fontSize:'13px', fontWeight:600, color:'var(--ink-soft)', background:'var(--card)', border:'1px solid var(--card-border)', borderRadius:'9px', padding:'8px', cursor:'pointer' };
 
     return {
       appStyle,
@@ -1571,11 +1566,14 @@ class Component extends DCLogic {
       bartenderPillStyle: st.bartenderMode ? { fontSize:'11.5px', fontWeight:600, color:'var(--accent-ink)', background:'var(--accent)', borderRadius:'999px', padding:'4px 13px' } : { fontSize:'11.5px', fontWeight:600, color:'var(--ink-faint)', background:'transparent', border:'1px solid var(--pill-line)', borderRadius:'999px', padding:'4px 13px' },
       bartenderPillLabel: st.bartenderMode ? 'On' : 'Off',
       bartenderAlert: st.bartenderAlert, onOpenOrdersFromAlert: () => this.openOrdersFromAlert(),
-      wallOpen: st.wallOpen, onOpenWall: () => this.openWall(), onCloseWall: () => this.closeWall(),
-      wallTonightStyle: tabStyle(st.wallScope!=='all'), wallAllStyle: tabStyle(st.wallScope==='all'),
-      onWallTonight: () => this.setWallScope('tonight'), onWallAll: () => this.setWallScope('all'),
       wallDraft: st.wallDraft, onWallDraft: (e) => this.onWallDraft(e), onPostWall: () => this.postWall(),
       wallNotes: wallNotes, hasWall: wallNotes.length>0, wallEmpty: wallNotes.length===0,
+      bookOpen: st.bookOpen, onOpenBook: () => this.openBook(), onCloseBook: () => this.closeBook(),
+      bookTabWall: st.bookTab==='wall', bookTabLedger: st.bookTab==='ledger',
+      bookWallTabStyle: bigTab(st.bookTab==='wall'), bookLedgerTabStyle: bigTab(st.bookTab==='ledger'),
+      onBookWall: () => this.setBookTab('wall'), onBookLedger: () => this.setBookTab('ledger'),
+      bookTonightStyle: tabStyle(st.bookScope!=='all'), bookAllStyle: tabStyle(st.bookScope==='all'),
+      onBookTonight: () => this.setBookScope('tonight'), onBookAll: () => this.setBookScope('all'),
       onToggleOrders: () => this.toggleOrders(),
       ordersOpen: st.ordersOpen, hasOrders: activeCount > 0, ordersCount: String(activeCount),
       ordersBadgeStyle, ordersSummary,
