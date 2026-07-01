@@ -294,12 +294,15 @@ function saveParlour(p) { Q.setSetting.run("parlour", JSON.stringify(p)); }
 function resetParlour() { Q.parlourClearPlayers.run(); Q.parlourClearAnswers.run(); Q.parlourClearPrompts.run(); saveParlour({ ...PARLOUR_DEFAULT }); }
 function dealParlourPrompt(p) {
   const bundled = PARLOUR_PROMPTS[p.game] || { tame: [], spicy: [] };
-  let pool = (bundled.tame || []).slice();
-  if (p.spicy) pool = pool.concat(bundled.spicy || []);
-  for (const r of Q.parlourPrompts.all(p.game)) { if (!r.spicy || p.spicy) pool.push(r.text); }
+  let base = (bundled.tame || []).slice();
+  if (p.spicy) base = base.concat(bundled.spicy || []);
+  const custom = [];   // player/host-submitted — these get priority
+  for (const r of Q.parlourPrompts.all(p.game)) { if (!r.spicy || p.spicy) custom.push(r.text); }
   p.dealt = Array.isArray(p.dealt) ? p.dealt : [];
-  let avail = pool.filter((t) => p.dealt.indexOf(t) === -1);
-  if (!avail.length) { p.dealt = []; avail = pool; }
+  // Prefer unused player-submitted prompts; fall back to the bundled pack.
+  let avail = custom.filter((t) => p.dealt.indexOf(t) === -1);
+  if (!avail.length) avail = base.filter((t) => p.dealt.indexOf(t) === -1);
+  if (!avail.length) { p.dealt = []; avail = custom.length ? custom.slice() : base.slice(); }  // all used → start over, still preferring custom
   if (!avail.length) return null;
   const pick = avail[Math.floor(Math.random() * avail.length)];
   p.dealt.push(pick);
