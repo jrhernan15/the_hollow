@@ -187,6 +187,7 @@ const Q = {
   parlourAddPrompt:    db.prepare("INSERT INTO parlour_prompts (game, text, spicy) VALUES (?, ?, ?)"),
   parlourPrompts:      db.prepare("SELECT text, spicy FROM parlour_prompts WHERE game = ?"),
   parlourClearPrompts: db.prepare("DELETE FROM parlour_prompts"),
+  parlourPromptCount:  db.prepare("SELECT COUNT(*) AS n FROM parlour_prompts"),
   // The Usual
   parlourRoundAnswers: db.prepare("SELECT cid, value, answer_id FROM parlour_answers WHERE round = ? ORDER BY answer_id"),
   parlourSetAnswerId:  db.prepare("UPDATE parlour_answers SET answer_id = ? WHERE round = ? AND cid = ?"),
@@ -363,7 +364,7 @@ function canAdvance(body) { const p = getParlour(); return p.advance === "anyone
 function parlourState() {
   const p = getParlour();
   const players = Q.parlourActivePlayers.all();   // only recently-seen devices count as "in the room"
-  const out = { game: p.game, phase: p.phase, round: p.round || 0, prompt: p.prompt || "", heat: p.promptHeat || "tame", spice: spiceLevel(p), spiceLabel: SPICE_LEVELS[spiceLevel(p)], advance: p.advance || "host", showWho: !!p.showWho, scoring: !!p.scoring, players, present: players.length };
+  const out = { game: p.game, phase: p.phase, round: p.round || 0, prompt: p.prompt || "", heat: p.promptHeat || "tame", spice: spiceLevel(p), spiceLabel: SPICE_LEVELS[spiceLevel(p)], advance: p.advance || "host", showWho: !!p.showWho, scoring: !!p.scoring, added: Q.parlourPromptCount.get().n, players, present: players.length };
   if (p.game && (p.phase === "answer" || p.phase === "guess" || p.phase === "reveal")) {
     out.answered = Q.parlourRoundCount.get(p.round).n;
     const atReveal = p.phase === "reveal";
@@ -834,6 +835,14 @@ const server = http.createServer(async (req, res) => {
       Q.parlourAddPrompt.run(game, text, b.spicy ? 1 : 0);
       broadcast();
       return sendJSON(res, 201, { ok: true });
+    }
+    // host: wipe every player-submitted prompt (e.g. clearing out test entries)
+    if (pathname === "/api/parlour/clear-prompts" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      Q.parlourClearPrompts.run();
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
     }
 
     return sendJSON(res, 404, { error: "not found" });

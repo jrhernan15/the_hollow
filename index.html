@@ -1147,6 +1147,12 @@
                   <button type="button" onClick="{{ pv.onShowWhoOff }}" style="{{ pv.showWhoOffStyle }}">Anon</button>
                 </div>
               </div>
+              <sc-if value="{{ pv.hasAdded }}" hint-placeholder-val="">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
+                  <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Added prompts <span style="color:var(--ink-faint,#827E6D)">({{ pv.addedCount }} in the pool)</span></span>
+                  <button type="button" onClick="{{ pv.onClearPrompts }}" style="flex:none;font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:7px 14px;cursor:pointer">Clear</button>
+                </div>
+              </sc-if>
               <sc-if value="{{ pv.live }}" hint-placeholder-val=""><button type="button" onClick="{{ pv.onEnd }}" style="display:block;width:100%;box-sizing:border-box;font-size:13px;font-weight:600;color:#CC7A6A;background:transparent;border:1px solid #6E4A44;border-radius:12px;padding:11px;cursor:pointer">End the game</button></sc-if>
             </div>
           </sc-if>
@@ -1619,6 +1625,7 @@ class Component extends DCLogic {
   parlourSet(patch){ this.api('POST','/api/parlour/settings', Object.assign({ code: this._parlourCode() }, patch||{})).then(()=>this.refreshState()).catch(()=>{}); }
   onParlourDraft(e){ this.setState({ parlourDraft: (e.target.value||'').slice(0,160) }); }
   parlourAddPrompt(){ const t = (this.state.parlourDraft||'').trim(); if (!t) return; const p = this.state.parlour || {}; this.api('POST','/api/parlour/prompt',{ game: p.game || 'confession', text: t, spicy: (((p.spice==null?1:p.spice)|0) >= 1) }).then(()=>{ this.setState({ parlourDraft: '' }); this.flashToast('Dropped in the pool ✓',1500); }).catch(()=>{}); }
+  parlourClearPrompts(){ this.api('POST','/api/parlour/clear-prompts',{ code: this._parlourCode() }).then(()=>{ this.refreshState(); this.flashToast('Added prompts cleared ✓',1600); }).catch(()=>this.flashToast('Only the host can clear',1800)); }
   onParlourGate(e){ this.setState({ parlourGate: (e.target.value||'').slice(0,10) }); }
   parlourUnlock(){ if ((this.state.parlourGate||'').trim() === '5352'){ try { localStorage.setItem('hollow_86_ok','1'); } catch(e){} this.setState({ parlourGate: '', parlourGateErr: false }); this.flashToast('You’re hosting',1500); } else { this.setState({ parlourGateErr: true, parlourGate: '' }); } }
   openPeek(name){ if (name) this.setState({ peekDrink: name }); }
@@ -1816,6 +1823,7 @@ class Component extends DCLogic {
       onOpenConfession: () => this.parlourOpenGame('confession'), dealLabel: pPhase==='lobby' ? 'Deal the first prompt' : 'Next round',
       advHostStyle: _pSeg(!pAdvanceAnyone), advAnyoneStyle: _pSeg(pAdvanceAnyone), onAdvHost: () => this.parlourSet({ advance:'host' }), onAdvAnyone: () => this.parlourSet({ advance:'anyone' }),
       onAddPrompt: () => this.parlourAddPrompt(), gateErr: st.parlourGateErr,
+      addedCount: String(P.added||0), hasAdded: (P.added||0) > 0, onClearPrompts: () => this.parlourClearPrompts(),
     };
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
