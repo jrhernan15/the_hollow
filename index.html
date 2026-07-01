@@ -990,9 +990,13 @@
                 <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Confession</div>
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">Never have I ever — answers stay anonymous, only the count shows.</div>
               </button>
-              <button type="button" onClick="{{ pv.onOpenFork }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer">
+              <button type="button" onClick="{{ pv.onOpenFork }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer;margin-bottom:9px">
                 <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Fork</div>
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">This or that — the room splits live, then the reveal names each side.</div>
+              </button>
+              <button type="button" onClick="{{ pv.onOpenUsual }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer">
+                <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Usual</div>
+                <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">Everyone answers a prompt, then the room guesses who wrote what.</div>
               </button>
             </sc-if>
             <sc-if value="{{ pv.notStaff }}" hint-placeholder-val="">
@@ -1030,8 +1034,33 @@
               <button type="button" onClick="{{ pv.onVoteB }}" style="{{ pv.forkBStyle }}">{{ pv.forkB }}</button>
               <div style="display:flex;height:30px;border-radius:9px;overflow:hidden;border:1px solid var(--card-border,#2D3422)"><div style="{{ pv.forkBarA }}">{{ pv.forkACount }}</div><div style="{{ pv.forkBarB }}">{{ pv.forkBCount }}</div></div>
             </sc-if>
+            <sc-if value="{{ pv.isUsual }}" hint-placeholder-val="">
+              <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:21px;line-height:1.3;color:var(--ink,#ECE7D7);margin-bottom:14px">{{ pv.prompt }}</div>
+              <input type="text" value="{{ parlourUsualDraft }}" onChange="{{ onParlourUsualDraft }}" placeholder="Your answer…" style="width:100%;box-sizing:border-box;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px 13px;outline:none;margin-bottom:9px">
+              <button type="button" onClick="{{ pv.onSubmitUsual }}" style="display:block;width:100%;box-sizing:border-box;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:12px;cursor:pointer">Submit</button>
+              <sc-if value="{{ pv.mySubmitted }}" hint-placeholder-val=""><div style="font-size:12px;color:var(--accent2,#CFA267);margin-top:8px;line-height:1.4">In ✓ — “{{ pv.mySubmittedText }}” · edit above to change it.</div></sc-if>
+            </sc-if>
             <div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);letter-spacing:.06em;margin-top:10px">{{ pv.answeredLabel }}</div>
-            <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val=""><button type="button" onClick="{{ pv.onReveal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Reveal the room</button></sc-if>
+            <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="">
+              <sc-if value="{{ pv.isUsual }}" hint-placeholder-val=""><button type="button" onClick="{{ pv.onClose }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Lock answers → guessing</button></sc-if>
+              <sc-if value="{{ pv.notUsual }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ pv.onReveal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Reveal the room</button></sc-if>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ pv.isGuess }}" hint-placeholder-val="">
+            <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:10px">The Usual · who wrote what</div>
+            <sc-if value="{{ pv.amSpectator }}" hint-placeholder-val=""><div style="font-size:13px;color:var(--ink-soft,#B7B3A1);line-height:1.5;margin-bottom:12px">You sat this one out — enjoy watching the room guess.</div></sc-if>
+            <sc-for list="{{ pv.guessCards }}" as="gc" hint-placeholder-count="2">
+              <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:13px 14px;margin-bottom:10px">
+                <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;line-height:1.4;color:var(--ink,#ECE7D7);margin-bottom:10px">“{{ gc.text }}”</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ gc.options }}" as="op" hint-placeholder-count="3"><button type="button" onClick="{{ op.onPick }}" style="{{ op.style }}">{{ op.name }}</button></sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:6px">{{ pv.guessProgress }}</div>
+            <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ pv.onReveal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:16px;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:13px;cursor:pointer">Reveal the writers</button></sc-if>
+            <sc-if value="{{ pv.waiting }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--ink-faint,#827E6D);margin-top:16px">Waiting for the host to reveal…</div></sc-if>
           </sc-if>
 
           <sc-if value="{{ pv.isReveal }}" hint-placeholder-val="">
@@ -1057,7 +1086,23 @@
                 </div>
               </sc-if>
             </sc-if>
-            <sc-if value="{{ pv.hasMyAnswer }}" hint-placeholder-val=""><div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:12px">{{ pv.myAnswerLabel }}</div></sc-if>
+            <sc-if value="{{ pv.isUsual }}" hint-placeholder-val="">
+              <sc-for list="{{ pv.revealCards }}" as="rc" hint-placeholder-count="2">
+                <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:13px 14px;margin-bottom:10px">
+                  <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;line-height:1.4;color:var(--ink,#ECE7D7)">“{{ rc.text }}”</div>
+                  <div style="font-size:13px;color:var(--accent2,#CFA267);font-weight:600;margin-top:6px">— {{ rc.author }}</div>
+                  <sc-if value="{{ rc.hasNailed }}" hint-placeholder-val=""><div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:3px">Nailed it: {{ rc.nailed }}</div></sc-if>
+                  <sc-if value="{{ rc.nailedNone }}" hint-placeholder-val=""><div style="font-size:12px;color:var(--ink-faint,#827E6D);margin-top:3px">Fooled the whole room.</div></sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{ pv.hasScores }}" hint-placeholder-val="">
+                <div style="margin-top:14px;border-top:1px solid var(--card-border,#2D3422);padding-top:12px">
+                  <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:8px">Standings</div>
+                  <sc-for list="{{ pv.usualScores }}" as="s" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink,#ECE7D7);padding:3px 0"><span>{{ s.rank }}. {{ s.name }}</span><span style="color:var(--accent2,#CFA267);font-weight:600">{{ s.points }}</span></div></sc-for>
+                </div>
+              </sc-if>
+            </sc-if>
+            <sc-if value="{{ pv.showMyAnswer }}" hint-placeholder-val=""><div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:12px">{{ pv.myAnswerLabel }}</div></sc-if>
             <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ pv.onDeal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:20px;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:13px;cursor:pointer">Next round</button></sc-if>
             <sc-if value="{{ pv.waiting }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--ink-faint,#827E6D);margin-top:16px">Waiting for the host…</div></sc-if>
           </sc-if>
@@ -1154,7 +1199,7 @@ class Component extends DCLogic {
       bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false, verdictDrink: null, peekDrink: null,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
       bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
-      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourDraft: '', parlourGate: '', parlourGateErr: false,
+      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourDraft: '', parlourUsualDraft: '', parlourGate: '', parlourGateErr: false,
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -1280,6 +1325,7 @@ class Component extends DCLogic {
     const _ns = (d && d.nightStart) || '';
     try { const _rxNight = localStorage.getItem('hollow_reactions_night') || ''; if (_ns && _rxNight !== _ns) { localStorage.setItem('hollow_reactions', '{}'); localStorage.setItem('hollow_reactions_night', _ns); } } catch(e){}
     this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme), reactions: (d && d.reactions) || {}, reactionsAll: (d && d.reactionsAll) || {}, serverNightStart: (d && d.nightStart) || '', parlour: (d && d.parlour) || { game: null, phase: 'ended', players: [], present: 0 } });
+    try { const _pr = (d && d.parlour) ? d.parlour.round : 0; if (_pr !== this._pLastRound) { this._pLastRound = _pr; if (this.state.parlourUsualDraft) this.setState({ parlourUsualDraft: '' }); } } catch(e){}
     if (this.state.bookOpen){ if (this.state.bookTab === 'wall') this.fetchWall(); else this.fetchHistory(); }
   }
 
@@ -1548,6 +1594,11 @@ class Component extends DCLogic {
   parlourOpenGame(game){ this.api('POST','/api/parlour/open',{ game: game || 'confession', code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>this.flashToast('The host starts the games',1800)); }
   parlourDeal(){ this.api('POST','/api/parlour/deal',{ code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>this.flashToast('Only the host can move it on',1800)); }
   parlourReveal(){ this.api('POST','/api/parlour/reveal',{ code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>this.flashToast('Only the host can reveal',1800)); }
+  parlourClose(){ this.api('POST','/api/parlour/close',{ code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>this.flashToast('Only the host can close answers',1800)); }
+  parlourGuess(answerId, guessCid){ try { let m = JSON.parse(localStorage.getItem('hollow_parlour_guesses')||'null'); const round = (this.state.parlour||{}).round; if (!m || m.round !== round) m = { round: round, g: {} }; m.g[answerId] = guessCid; localStorage.setItem('hollow_parlour_guesses', JSON.stringify(m)); } catch(e){} this.forceUpdate(); this.api('POST','/api/parlour/guess',{ cid: this._cid(), answerId: answerId, guessCid: guessCid }).then(()=>this.refreshState()).catch(()=>{}); }
+  parlourMyGuesses(){ try { const m = JSON.parse(localStorage.getItem('hollow_parlour_guesses')||'null'); const round = (this.state.parlour||{}).round; if (m && m.round === round) return m.g || {}; } catch(e){} return {}; }
+  onParlourUsualDraft(e){ this.setState({ parlourUsualDraft: (e.target.value||'').slice(0,120) }); }
+  parlourSubmitUsual(){ const t = (this.state.parlourUsualDraft||'').trim(); if (t) this.parlourAnswer(t); }
   parlourEnd(){ this.api('POST','/api/parlour/end',{ code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>{}); }
   parlourSet(patch){ this.api('POST','/api/parlour/settings', Object.assign({ code: this._parlourCode() }, patch||{})).then(()=>this.refreshState()).catch(()=>{}); }
   onParlourDraft(e){ this.setState({ parlourDraft: (e.target.value||'').slice(0,160) }); }
@@ -1659,7 +1710,7 @@ class Component extends DCLogic {
     const pCanAdvance = pStaff || pAdvanceAnyone;
     const pMy = this.parlourMyAnswer();
     const pPresent = P.present || 0, pAnswered = P.answered || 0;
-    const pGameName = ({ confession:'The Confession', fork:'The Fork' })[pGame] || 'The Parlour';
+    const pGameName = ({ confession:'The Confession', fork:'The Fork', usual:'The Usual' })[pGame] || 'The Parlour';
     const pIsFork = pGame==='fork', pIsConfession = pGame==='confession';
     let forkA='', forkB='';
     if (pIsFork && P.prompt){ const _pp = String(P.prompt).split('|'); forkA = (_pp[0]||'').trim(); forkB = ((_pp[1]||'').trim()) || '…'; }
@@ -1668,6 +1719,22 @@ class Component extends DCLogic {
     const _forkCard = (on) => ({ display:'block', width:'100%', boxSizing:'border-box', textAlign:'center', fontFamily:"'Fraunces',Georgia,serif", fontSize:'17px', fontWeight:500, lineHeight:'1.25', borderRadius:'14px', padding:'18px 12px', marginBottom:'10px', cursor:'pointer', color: on?'var(--ink)':'var(--ink-soft)', border:'1px solid '+(on?'var(--accent2)':'var(--card-border)'), background: on?'rgba(207,162,103,.13)':'var(--field)', transition:'background .15s ease, border-color .15s ease' });
     let forkMinority='';
     if (pIsFork && pPhase==='reveal'){ forkMinority = (_spl.a<_spl.b) ? ('The brave '+_spl.a) : (_spl.b<_spl.a) ? ('The brave '+_spl.b) : 'A dead heat, somehow.'; }
+    // The Usual
+    const pIsUsual = pGame==='usual';
+    const _guessChip = (on) => ({ fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'5px 11px', cursor:'pointer', border:'1px solid '+(on?'var(--accent2)':'var(--pill-line)'), background: on?'rgba(207,162,103,.14)':'var(--field)', color: on?'var(--ink)':'var(--ink-soft)' });
+    let guessCards=[], amSpectator=false, guessProgress='', revealCards=[], usualScores=[];
+    if (pIsUsual && pPhase==='guess'){
+      const _myCid = this._cid(); const _ans = P.answers || []; const _myText = pMy; const _mg = this.parlourMyGuesses();
+      const _roster = (P.players||[]).filter(x => x.cid !== _myCid);
+      guessCards = _ans.filter(a => a.text !== _myText).map(a => ({ id:a.id, text:a.text,
+        options: _roster.map(pl => ({ cid:pl.cid, name:(pl.name && String(pl.name).trim())||'Someone', style:_guessChip(_mg[a.id]===pl.cid), onPick: () => this.parlourGuess(a.id, pl.cid) })) }));
+      amSpectator = !_myText;
+      guessProgress = (P.guessDone||0) + ' of ' + (P.guessTotal||0) + ' done guessing';
+    }
+    if (pIsUsual && pPhase==='reveal'){
+      revealCards = (P.reveal||[]).map(r => ({ text:r.text, author:r.author, nailed:(r.nailed||[]).join(', '), hasNailed:(r.nailed||[]).length>0, nailedNone:(r.nailed||[]).length===0, fooledLabel:(r.fooledCount||0) + ((r.fooledCount||0)===1?' fooled':' fooled') }));
+      usualScores = (P.scores||[]).map((s,i) => ({ rank:String(i+1), name:s.name, points:String(s.points) }));
+    }
     const _pSeg = (on) => ({ flex:'1', textAlign:'center', fontFamily:"'Inter',sans-serif", fontSize:'12px', fontWeight:600, borderRadius:'999px', padding:'6px 10px', cursor:'pointer', border:'none', background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--ink-soft)' });
     const _pAns = (on) => ({ display:'block', width:'100%', boxSizing:'border-box', textAlign:'center', fontFamily:"'Fraunces',Georgia,serif", fontSize:'17px', fontWeight:500, borderRadius:'14px', padding:'15px', marginBottom:'10px', cursor:'pointer', color: on?'var(--ink)':'var(--ink-soft)', border:'1px solid '+(on?'var(--accent2)':'var(--card-border)'), background: on?'rgba(207,162,103,.13)':'var(--field)', transition:'background .15s ease, border-color .15s ease' });
     let pRevealBig='', pRevealSub='', pWry='', pBarPct='0%';
@@ -1684,10 +1751,14 @@ class Component extends DCLogic {
     const pv = {
       live: pLive, game: pGame, gameName: pGameName,
       isNone: (!pGame || pPhase==='ended'), isLobby: pPhase==='lobby', isAnswer: pPhase==='answer', isReveal: pPhase==='reveal',
-      isConfession: pIsConfession, isFork: pIsFork,
+      isConfession: pIsConfession, isFork: pIsFork, isUsual: pIsUsual, notUsual: !pIsUsual, isGuess: pPhase==='guess',
       staff: pStaff, notStaff: !pStaff, canAdvance: pCanAdvance, waiting: (pLive && !pCanAdvance),
-      promptPlaceholder: pIsFork ? 'This | that' : 'Never have I ever…',
-      onOpenFork: () => this.parlourOpenGame('fork'),
+      promptPlaceholder: pIsFork ? 'This | that' : pIsUsual ? 'A question everyone answers…' : 'Never have I ever…',
+      onOpenFork: () => this.parlourOpenGame('fork'), onOpenUsual: () => this.parlourOpenGame('usual'),
+      onClose: () => this.parlourClose(), onSubmitUsual: () => this.parlourSubmitUsual(),
+      mySubmitted: (pIsUsual && pMy!=null), mySubmittedText: pMy || '', showMyAnswer: (pMy!=null && !pIsUsual),
+      guessCards: guessCards, amSpectator: amSpectator, guessProgress: guessProgress,
+      revealCards: revealCards, usualScores: usualScores, hasScores: (pIsUsual && pPhase==='reveal' && !!P.scoring && usualScores.length>0),
       forkA: forkA, forkB: forkB, forkAStyle: _forkCard(pMy==='a'), forkBStyle: _forkCard(pMy==='b'),
       onVoteA: () => this.parlourAnswer('a'), onVoteB: () => this.parlourAnswer('b'),
       forkACount: String(_spl.a), forkBCount: String(_spl.b),
@@ -2152,7 +2223,7 @@ class Component extends DCLogic {
       bookOpen: st.bookOpen, onOpenBook: () => this.openBook(), onCloseBook: () => this.closeBook(),
       pv: pv, parlourLive: pLive, parlourOpen: st.parlourOpen, onOpenParlour: () => this.openParlour(), onCloseParlour: () => this.closeParlour(),
       parlourBannerOpen: (pLive && !st.parlourOpen && !st.parlourBannerDismissed), onDismissParlourBanner: () => this.dismissParlourBanner(),
-      parlourDraft: st.parlourDraft, onParlourDraft: (e) => this.onParlourDraft(e), parlourGate: st.parlourGate, onParlourGate: (e) => this.onParlourGate(e), onParlourUnlock: () => this.parlourUnlock(),
+      parlourDraft: st.parlourDraft, onParlourDraft: (e) => this.onParlourDraft(e), parlourUsualDraft: st.parlourUsualDraft, onParlourUsualDraft: (e) => this.onParlourUsualDraft(e), parlourGate: st.parlourGate, onParlourGate: (e) => this.onParlourGate(e), onParlourUnlock: () => this.parlourUnlock(),
       bookTabWall: st.bookTab==='wall', bookTabLedger: st.bookTab==='ledger',
       bookWallTabStyle: bookTabStyle(st.bookTab==='wall'), bookLedgerTabStyle: bookTabStyle(st.bookTab==='ledger'), bookIndStyle: slideInd(st.bookTab==='ledger'?1:0, 2),
       onBookWall: () => this.setBookTab('wall'), onBookLedger: () => this.setBookTab('ledger'),
