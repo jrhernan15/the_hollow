@@ -1142,6 +1142,12 @@
             </div>
           </sc-if>
 
+          <sc-if value="{{ pv.live }}" hint-placeholder-val="">
+            <div style="text-align:center;margin-top:20px">
+              <button type="button" onClick="{{ pv.onLeave }}" style="font-size:12.5px;font-weight:600;color:var(--ink-faint,#827E6D);background:transparent;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Leave the game</button>
+            </div>
+          </sc-if>
+
         </div>
       </aside>
     </div>
@@ -1584,10 +1590,12 @@ class Component extends DCLogic {
   parlourStaff(){ let ok=false; try { ok = localStorage.getItem('hollow_86_ok')==='1'; } catch(e){} return ok; }
   _parlourCode(){ return this.parlourStaff() ? '5352' : ''; }
   _myNameNow(){ try { return localStorage.getItem('hollow_name_v1') || ''; } catch(e){ return ''; } }
-  openParlour(){ this.parlourJoin(); this.setState({ parlourOpen: true, parlourBannerDismissed: true }); }
-  closeParlour(){ this.setState({ parlourOpen: false }); }
+  openParlour(){ this.parlourJoin(); try { clearInterval(this._pHeart); } catch(e){} this._pHeart = setInterval(() => this.parlourPing(), 30000); this.setState({ parlourOpen: true, parlourBannerDismissed: true }); }
+  closeParlour(){ try { clearInterval(this._pHeart); } catch(e){} this._pHeart = null; this.setState({ parlourOpen: false }); }
   dismissParlourBanner(){ this.setState({ parlourBannerDismissed: true }); }
   parlourJoin(){ this.api('POST','/api/parlour/join',{ cid: this._cid(), name: this._myNameNow() }).then(()=>this.refreshState()).catch(()=>{}); }
+  parlourPing(){ this.api('POST','/api/parlour/ping',{ cid: this._cid(), name: this._myNameNow() }).catch(()=>{}); }
+  parlourLeave(){ try { clearInterval(this._pHeart); } catch(e){} this._pHeart = null; this.api('POST','/api/parlour/leave',{ cid: this._cid() }).then(()=>this.refreshState()).catch(()=>{}); this.setState({ parlourOpen: false }); this.flashToast('Left the game', 1500); }
   parlourAnswer(value){ const p = this.state.parlour || {}; try { localStorage.setItem('hollow_parlour_ans', JSON.stringify({ round: p.round, value: value })); } catch(e){} this.forceUpdate(); this.api('POST','/api/parlour/answer',{ cid: this._cid(), value: value, name: this._myNameNow() }).then(()=>this.refreshState()).catch(()=>{}); }
   parlourMyAnswer(){ const p = this.state.parlour || {}; try { const a = JSON.parse(localStorage.getItem('hollow_parlour_ans')||'null'); if (a && a.round === p.round) return a.value; } catch(e){} return null; }
   parlourOpenGame(game){ this.api('POST','/api/parlour/open',{ game: game || 'confession', code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>this.flashToast('The host starts the games',1800)); }
@@ -1775,7 +1783,7 @@ class Component extends DCLogic {
       revealBig: pRevealBig, revealSub: pRevealSub, wry: pWry,
       barStyle: { width: pBarPct, height:'100%', background:'var(--accent)', borderRadius:'999px', transition:'width .5s cubic-bezier(.4,0,.2,1)' },
       myAnswerLabel: pMy ? ('you said · ' + (pIsFork ? (pMy==='a'?forkA:forkB) : (pMy==='have'?'I have':'Never have I'))) : '', hasMyAnswer: pMy!=null,
-      onDeal: () => this.parlourDeal(), onReveal: () => this.parlourReveal(), onEnd: () => this.parlourEnd(),
+      onDeal: () => this.parlourDeal(), onReveal: () => this.parlourReveal(), onEnd: () => this.parlourEnd(), onLeave: () => this.parlourLeave(),
       onOpenConfession: () => this.parlourOpenGame('confession'), dealLabel: pPhase==='lobby' ? 'Deal the first prompt' : 'Next round',
       spicyOnStyle: _pSeg(!!P.spicy), spicyOffStyle: _pSeg(!P.spicy), onSpicyOn: () => this.parlourSet({ spicy:true }), onSpicyOff: () => this.parlourSet({ spicy:false }),
       advHostStyle: _pSeg(!pAdvanceAnyone), advAnyoneStyle: _pSeg(pAdvanceAnyone), onAdvHost: () => this.parlourSet({ advance:'host' }), onAdvAnyone: () => this.parlourSet({ advance:'anyone' }),
