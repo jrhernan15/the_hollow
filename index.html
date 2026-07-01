@@ -151,10 +151,11 @@
           <span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint,#8A8474);font-weight:600">Refine the shelf</span>
           <div style="display:inline-flex;align-items:center;gap:8px">
             <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint,#8A8474);font-weight:600">Sort</span>
-            <div role="group" aria-label="Sort" style="display:inline-flex;background:var(--field,#FBF9F3);border:1px solid var(--card-border,#E8E4DC);border-radius:999px;padding:3px">
+            <div role="group" aria-label="Sort" style="position:relative;display:flex;width:150px;background:var(--field,#FBF9F3);border:1px solid var(--card-border,#E8E4DC);border-radius:999px;overflow:hidden">
               <sc-for list="{{ sorts }}" as="so" hint-placeholder-count="2">
                 <button type="button" data-toggle onClick="{{ so.onClick }}" aria-pressed="{{ so.active }}" style="{{ so.style }}">{{ so.label }}</button>
               </sc-for>
+              <div style="{{ sortThumbStyle }}"></div>
             </div>
           </div>
         </div>
@@ -615,9 +616,10 @@
               <button type="button" onClick="{{ onBookLedger }}" style="{{ bookLedgerTabStyle }}">The Ledger</button>
               <div style="{{ bookIndStyle }}"></div>
             </div>
-            <div style="display:flex;flex:none;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:2px">
+            <div style="position:relative;display:flex;flex:none;width:150px;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;overflow:hidden">
               <button type="button" onClick="{{ onBookTonight }}" style="{{ bookTonightStyle }}">Tonight</button>
               <button type="button" onClick="{{ onBookAll }}" style="{{ bookAllStyle }}">All-time</button>
+              <div style="{{ bookScopeThumbStyle }}"></div>
             </div>
           </div>
         </header>
@@ -810,9 +812,10 @@
 
           <div style="height:1px;background:var(--card-border,#2D3422);margin:18px 0 0"></div>
           <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin:14px 0 8px">Appearance</div>
-          <div style="display:flex;gap:7px">
+          <div style="position:relative;display:flex;width:150px;background:var(--field,#161A11);border:1px solid var(--pill-line,#3A4430);border-radius:999px;overflow:hidden">
             <button type="button" onClick="{{ onSetLight }}" style="{{ appearanceLightStyle }}">Light</button>
             <button type="button" onClick="{{ onSetDark }}" style="{{ appearanceDarkStyle }}">Dark</button>
+            <div style="{{ appearanceThumbStyle }}"></div>
           </div>
 
           <div style="height:1px;background:var(--card-border,#2D3422);margin:18px 0 0"></div>
@@ -845,9 +848,10 @@
         <p style="font-size:13px;line-height:1.5;color:var(--ink-soft,#B7B3A1);margin:0 0 16px">Set yourself up — or skip and dive into the menu.</p>
         <input type="text" value="{{ welcomeName }}" onChange="{{ onWelcomeName }}" autocomplete="name" placeholder="Your name (optional)" style="width:100%;box-sizing:border-box;text-align:center;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:11px 13px;outline:none" style-focus="border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)">
         <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin:16px 0 7px">Appearance</div>
-        <div style="display:flex;gap:7px;justify-content:center">
+        <div style="position:relative;display:flex;width:150px;margin:0 auto;background:var(--field,#161A11);border:1px solid var(--pill-line,#3A4430);border-radius:999px;overflow:hidden">
           <button type="button" onClick="{{ onSetLight }}" style="{{ appearanceLightStyle }}">Light</button>
           <button type="button" onClick="{{ onSetDark }}" style="{{ appearanceDarkStyle }}">Dark</button>
+          <div style="{{ appearanceThumbStyle }}"></div>
         </div>
         <div style="display:flex;gap:10px;margin-top:20px">
           <button type="button" onClick="{{ onWelcomeSkip }}" style="flex:1;font-size:13px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:transparent;border:1px solid var(--pill-line,#3A4430);border-radius:11px;padding:11px;cursor:pointer">Skip</button>
@@ -1482,7 +1486,7 @@ class Component extends DCLogic {
       fontSize:'16px', lineHeight:'1.55',
     };
 
-    const segStyle = (active) => ({ border:'none', borderRadius:'999px', padding:'6px 13px', cursor:'pointer', fontFamily:'Inter,sans-serif', fontSize:'11.5px', fontWeight:600, letterSpacing:'.03em', whiteSpace:'nowrap', backgroundColor: active ? 'var(--accent)' : 'transparent', color: active ? 'var(--accent-ink)' : 'var(--ink-soft)' });
+    const segStyle = (active) => ({ position:'relative', zIndex:1, flex:'1', textAlign:'center', border:'none', background:'transparent', borderRadius:'999px', padding:'6px 10px', cursor:'pointer', fontFamily:'Inter,sans-serif', fontSize:'11.5px', fontWeight:600, letterSpacing:'.03em', whiteSpace:'nowrap', color: active ? 'var(--accent-ink)' : 'var(--ink-soft)' });
 
     const sorts = [
       { key:'spirit', label:'By spirit' },
@@ -1686,6 +1690,8 @@ class Component extends DCLogic {
     const tabStyle = (active) => ({ flex:'1', textAlign:'center', fontFamily:"'Inter',sans-serif", fontSize:'14.5px', fontWeight: active?600:500, color: active ? 'var(--ink)' : 'var(--ink-faint)', background:'transparent', border:'none', padding:'0 2px 10px', cursor:'pointer', lineHeight:'1', whiteSpace:'nowrap' });
     // One underline element per tab row; equal cells make its position pure math, so it can glide.
     const slideInd = (idx, n) => ({ position:'absolute', bottom:'-1px', left:((idx*100)/n)+'%', width:(100/n)+'%', height:'2px', background:'var(--accent)', borderRadius:'2px', transition:'left .3s cubic-bezier(.4,0,.2,1), width .3s cubic-bezier(.4,0,.2,1)', pointerEvents:'none' });
+    // Filled thumb for segmented pills (Tonight/All-time, sort, Light/Dark) — equal cells, so it glides on plain %.
+    const pillThumb = (idx, n) => ({ position:'absolute', top:'2px', bottom:'2px', left:((idx*100)/n)+'%', width:(100/n)+'%', background:'var(--accent)', borderRadius:'999px', transition:'left .28s cubic-bezier(.4,0,.2,1), width .28s cubic-bezier(.4,0,.2,1)', pointerEvents:'none', zIndex:0 });
 
     // ---- The 86 (stock board) ----
     const clean86 = (s) => String(s||'').replace(/\s*\([^)]*\)/g, '').trim();
@@ -1714,7 +1720,7 @@ class Component extends DCLogic {
     const hiddenCount = st.cocktails.filter(c => !this.isAvailable(c)).length;
     const themeDir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const logoSrc = themeDir.logo || 'assets/logo.png';
-    const themeChip = (active) => ({ fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'6px 13px', cursor:'pointer', border:'1px solid '+(active?'var(--accent)':'var(--pill-line)'), background: active?'var(--accent)':'var(--field)', color: active?'var(--accent-ink)':'var(--ink-soft)' });
+    const themeChip = (active) => ({ position:'relative', zIndex:1, flex:'1', textAlign:'center', fontFamily:'Inter,sans-serif', fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'7px 10px', cursor:'pointer', border:'none', background:'transparent', color: active?'var(--accent-ink)':'var(--ink-soft)' });
     const themeOptions = [['auto','Auto'],['herbarium','Default'],['halloween','Halloween'],['christmas','Christmas'],['birthday','Birthday']].map((p) => ({ key:p[0], label:p[1], style: themeChip(st.serverTheme===p[0]), onSelect: () => this.setTheme(p[0]) }));
     const themeAutoNote = 'Auto follows the calendar — now showing ' + ((this.THEMES[this.autoTheme()]||{}).label || 'Default') + '.';
     const chimeChips = (items) => items.map((p) => ({ key:p[0], label:p[1], style: themeChip(st.chimePref===p[0]), onSelect: () => this.setChime(p[0]) }));
@@ -1824,7 +1830,7 @@ class Component extends DCLogic {
       nameStyle: { color:t.nm, fontSize:'12px', marginTop:'6px' },
       canDelete: wallStaff, onDelete: () => this.deleteWallPost(p.id) }; });
     const bookTabStyle = (on) => ({ flex:'1', textAlign:'center', fontFamily:"'Inter',sans-serif", fontSize:'14.5px', fontWeight: on?600:500, color: on ? 'var(--ink)' : 'var(--ink-faint)', background:'transparent', border:'none', padding:'0 1px 8px', cursor:'pointer', lineHeight:'1' });
-    const bookScopeStyle = (on) => ({ fontFamily:"'Inter',sans-serif", fontSize:'11.5px', fontWeight:600, color: on ? 'var(--accent-ink)' : 'var(--ink-soft)', background: on ? 'var(--accent)' : 'transparent', border:'none', borderRadius:'999px', padding:'4px 11px', cursor:'pointer' });
+    const bookScopeStyle = (on) => ({ position:'relative', zIndex:1, flex:'1', textAlign:'center', fontFamily:"'Inter',sans-serif", fontSize:'11.5px', fontWeight:600, color: on ? 'var(--accent-ink)' : 'var(--ink-soft)', background:'transparent', border:'none', borderRadius:'999px', padding:'5px 10px', cursor:'pointer' });
     const myPourCards = (st.myPours || []).filter(p => p && p.drink && (!nightMs || (p.ts||0) >= nightMs)).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p => ({ drink: p.drink, time: fmtTime(p.ts), verdict: verdictFor(p.drink) }));
 
     const _vd = st.verdictDrink;
@@ -1871,7 +1877,7 @@ class Component extends DCLogic {
       helpOpen: st.helpOpen, onOpenHelp: () => this.openHelp(), onCloseHelp: () => this.closeHelp(),
       myName: st.myName, onMyName: (e) => this.onMyName(e), noMyDrinks: myDrinks.length===0,
       hasMyName: !!(st.myName && st.myName.trim()), settingsName: (st.myName||'').trim().split(/\s+/)[0] || '',
-      appearanceLightStyle: themeChip(!st.dark), appearanceDarkStyle: themeChip(st.dark),
+      appearanceLightStyle: themeChip(!st.dark), appearanceDarkStyle: themeChip(st.dark), appearanceThumbStyle: pillThumb(st.dark?1:0, 2),
       onSetLight: () => this.setDark(false), onSetDark: () => this.setDark(true), onResetMyData: () => this.resetMyData(),
       welcomeOpen: st.welcomeOpen, welcomeName: st.welcomeName, onWelcomeName: (e) => this.onWelcomeName(e), onWelcomeSave: () => this.welcomeSave(), onWelcomeSkip: () => this.welcomeSkip(),
       confirmOpen: !!st.confirm, confirmTitle: st.confirm ? st.confirm.title : '', confirmBody: st.confirm ? st.confirm.body : '', confirmLabel: st.confirm ? st.confirm.label : 'Confirm',
@@ -1899,7 +1905,7 @@ class Component extends DCLogic {
       bookTabWall: st.bookTab==='wall', bookTabLedger: st.bookTab==='ledger',
       bookWallTabStyle: bookTabStyle(st.bookTab==='wall'), bookLedgerTabStyle: bookTabStyle(st.bookTab==='ledger'), bookIndStyle: slideInd(st.bookTab==='ledger'?1:0, 2),
       onBookWall: () => this.setBookTab('wall'), onBookLedger: () => this.setBookTab('ledger'),
-      bookTonightStyle: bookScopeStyle(st.bookScope!=='all'), bookAllStyle: bookScopeStyle(st.bookScope==='all'),
+      bookTonightStyle: bookScopeStyle(st.bookScope!=='all'), bookAllStyle: bookScopeStyle(st.bookScope==='all'), bookScopeThumbStyle: pillThumb(st.bookScope==='all'?1:0, 2),
       onBookTonight: () => this.setBookScope('tonight'), onBookAll: () => this.setBookScope('all'),
       onToggleOrders: () => this.toggleOrders(),
       ordersOpen: st.ordersOpen, hasOrders: activeCount > 0, ordersCount: String(activeCount),
@@ -1957,7 +1963,7 @@ class Component extends DCLogic {
       filterCountLabel: selectedCount ? '(' + selectedCount + ')' : '',
       hasActive, shownCount, totalCount, summaryChips,
       onClearAll: () => this.clearAll(),
-      sorts, filterGroups,
+      sorts, sortThumbStyle: pillThumb(st.sort==='az'?1:0, 2), filterGroups,
       sections,
       noResults: st.loaded && shownCount === 0,
       notLoaded: !st.loaded,
