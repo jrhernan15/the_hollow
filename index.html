@@ -624,14 +624,14 @@
             <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin:7px 2px 0">Signed with your name from The Knobs.</div>
             <sc-if value="{{ ledgerHasFave }}" hint-placeholder-val="">
               <div style="display:flex;gap:9px;margin-top:14px">
-                <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--accent2,#CFA267);border-radius:14px;padding:11px 13px">
-                  <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">🔥 Crowd favorite</div>
+                <div onClick="{{ onRevealFave }}" role="button" style="flex:1;background:var(--card,#1D2217);border:1px solid var(--accent2,#CFA267);border-radius:14px;padding:11px 13px;cursor:pointer" style-hover="background:var(--bg2,#141810)">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">🔥 Crowd favorite</span><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex:none;color:var(--ink-faint,#827E6D)"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"></path></svg></div>
                   <div style="font-family:'Fraunces',Georgia,serif;font-size:17px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerFave }}</div>
                   <div style="font-size:11.5px;color:var(--accent2,#CFA267);margin-top:2px">{{ ledgerFaveN }} reactions</div>
                 </div>
                 <sc-if value="{{ ledgerHasPoop }}" hint-placeholder-val="">
-                  <div style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:11px 13px">
-                    <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">The 💩 award</div>
+                  <div onClick="{{ onRevealPoop }}" role="button" style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:11px 13px;cursor:pointer" style-hover="background:var(--bg2,#141810)">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">The 💩 award</span><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex:none;color:var(--ink-faint,#827E6D)"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"></path></svg></div>
                     <div style="font-family:'Fraunces',Georgia,serif;font-size:17px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerPoop }}</div>
                     <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:2px">{{ ledgerPoopN }} × 💩</div>
                   </div>
@@ -1296,9 +1296,13 @@ class Component extends DCLogic {
     const vis = this.computeVisible();
     if (!vis.length) return;
     const pick = vis[Math.floor(Math.random() * vis.length)];
-    this.setState(s => ({ open: Object.assign({}, s.open, { [pick.name]: true }), highlight: pick.name }), () => {
+    this.revealDrink(pick.name);
+  }
+  revealDrink(name){
+    if (!name) return;
+    this.setState(s => ({ bookOpen:false, open: Object.assign({}, s.open, { [name]: true }), highlight: name }), () => {
       try {
-        const el = document.querySelector('[data-name="' + (window.CSS && CSS.escape ? CSS.escape(pick.name) : pick.name) + '"]');
+        const el = document.querySelector('[data-name="' + (window.CSS && CSS.escape ? CSS.escape(name) : name) + '"]');
         if (el) { const y = el.getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: y, behavior: 'smooth' }); }
       } catch(e){}
     });
@@ -1712,6 +1716,7 @@ class Component extends DCLogic {
       ledgerSince: ledgerVals.ledgerSince, hasLedger: ledgerVals.hasLedger, ledgerEmpty: ledgerVals.ledgerEmpty, ledgerStaff: ledgerVals.ledgerStaff,
       ledgerTop: ledgerVals.ledgerTop, ledgerOz: ledgerVals.ledgerOz, ledgerSupers: ledgerVals.ledgerSupers, ledgerFeed: ledgerVals.ledgerFeed,
       ledgerHasFave: ledgerVals.hasFave, ledgerFave: ledgerVals.ledgerFave, ledgerFaveN: ledgerVals.ledgerFaveN, ledgerHasPoop: ledgerVals.hasPoop, ledgerPoop: ledgerVals.ledgerPoop, ledgerPoopN: ledgerVals.ledgerPoopN,
+      onRevealFave: () => this.revealDrink(ledgerVals.ledgerFave), onRevealPoop: () => this.revealDrink(ledgerVals.ledgerPoop),
       darkIconPath: st.dark ? sunPath : moonPath,
       settingsOpen: st.settingsOpen, onOpenSettings: () => this.openSettings(), onCloseSettings: () => this.closeSettings(),
       helpOpen: st.helpOpen, onOpenHelp: () => this.openHelp(), onCloseHelp: () => this.closeHelp(),
