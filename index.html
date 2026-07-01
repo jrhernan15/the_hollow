@@ -624,13 +624,13 @@
             <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin:7px 2px 0">Signed with your name from The Knobs.</div>
             <sc-if value="{{ ledgerHasFave }}" hint-placeholder-val="">
               <div style="display:flex;gap:9px;margin-top:14px">
-                <div onClick="{{ onRevealFave }}" role="button" style="flex:1;background:var(--card,#1D2217);border:1px solid var(--accent2,#CFA267);border-radius:14px;padding:11px 13px;cursor:pointer" style-hover="background:var(--bg2,#141810)">
+                <div onClick="{{ onPeekFave }}" role="button" style="flex:1;background:var(--card,#1D2217);border:1px solid var(--accent2,#CFA267);border-radius:14px;padding:11px 13px;cursor:pointer" style-hover="background:var(--bg2,#141810)">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">🔥 Crowd favorite</span><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex:none;color:var(--ink-faint,#827E6D)"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"></path></svg></div>
                   <div style="font-family:'Fraunces',Georgia,serif;font-size:17px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerFave }}</div>
                   <div style="font-size:11.5px;color:var(--accent2,#CFA267);margin-top:2px">{{ ledgerFaveN }} reactions</div>
                 </div>
                 <sc-if value="{{ ledgerHasPoop }}" hint-placeholder-val="">
-                  <div onClick="{{ onRevealPoop }}" role="button" style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:11px 13px;cursor:pointer" style-hover="background:var(--bg2,#141810)">
+                  <div onClick="{{ onPeekPoop }}" role="button" style="flex:1;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:11px 13px;cursor:pointer" style-hover="background:var(--bg2,#141810)">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D)">The 💩 award</span><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex:none;color:var(--ink-faint,#827E6D)"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"></path></svg></div>
                     <div style="font-family:'Fraunces',Georgia,serif;font-size:17px;color:var(--ink,#ECE7D7);margin-top:4px;line-height:1.15">{{ ledgerPoop }}</div>
                     <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:2px">{{ ledgerPoopN }} × 💩</div>
@@ -859,6 +859,40 @@
     <button type="button" data-chrome onClick="{{ onScrollTop }}" aria-label="Back to top" style="position:fixed;right:18px;bottom:24px;z-index:50;width:46px;height:46px;border-radius:999px;border:1px solid var(--pill-line,#B9C6AC);background:var(--accent,#2F3D2C);color:var(--accent-ink,#F4F1E6);box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" style-hover="filter:brightness(1.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg></button>
   </sc-if>
 
+  <sc-if value="{{ peekOpen }}" hint-placeholder-val="">
+    <div data-chrome data-modalwrap onClick="{{ onClosePeek }}" style="position:fixed;inset:0;z-index:63;background:rgba(12,11,8,.6);display:flex;align-items:center;justify-content:center;padding:20px">
+      <div data-modal onClick="{{ stop }}" style="width:min(440px,100%);max-height:86vh;overflow:auto;overscroll-behavior:contain;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.5);padding:20px 22px 20px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div>
+            <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">{{ peekBase }}</div>
+            <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:24px;line-height:1.1;margin:3px 0 0;color:var(--ink,#ECE7D7)">{{ peekName }}</h2>
+            <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:3px">{{ peekMeta }}</div>
+          </div>
+          <button type="button" onClick="{{ onClosePeek }}" aria-label="Close" style="flex:none;width:34px;height:34px;border-radius:999px;border:1px solid var(--card-border,#2D3422);background:var(--field,#161A11);color:var(--ink-soft,#B7B3A1);font-size:19px;line-height:1;cursor:pointer">×</button>
+        </div>
+        <p style="font-size:13.5px;color:var(--ink-soft,#B7B3A1);line-height:1.5;margin:12px 0 0">{{ peekSummary }}</p>
+        <h3 style="font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2,#AD7C44);font-weight:600;margin:16px 0 7px">Pour</h3>
+        <ul style="list-style:none;margin:0;padding:0">
+          <sc-for list="{{ peekSpec }}" as="r" hint-placeholder-count="3">
+            <li style="font-size:14px;padding:4px 0;border-bottom:1px dotted var(--line,#2D3422);display:flex;gap:10px;color:var(--ink,#ECE7D7)"><span style="font-variant-numeric:tabular-nums;color:var(--accent,#A6BB8E);font-weight:600;flex:none;min-width:62px">{{ r.amt }}</span><span>{{ r.ing }}</span></li>
+          </sc-for>
+        </ul>
+        <sc-if value="{{ hasPeekSteps }}" hint-placeholder-val="{{ true }}">
+          <h3 style="font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent2,#AD7C44);font-weight:600;margin:16px 0 7px">Method</h3>
+          <ol style="margin:0;padding-left:18px">
+            <sc-for list="{{ peekSteps }}" as="s" hint-placeholder-count="2">
+              <li style="font-size:13.5px;color:var(--ink-soft,#B7B3A1);padding:2px 0;line-height:1.5">{{ s }}</li>
+            </sc-for>
+          </ol>
+        </sc-if>
+        <div style="display:flex;gap:9px;margin-top:18px">
+          <button type="button" onClick="{{ onVerdictPeek }}" style="flex:1;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:11px;padding:11px;cursor:pointer">Your Verdict</button>
+          <button type="button" onClick="{{ onOrderPeek }}" style="flex:2;font-size:13px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:11px;padding:11px;cursor:pointer" style-hover="filter:brightness(1.08)">Send to the bar</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ verdictOpen }}" hint-placeholder-val="">
     <div data-chrome onClick="{{ onCloseVerdict }}" style="position:fixed;inset:0;z-index:68;background:rgba(12,11,8,.55);display:flex;align-items:flex-end;justify-content:center">
       <div onClick="{{ stop }}" style="width:min(460px,100%);background:var(--bg2,#1A1E14);border:1px solid var(--card-border,#2D3422);border-bottom:none;border-radius:18px 18px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.4);padding:16px 16px calc(20px + env(safe-area-inset-bottom))">
@@ -913,7 +947,7 @@ class Component extends DCLogic {
       eightySix: [], pantryOpen: false, pantryGate: false, gateInput: '', gateErr: false, serverTheme: 'auto', eightySixTab: 'ingredients', chimePref: 'auto',
       ledgerOpen: false, ledgerRows: [], ledgerNightStart: '', ledgerNow: '', ledgerScope: 'tonight',
       settingsOpen: false, myName: '', welcomeOpen: false, welcomeName: '', confirm: null, helpOpen: false,
-      bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false, verdictDrink: null,
+      bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false, verdictDrink: null, peekDrink: null,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
       bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
     };
@@ -1244,6 +1278,8 @@ class Component extends DCLogic {
   }
   openVerdict(drink){ this.setState({ verdictDrink: drink }); }
   closeVerdict(){ this.setState({ verdictDrink: null }); }
+  openPeek(name){ if (name) this.setState({ peekDrink: name }); }
+  closePeek(){ this.setState({ peekDrink: null }); }
   fetchHistory(){ fetch('/api/history').then(r=>r.json()).then(d=>{ this.setState({ ledgerRows: Array.isArray(d.rows)?d.rows:[], ledgerNightStart: d.nightStart||'', ledgerNow: d.now||'' }); }).catch(()=>{}); }
   newNight(){ this.api('POST','/api/history/new-night',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not start a new night',2000)); }
   clearHistory(){ try { if (!window.confirm('Clear all-time stats? This erases the whole history and cannot be undone.')) return; } catch(e){} this.api('POST','/api/history/clear',{ code:'5352' }).then(()=>this.fetchHistory()).catch(()=>this.flashToast('Could not clear stats',2000)); }
@@ -1336,7 +1372,7 @@ class Component extends DCLogic {
     const dir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const pal = st.dark ? dir.dark : dir.light;
     try { document.documentElement.style.background = pal.bg; document.body.style.background = pal.bg; } catch(e){}
-    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.bookOpen || st.settingsOpen || st.welcomeOpen || st.confirm || st.verdictDrink || st.helpOpen);
+    const _overlay = !!(st.ordersOpen || st.orderModalName || st.makeView || st.pantryOpen || st.pantryGate || st.bookOpen || st.settingsOpen || st.welcomeOpen || st.confirm || st.verdictDrink || st.helpOpen || st.peekDrink);
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
     const meta = dir.meta;
@@ -1706,6 +1742,15 @@ class Component extends DCLogic {
       verdictPicks = _picks.length ? ('You picked ' + _picks.join(' + ')) : 'Tap all that fit';
     }
 
+    const _pk = st.peekDrink ? byName[st.peekDrink] : null;
+    const peekOpen = !!_pk;
+    const peekName = _pk ? _pk.name : '';
+    const peekBase = _pk ? (_pk.base || '') : '';
+    const peekMeta = _pk ? (_pk.build + ' · ' + _pk.glass) : '';
+    const peekSummary = _pk ? (_pk.summary || '') : '';
+    const peekSpec = _pk ? (_pk.spec || []).map(s => ({ amt:s[0], ing:s[1] })) : [];
+    const peekSteps = _pk ? (_pk.steps || []) : [];
+
     return {
       appStyle,
       ledgerOpen: st.ledgerOpen, onOpenLedger: () => this.openLedger(), onCloseLedger: () => this.closeLedger(),
@@ -1716,7 +1761,7 @@ class Component extends DCLogic {
       ledgerSince: ledgerVals.ledgerSince, hasLedger: ledgerVals.hasLedger, ledgerEmpty: ledgerVals.ledgerEmpty, ledgerStaff: ledgerVals.ledgerStaff,
       ledgerTop: ledgerVals.ledgerTop, ledgerOz: ledgerVals.ledgerOz, ledgerSupers: ledgerVals.ledgerSupers, ledgerFeed: ledgerVals.ledgerFeed,
       ledgerHasFave: ledgerVals.hasFave, ledgerFave: ledgerVals.ledgerFave, ledgerFaveN: ledgerVals.ledgerFaveN, ledgerHasPoop: ledgerVals.hasPoop, ledgerPoop: ledgerVals.ledgerPoop, ledgerPoopN: ledgerVals.ledgerPoopN,
-      onRevealFave: () => this.revealDrink(ledgerVals.ledgerFave), onRevealPoop: () => this.revealDrink(ledgerVals.ledgerPoop),
+      onPeekFave: () => this.openPeek(ledgerVals.ledgerFave), onPeekPoop: () => this.openPeek(ledgerVals.ledgerPoop),
       darkIconPath: st.dark ? sunPath : moonPath,
       settingsOpen: st.settingsOpen, onOpenSettings: () => this.openSettings(), onCloseSettings: () => this.closeSettings(),
       helpOpen: st.helpOpen, onOpenHelp: () => this.openHelp(), onCloseHelp: () => this.closeHelp(),
@@ -1728,6 +1773,8 @@ class Component extends DCLogic {
       confirmOpen: !!st.confirm, confirmTitle: st.confirm ? st.confirm.title : '', confirmBody: st.confirm ? st.confirm.body : '', confirmLabel: st.confirm ? st.confirm.label : 'Confirm',
       onCloseConfirm: () => this.closeConfirm(), onDoConfirm: () => this.doConfirm(),
       verdictOpen: !!st.verdictDrink, verdictTitle: verdictTitle, verdictOptions: verdictOptions, verdictPicks: verdictPicks, onCloseVerdict: () => this.closeVerdict(),
+      peekOpen: peekOpen, peekName: peekName, peekBase: peekBase, peekMeta: peekMeta, peekSummary: peekSummary, peekSpec: peekSpec, peekSteps: peekSteps, hasPeekSteps: peekSteps.length>0,
+      onClosePeek: () => this.closePeek(), onOrderPeek: () => { this.closePeek(); this.openOrder(peekName); }, onVerdictPeek: () => { this.closePeek(); this.openVerdict(peekName); },
       bartenderMode: st.bartenderMode, onToggleBartender: () => this.toggleBartender(),
       bartenderArmed: passArmed, passBtnStyle: passBtnStyle, passTitle: passArmed ? 'The Pass · on duty' : 'The Pass',
       bartenderRibbon: passArmed && !st.bmBannerDismissed, onDismissRibbon: () => this.dismissRibbon(), onTurnOffBartender: () => this.toggleBartender(),
