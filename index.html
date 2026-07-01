@@ -113,7 +113,7 @@
                   <span style="{{ md.style }}">{{ md.drink }} · {{ md.label }}</span>
                 </sc-if>
                 <sc-if value="{{ md.ready }}" hint-placeholder-val="">
-                  <span style="display:inline-flex;flex-direction:column;gap:7px;min-width:186px;border:1px solid var(--accent2,#CFA267);background:rgba(207,162,103,.12);border-radius:14px;padding:8px 10px">
+                  <span style="display:inline-flex;flex-direction:column;gap:7px;min-width:290px;max-width:100%;border:1px solid var(--accent2,#CFA267);background:rgba(207,162,103,.12);border-radius:14px;padding:8px 10px">
                     <span style="font-size:11.5px;font-weight:700;color:var(--accent2,#CFA267);white-space:nowrap">{{ md.drink }} · up</span>
                     <span style="display:flex;gap:5px">
                       <sc-for list="{{ md.verdict.chips }}" as="ch" hint-placeholder-count="6"><button type="button" onClick="{{ ch.onTap }}" aria-pressed="{{ ch.mine }}" aria-label="{{ ch.aria }}" style="{{ ch.style }}">{{ ch.emoji }}<sc-if value="{{ ch.hasCount }}" hint-placeholder-val=""><span style="{{ ch.countStyle }}">{{ ch.count }}</span></sc-if></button></sc-for>
@@ -125,7 +125,7 @@
             </sc-for>
             <sc-for list="{{ myPastPours }}" as="md" hint-placeholder-count="1">
               <span style="display:inline-flex;align-items:center;gap:4px">
-                <span style="display:inline-flex;flex-direction:column;gap:7px;min-width:186px;border:1px solid var(--card-border,#2D3422);background:var(--card,#1D2217);border-radius:14px;padding:8px 10px">
+                <span style="display:inline-flex;flex-direction:column;gap:7px;min-width:290px;max-width:100%;border:1px solid var(--card-border,#2D3422);background:var(--card,#1D2217);border-radius:14px;padding:8px 10px">
                   <span style="font-size:11.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);white-space:nowrap">{{ md.drink }}</span>
                   <span style="display:flex;gap:5px">
                     <sc-for list="{{ md.verdict.chips }}" as="ch" hint-placeholder-count="6"><button type="button" onClick="{{ ch.onTap }}" aria-pressed="{{ ch.mine }}" aria-label="{{ ch.aria }}" style="{{ ch.style }}">{{ ch.emoji }}<sc-if value="{{ ch.hasCount }}" hint-placeholder-val=""><span style="{{ ch.countStyle }}">{{ ch.count }}</span></sc-if></button></sc-for>
