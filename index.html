@@ -2067,7 +2067,8 @@ class Component extends DCLogic {
     }));
     const _fresh = !!P.fresh;
     const _heat = P.heat || 'tame';
-    const heatBadge = _fresh ? '✋ From the room' : (_heat==='raunchy' ? '🔥 Raunchy' : (_heat==='spicy' ? '🌶 Spicy' : ''));
+    const _filledBlank = !!P.filledBy;   // a fill-in-the-blank card: the random word decides the real heat, so the pool-tier badge would over-promise
+    const heatBadge = _fresh ? '✋ From the room' : (_filledBlank ? '' : (_heat==='raunchy' ? '🔥 Raunchy' : (_heat==='spicy' ? '🌶 Spicy' : '')));
     const heatBadgeStyle = _fresh
       ? { fontSize:'9.5px', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', padding:'3px 8px', borderRadius:'999px', whiteSpace:'nowrap', flex:'none',
           background:'rgba(166,187,142,.2)', color:'var(--accent,#A6BB8E)', border:'1px solid rgba(166,187,142,.5)' }
