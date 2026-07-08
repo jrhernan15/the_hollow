@@ -922,6 +922,7 @@ const server = http.createServer(async (req, res) => {
       if (!canAdvance(b)) return sendJSON(res, 403, { error: "bad code" });
       const p = getParlour();
       if (!p.game) return sendJSON(res, 400, { error: "no game" });
+      if (b.cid) Q.parlourUpsertPlayer.run(str(b.cid, 40), str(b.name, 60));   // whoever taps "next" is here — check them in before we pick a filler/reader
       // The House Read needs a present player to be the Reader — fail before any side effects.
       if (p.game === "houseread" && !Q.parlourActivePlayers.all().length) return sendJSON(res, 409, { error: "no one in the room to read" });
       // If the previous round showed a drop-in the host never saved, the room passed on it → discard.
@@ -1029,6 +1030,7 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       if (!canAdvance(b)) return sendJSON(res, 403, { error: "bad code" });
       const p = getParlour();
+      if (b.cid) Q.parlourUpsertPlayer.run(str(b.cid, 40), str(b.name, 60));   // advancing keeps you in the room
       if (!p.game || (p.phase !== "answer" && p.phase !== "guess")) return sendJSON(res, 409, { error: "nothing to reveal" });
       if (p.game === "usual" && p.scoring && p.phase === "guess") {
         // tally this round's points once, on the way into reveal
@@ -1069,6 +1071,7 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req);
       if (!canAdvance(b)) return sendJSON(res, 403, { error: "bad code" });
       const p = getParlour();
+      if (b.cid) Q.parlourUpsertPlayer.run(str(b.cid, 40), str(b.name, 60));   // advancing keeps you in the room
       if (p.game !== "usual" || p.phase !== "answer") return sendJSON(res, 409, { error: "nothing to close" });
       const rows = Q.parlourRoundAnswers.all(p.round);
       const order = rows.map((_, i) => i);
