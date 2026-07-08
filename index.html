@@ -24,6 +24,7 @@
   @keyframes hollowPulse{0%{box-shadow:0 0 0 0 var(--accent);}100%{box-shadow:0 0 0 10px transparent;}}
   .bmdot{width:7px;height:7px;border-radius:50%;background:var(--accent2,#CFA267);flex:none;animation:bmPulse 1.9s ease-out infinite;}
   @keyframes bmPulse{0%{box-shadow:0 0 0 0 rgba(207,162,103,.5);}70%{box-shadow:0 0 0 6px rgba(207,162,103,0);}100%{box-shadow:0 0 0 0 rgba(207,162,103,0);}}
+  @keyframes hrSwing{0%{left:50%;}60%{transform:translateX(-50%) rotate(6deg);}100%{transform:translateX(-50%) rotate(0deg);}}
 
   @media (max-width: 600px){
     [data-header]{padding-top:22px !important;}
@@ -993,9 +994,13 @@
                 <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Fork</div>
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">This or that — the room splits live, then the reveal names each side.</div>
               </button>
-              <button type="button" onClick="{{ pv.onOpenUsual }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer">
+              <button type="button" onClick="{{ pv.onOpenUsual }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer;margin-bottom:9px">
                 <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Usual</div>
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">Everyone answers a prompt, then the room guesses who wrote what.</div>
+              </button>
+              <button type="button" onClick="{{ pv.onOpenHouseread }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer">
+                <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The House Read</div>
+                <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">One player gets a secret spot on a spectrum and gives a clue — everyone else reads the room.</div>
               </button>
             </sc-if>
             <sc-if value="{{ pv.notStaff }}" hint-placeholder-val="">
@@ -1042,10 +1047,57 @@
               <button type="button" onClick="{{ pv.onSubmitUsual }}" style="display:block;width:100%;box-sizing:border-box;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:12px;cursor:pointer">Submit</button>
               <sc-if value="{{ pv.mySubmitted }}" hint-placeholder-val=""><div style="font-size:12px;color:var(--accent2,#CFA267);margin-top:8px;line-height:1.4">In ✓ — “{{ pv.mySubmittedText }}” · edit above to change it.</div></sc-if>
             </sc-if>
+            <sc-if value="{{ pv.isHouseread }}" hint-placeholder-val="">
+              <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:500;font-size:21px;line-height:1.3;color:var(--ink,#ECE7D7);margin-bottom:4px">“{{ pv.hrClue }}”</div>
+              <div style="font-size:13px;color:var(--accent2,#CFA267);font-weight:600;margin-bottom:14px">— {{ pv.readerName }}</div>
+              <sc-if value="{{ pv.hrCanGuess }}" hint-placeholder-val="">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px">
+                  <span style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:15px;color:var(--accent,#A6BB8E)">{{ pv.hrPoleA }}</span>
+                  <span style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:15px;color:var(--ink,#ECE7D7);text-align:right">{{ pv.hrPoleB }}</span>
+                </div>
+                <div style="display:flex;height:56px;border-radius:12px;overflow:hidden;border:1px solid var(--card-border,#2D3422)">
+                  <sc-for list="{{ pv.hrTapZones }}" as="z" hint-placeholder-count="7"><button type="button" onClick="{{ z.onTap }}" style="{{ z.style }}">{{ z.label }}</button></sc-for>
+                </div>
+                <div style="font-size:11.5px;color:var(--ink-faint,#827E6D);text-align:center;margin-top:8px">Tap the zone where the clue lands. You can change it until the reveal.</div>
+              </sc-if>
+              <sc-if value="{{ pv.amReader }}" hint-placeholder-val="">
+                <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:16px;text-align:center;font-size:13px;color:var(--ink-soft,#B7B3A1);line-height:1.5">Your clue is out — sit back and watch them squint.</div>
+              </sc-if>
+            </sc-if>
             <div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);letter-spacing:.06em;margin-top:10px">{{ pv.answeredLabel }}</div>
             <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="">
               <sc-if value="{{ pv.isUsual }}" hint-placeholder-val=""><button type="button" onClick="{{ pv.onClose }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Lock answers → guessing</button></sc-if>
               <sc-if value="{{ pv.notUsual }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ pv.onReveal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Reveal the room</button></sc-if>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ pv.isClue }}" hint-placeholder-val="">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
+              <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">{{ pv.gameName }} · {{ pv.roundLabel }}</span>
+              <sc-if value="{{ pv.heatBadge }}" hint-placeholder-val=""><span style="{{ pv.heatBadgeStyle }}">{{ pv.heatBadge }}</span></sc-if>
+            </div>
+            <sc-if value="{{ pv.amReader }}" hint-placeholder-val="">
+              <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:23px;line-height:1.3;color:var(--ink,#ECE7D7);margin-bottom:14px">You’re the Reader.</div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px">
+                <span style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:15px;color:var(--accent,#A6BB8E)">{{ pv.hrPoleA }}</span>
+                <span style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:15px;color:var(--ink,#ECE7D7);text-align:right">{{ pv.hrPoleB }}</span>
+              </div>
+              <div style="display:flex;height:56px;border-radius:12px;overflow:hidden;border:1px solid var(--card-border,#2D3422)">
+                <sc-for list="{{ pv.hrClueZones }}" as="z" hint-placeholder-count="7"><div style="{{ z.style }}">{{ z.label }}</div></sc-for>
+              </div>
+              <sc-if value="{{ pv.hrHavePeek }}" hint-placeholder-val=""><div style="font-size:12.5px;color:var(--ink-faint,#827E6D);line-height:1.5;margin:8px 0 14px">That’s your zone — only you can see it. Give a one-line clue that lands there.</div></sc-if>
+              <sc-if value="{{ pv.hrNoPeek }}" hint-placeholder-val=""><div style="font-size:12.5px;color:var(--ink-faint,#827E6D);line-height:1.5;margin:8px 0 14px">Reading your card…</div></sc-if>
+              <input type="text" value="{{ parlourClueDraft }}" onChange="{{ onParlourClueDraft }}" placeholder="One line that points at it…" style="width:100%;box-sizing:border-box;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px 13px;outline:none;margin-bottom:9px">
+              <button type="button" onClick="{{ pv.onClueSubmit }}" style="display:block;width:100%;box-sizing:border-box;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:12px;cursor:pointer">Give the clue</button>
+            </sc-if>
+            <sc-if value="{{ pv.notReader }}" hint-placeholder-val="">
+              <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:18px 16px;text-align:center">
+                <div style="font-size:22px;margin-bottom:8px">🔮</div>
+                <div style="font-size:13.5px;color:var(--ink-soft,#B7B3A1);line-height:1.5">Waiting for {{ pv.readerName }} to read the room…</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="">
+              <button type="button" onClick="{{ pv.onDeal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Deal a different card</button>
             </sc-if>
           </sc-if>
 
@@ -1137,6 +1189,31 @@
                 </div>
               </sc-if>
             </sc-if>
+            <sc-if value="{{ pv.isHouseread }}" hint-placeholder-val="">
+              <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:500;font-size:17px;line-height:1.35;color:var(--ink,#ECE7D7);margin-bottom:2px">“{{ pv.hrClue }}”</div>
+              <div style="font-size:12.5px;color:var(--accent2,#CFA267);font-weight:600;margin-bottom:14px">— {{ pv.readerName }}</div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px">
+                <span style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:15px;color:var(--accent,#A6BB8E)">{{ pv.hrPoleA }}</span>
+                <span style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:15px;color:var(--ink,#ECE7D7);text-align:right">{{ pv.hrPoleB }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:10px;text-align:center;color:var(--ink-soft,#B7B3A1);line-height:1.5">
+                <sc-for list="{{ pv.hrPinCols }}" as="col" hint-placeholder-count="7"><div style="min-width:0;overflow:hidden"><sc-for list="{{ col.names }}" as="n" hint-placeholder-count="1"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍{{ n.name }}</div></sc-for></div></sc-for>
+              </div>
+              <div style="position:relative;height:14px"><div style="{{ pv.hrNeedleStyle }}"></div></div>
+              <div style="display:flex;height:56px;border-radius:12px;overflow:hidden;border:1px solid var(--card-border,#2D3422)">
+                <sc-for list="{{ pv.hrRevealZones }}" as="z" hint-placeholder-count="7"><div style="{{ z.style }}">{{ z.label }}</div></sc-for>
+              </div>
+              <div style="margin-top:14px">
+                <sc-for list="{{ pv.hrRoundScores }}" as="s" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink,#ECE7D7);padding:3px 0"><span>{{ s.name }} · {{ s.zoneLabel }}</span><span style="color:var(--accent2,#CFA267);font-weight:600">{{ s.pts }}</span></div></sc-for>
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink,#ECE7D7);padding:3px 0;border-top:1px solid var(--card-border,#2D3422);margin-top:4px"><span>{{ pv.readerName }} read the room</span><span style="color:var(--accent2,#CFA267);font-weight:600">+{{ pv.hrReaderPts }}</span></div>
+              </div>
+              <sc-if value="{{ pv.hrHasScores }}" hint-placeholder-val="">
+                <div style="margin-top:14px;border-top:1px solid var(--card-border,#2D3422);padding-top:12px">
+                  <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:8px">Standings</div>
+                  <sc-for list="{{ pv.usualScores }}" as="s" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink,#ECE7D7);padding:3px 0"><span>{{ s.rank }}. {{ s.name }}</span><span style="color:var(--accent2,#CFA267);font-weight:600">{{ s.points }}</span></div></sc-for>
+                </div>
+              </sc-if>
+            </sc-if>
             <sc-if value="{{ pv.hasFilledBy }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--accent2,#CFA267);margin-top:14px">✍️ Filled by {{ pv.filledBy }}</div></sc-if>
             <sc-if value="{{ pv.keepVoting }}" hint-placeholder-val="">
               <div style="margin-top:18px;border-top:1px solid var(--card-border,#2D3422);padding-top:14px">
@@ -1172,13 +1249,13 @@
               </button>
               <sc-if value="{{ pv.addOpen }}" hint-placeholder-val="">
                 <div style="margin-top:12px">
-                  <sc-if value="{{ pv.isFork }}" hint-placeholder-val="">
-                    <div style="font-size:11px;color:var(--ink-faint,#827E6D);margin-bottom:6px">Give the two things to choose between:</div>
+                  <sc-if value="{{ pv.addTwoField }}" hint-placeholder-val="">
+                    <div style="font-size:11px;color:var(--ink-faint,#827E6D);margin-bottom:6px">{{ pv.addTwoLabel }}</div>
                     <input type="text" value="{{ parlourDraft }}" onChange="{{ onParlourDraft }}" placeholder="Option one — “this”" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:7px">
                     <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-bottom:7px">or</div>
                     <input type="text" value="{{ parlourDraftB }}" onChange="{{ onParlourDraftB }}" placeholder="Option two — “that”" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:8px">
                   </sc-if>
-                  <sc-if value="{{ pv.notFork }}" hint-placeholder-val="{{ true }}">
+                  <sc-if value="{{ pv.addOneField }}" hint-placeholder-val="{{ true }}">
                     <input type="text" value="{{ parlourDraft }}" onChange="{{ onParlourDraft }}" placeholder="{{ pv.promptPlaceholder }}" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:8px">
                   </sc-if>
                   <button type="button" onClick="{{ pv.onAddPrompt }}" style="{{ pv.dropBtnStyle }}">Drop it in the pool</button>
@@ -1294,7 +1371,7 @@ class Component extends DCLogic {
       bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false, verdictDrink: null, peekDrink: null,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
       bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
-      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourAddOpen: false, parlourDraft: '', parlourDraftB: '', parlourUsualDraft: '', parlourFillDraft: '', parlourFillDraftB: '', parlourGate: '', parlourGateErr: false,
+      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourAddOpen: false, parlourDraft: '', parlourDraftB: '', parlourUsualDraft: '', parlourFillDraft: '', parlourFillDraftB: '', parlourClueDraft: '', parlourTarget: null, parlourGate: '', parlourGateErr: false,
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -1420,7 +1497,22 @@ class Component extends DCLogic {
     const _ns = (d && d.nightStart) || '';
     try { const _rxNight = localStorage.getItem('hollow_reactions_night') || ''; if (_ns && _rxNight !== _ns) { localStorage.setItem('hollow_reactions', '{}'); localStorage.setItem('hollow_reactions_night', _ns); } } catch(e){}
     this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme), reactions: (d && d.reactions) || {}, reactionsAll: (d && d.reactionsAll) || {}, serverNightStart: (d && d.nightStart) || '', parlour: (d && d.parlour) || { game: null, phase: 'ended', players: [], present: 0 } });
-    try { const _pr = (d && d.parlour) ? d.parlour.round : 0; if (_pr !== this._pLastRound) { this._pLastRound = _pr; if (this.state.parlourUsualDraft || this.state.parlourFillDraft || this.state.parlourFillDraftB) this.setState({ parlourUsualDraft: '', parlourFillDraft: '', parlourFillDraftB: '' }); } } catch(e){}
+    try { const _pr = (d && d.parlour) ? d.parlour.round : 0; if (_pr !== this._pLastRound) { this._pLastRound = _pr; if (this.state.parlourUsualDraft || this.state.parlourFillDraft || this.state.parlourFillDraftB || this.state.parlourClueDraft || this.state.parlourTarget) this.setState({ parlourUsualDraft: '', parlourFillDraft: '', parlourFillDraftB: '', parlourClueDraft: '', parlourTarget: null }); } } catch(e){}
+    // The House Read: I'm the Reader and the clue is being written → fetch my secret target
+    // privately (it never rides the shared broadcast). One in-flight fetch per round.
+    try {
+      const _hp = (d && d.parlour) || {}; const _hhr = _hp.houseread;
+      if (_hp.game === 'houseread' && _hp.phase === 'clue' && _hhr && _hhr.reader === this._cid()) {
+        const _hc = this.state.parlourTarget;
+        if ((!_hc || _hc.round !== _hp.round) && this._hrFetchRound !== _hp.round) {
+          this._hrFetchRound = _hp.round;
+          fetch('/api/parlour/target?cid=' + encodeURIComponent(this._cid()))
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(j => this.setState({ parlourTarget: { round: (j.round != null ? j.round : _hp.round), zone: j.zone } }))
+            .catch(() => { this._hrFetchRound = null; });   // retry on the next state frame
+        }
+      }
+    } catch(e){}
     if (this.state.bookOpen){ if (this.state.bookTab === 'wall') this.fetchWall(); else this.fetchHistory(); }
   }
 
@@ -1696,6 +1788,13 @@ class Component extends DCLogic {
   parlourMyGuesses(){ try { const m = JSON.parse(localStorage.getItem('hollow_parlour_guesses')||'null'); const round = (this.state.parlour||{}).round; if (m && m.round === round) return m.g || {}; } catch(e){} return {}; }
   onParlourUsualDraft(e){ this.setState({ parlourUsualDraft: (e.target.value||'').slice(0,120) }); }
   parlourSubmitUsual(){ const t = (this.state.parlourUsualDraft||'').trim(); if (t) this.parlourAnswer(t); }
+  onParlourClueDraft(e){ this.setState({ parlourClueDraft: (e.target.value||'').slice(0,80) }); }
+  parlourClueSubmit(){
+    const t = (this.state.parlourClueDraft||'').trim();
+    if (!t){ this.flashToast('Give the room a clue first', 1600); return; }
+    this.api('POST','/api/parlour/clue',{ cid: this._cid(), text: t, name: this._myNameNow() }).then(()=>{ this.setState({ parlourClueDraft:'' }); this.refreshState(); }).catch((e)=>this.flashToast((e && e.error) || 'Not your clue to give', 1800));
+  }
+  parlourZone(z){ this.parlourAnswer(String(z)); }
   onParlourFillDraft(e){ this.setState({ parlourFillDraft: (e.target.value||'').slice(0,40) }); }
   onParlourFillDraftB(e){ this.setState({ parlourFillDraftB: (e.target.value||'').slice(0,40) }); }
   parlourFillSubmit(){
@@ -1714,7 +1813,7 @@ class Component extends DCLogic {
   parlourAddPrompt(){
     const p = this.state.parlour || {}; const game = p.game || 'confession';
     let text;
-    if (game === 'fork'){
+    if (game === 'fork' || game === 'houseread'){
       const a = (this.state.parlourDraft||'').trim(), b = (this.state.parlourDraftB||'').trim();
       if (!a || !b){ this.flashToast('Fill in both options',1600); return; }
       text = a + ' | ' + b;
@@ -1833,7 +1932,7 @@ class Component extends DCLogic {
     const pCanAdvance = pStaff || pAdvanceAnyone;
     const pMy = this.parlourMyAnswer();
     const pPresent = P.present || 0, pAnswered = P.answered || 0;
-    const pGameName = ({ confession:'The Confession', fork:'The Fork', usual:'The Usual' })[pGame] || 'The Parlor';
+    const pGameName = ({ confession:'The Confession', fork:'The Fork', usual:'The Usual', houseread:'The House Read' })[pGame] || 'The Parlor';
     const pIsFork = pGame==='fork', pIsConfession = pGame==='confession';
     let forkA='', forkB='';
     if (pIsFork && P.prompt){ const _pp = String(P.prompt).split('|'); forkA = (_pp[0]||'').trim(); forkB = ((_pp[1]||'').trim()) || '…'; }
@@ -1857,6 +1956,31 @@ class Component extends DCLogic {
     if (pIsUsual && pPhase==='reveal'){
       revealCards = (P.reveal||[]).map(r => ({ text:r.text, author:r.author, nailed:(r.nailed||[]).join(', '), hasNailed:(r.nailed||[]).length>0, nailedNone:(r.nailed||[]).length===0, fooledLabel:(r.fooledCount||0) + ((r.fooledCount||0)===1?' fooled':' fooled') }));
       usualScores = (P.scores||[]).map((s,i) => ({ rank:String(i+1), name:s.name, points:String(s.points) }));
+    }
+    // ---- The House Read (spectrum + hidden target) ----
+    const pIsHouse = pGame==='houseread';
+    const HR = P.houseread || null;
+    const amReader = !!(HR && HR.reader === this._cid());
+    const _hrMyZone = (pIsHouse && pMy != null) ? parseInt(pMy,10) : null;
+    const _hrPeek = (pIsHouse && st.parlourTarget && st.parlourTarget.round === P.round) ? st.parlourTarget.zone : null;   // my private target (Reader only)
+    const _hrSeg = (i, o) => ({ flex:'1', minWidth:0, height:'56px', padding:'0', cursor: o.tap?'pointer':'default', fontSize:'14px', fontWeight:700, lineHeight:'56px', textAlign:'center', border:'none', borderRight: i===6 ? 'none' : '1px solid var(--card-border,#2D3422)',
+      color: o.hot?'var(--accent-ink,#13160F)':'var(--ink-soft,#B7B3A1)',
+      background: o.hot?'var(--accent,#A6BB8E)': o.warm?'rgba(166,187,142,.28)': o.on?'rgba(207,162,103,.3)':'var(--field,#161A11)', transition:'background .2s ease' });
+    let hrClueZones=[], hrTapZones=[], hrRevealZones=[], hrPinCols=[], hrRoundScores=[], hrNeedleStyle={};
+    if (pIsHouse && pPhase==='clue' && amReader){
+      hrClueZones = [0,1,2,3,4,5,6].map(i => ({ label: i===_hrPeek?'◈':'', style:_hrSeg(i,{ hot:i===_hrPeek, warm:_hrPeek!=null && Math.abs(i-_hrPeek)===1 }) }));
+    }
+    if (pIsHouse && pPhase==='answer'){
+      hrTapZones = [0,1,2,3,4,5,6].map(i => ({ label: _hrMyZone===i?'●':'', onTap: () => this.parlourZone(i), style:_hrSeg(i,{ tap:true, on:_hrMyZone===i }) }));
+    }
+    if (pIsHouse && pPhase==='reveal' && HR){
+      const _hrT = (HR.target!=null) ? HR.target : null;
+      const _pins = HR.pins || [];
+      hrRevealZones = [0,1,2,3,4,5,6].map(i => { const n = _pins.filter(x=>x.zone===i).length; return { label: n?String(n):'', style:_hrSeg(i,{ hot:i===_hrT, warm:_hrT!=null && Math.abs(i-_hrT)===1 }) }; });
+      hrPinCols = [0,1,2,3,4,5,6].map(i => ({ names: _pins.filter(x=>x.zone===i).map(x=>({ name:x.name })) }));
+      hrRoundScores = _pins.map(x => ({ name:x.name, zoneLabel:'zone '+(x.zone+1), pts:'+'+(x.pts||0) }));
+      if (_hrT!=null) hrNeedleStyle = { position:'absolute', bottom:'-2px', left:(((_hrT+0.5)/7*100)+'%'), width:'0', height:'0', borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderTop:'12px solid var(--accent2,#CFA267)', transform:'translateX(-50%)', animation:'hrSwing .7s cubic-bezier(.34,1.4,.64,1)' };
+      usualScores = (P.scores||[]).map((s,i) => ({ rank:String(i+1), name:s.name, points:String(s.points) }));   // standings share The Usual's shape
     }
     const _pSeg = (on) => ({ flex:'1', textAlign:'center', fontFamily:"'Inter',sans-serif", fontSize:'12px', fontWeight:600, borderRadius:'999px', padding:'6px 10px', cursor:'pointer', border:'none', background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--ink-soft)' });
     const _pAns = (on) => ({ display:'block', width:'100%', boxSizing:'border-box', textAlign:'center', fontFamily:"'Fraunces',Georgia,serif", fontSize:'17px', fontWeight:500, borderRadius:'14px', padding:'15px', marginBottom:'10px', cursor:'pointer', color: on?'var(--ink)':'var(--ink-soft)', border:'1px solid '+(on?'var(--accent2)':'var(--card-border)'), background: on?'rgba(207,162,103,.13)':'var(--field)', transition:'background .15s ease, border-color .15s ease' });
@@ -1902,7 +2026,7 @@ class Component extends DCLogic {
       background: on ? (kind==='up'?'rgba(166,187,142,.18)':'rgba(197,106,68,.16)') : 'var(--field,#161A11)', filter: on?'none':'grayscale(.3) opacity(.85)' });
     const _tierBtn = (c) => ({ flex:'1', textAlign:'center', fontSize:'12px', fontWeight:700, borderRadius:'10px', padding:'9px 6px', cursor:'pointer', color:'#13160F', background:c, border:'none' });
     // "Drop it in the pool" is only active once every field is filled (Fork needs both options).
-    const _canDrop = pIsFork ? (!!(st.parlourDraft||'').trim() && !!(st.parlourDraftB||'').trim()) : !!(st.parlourDraft||'').trim();
+    const _canDrop = (pIsFork || pIsHouse) ? (!!(st.parlourDraft||'').trim() && !!(st.parlourDraftB||'').trim()) : !!(st.parlourDraft||'').trim();
     // ---- The Blanks (fill phase) ----
     const pFill = (pPhase==='fill' && P.fill) ? P.fill : null;
     const _fillBucketLabels = { people:'a person', object:'an object', food:'a food', place:'a place', activity:'an activity', drink:'a drink', animal:'an animal', chore:'a chore' };
@@ -1925,10 +2049,10 @@ class Component extends DCLogic {
       isNone: (!pGame || pPhase==='ended'), isLobby: pPhase==='lobby', isAnswer: pPhase==='answer', isReveal: pPhase==='reveal',
       isConfession: pIsConfession, isFork: pIsFork, isUsual: pIsUsual, notUsual: !pIsUsual, isGuess: pPhase==='guess',
       staff: pStaff, notStaff: !pStaff, canAdvance: pCanAdvance, waiting: (pLive && !pCanAdvance),
-      promptPlaceholder: pIsFork ? 'This | that' : pIsUsual ? 'A question everyone answers…' : 'Never have I ever…',
+      promptPlaceholder: pIsFork ? 'This | that' : pIsHouse ? 'Underrated | Overrated' : pIsUsual ? 'A question everyone answers…' : 'Never have I ever…',
       onOpenFork: () => this.parlourOpenGame('fork'), onOpenUsual: () => this.parlourOpenGame('usual'),
       onClose: () => this.parlourClose(), onSubmitUsual: () => this.parlourSubmitUsual(),
-      mySubmitted: (pIsUsual && pMy!=null), mySubmittedText: pMy || '', showMyAnswer: (pMy!=null && !pIsUsual),
+      mySubmitted: (pIsUsual && pMy!=null), mySubmittedText: pMy || '', showMyAnswer: (pMy!=null && !pIsUsual && !pIsHouse),
       guessCards: guessCards, amSpectator: amSpectator, guessProgress: guessProgress,
       revealCards: revealCards, usualScores: usualScores, hasScores: (pIsUsual && pPhase==='reveal' && !!P.scoring && usualScores.length>0),
       forkA: forkA, forkB: forkB, forkAStyle: _forkCard(pMy==='a'), forkBStyle: _forkCard(pMy==='b'),
@@ -1941,7 +2065,7 @@ class Component extends DCLogic {
       namesA: (P.namesA||[]).map(n => ({ name:n })), namesB: (P.namesB||[]).map(n => ({ name:n })),
       showWhoOnStyle: _pSeg(!!P.showWho), showWhoOffStyle: _pSeg(!P.showWho), onShowWhoOn: () => this.parlourSet({ showWho:true }), onShowWhoOff: () => this.parlourSet({ showWho:false }),
       prompt: P.prompt || '', roundLabel: 'Round ' + (P.round||0),
-      answeredLabel: pAnswered + ' of ' + pPresent + ' in', present: String(pPresent), hasPlayers: pPresent>0,
+      answeredLabel: pIsHouse ? (pAnswered + ' of ' + Math.max(0, pPresent - ((P.players||[]).some(x => HR && x.cid===HR.reader) ? 1 : 0)) + ' locked in') : (pAnswered + ' of ' + pPresent + ' in'), present: String(pPresent), hasPlayers: pPresent>0,
       players: (P.players||[]).map(x => ({ name: (x.name && String(x.name).trim()) || 'Someone' })),
       onAnswerHave: () => this.parlourAnswer('have'), onAnswerNever: () => this.parlourAnswer('never'),
       haveStyle: _pAns(pMy==='have'), neverStyle: _pAns(pMy==='never'),
@@ -1966,6 +2090,17 @@ class Component extends DCLogic {
       onFillSubmit: () => this.parlourFillSubmit(), onFillPass: () => this.parlourFillSkip('pass'), onFillAuto: () => this.parlourFillSkip('auto'),
       hasFilledBy: (pPhase==='reveal' && !!P.filledBy), filledBy: P.filledBy || '',
       fillShowOnStyle: _pSeg(!!P.showFillSentence), fillShowOffStyle: _pSeg(!P.showFillSentence), onFillShowOn: () => this.parlourSet({ showFillSentence:true }), onFillShowOff: () => this.parlourSet({ showFillSentence:false }),
+      isHouseread: pIsHouse, isClue: pPhase==='clue', amReader: amReader, notReader: !!(pIsHouse && !amReader),
+      hrPoleA: (HR && HR.poles && HR.poles.a) || '', hrPoleB: (HR && HR.poles && HR.poles.b) || '…',
+      hrClue: (HR && HR.clue) || '', readerName: (HR && HR.readerName) || 'Someone',
+      hrHavePeek: _hrPeek!=null, hrNoPeek: _hrPeek==null,
+      hrClueZones: hrClueZones, hrTapZones: hrTapZones, hrRevealZones: hrRevealZones, hrPinCols: hrPinCols,
+      hrNeedleStyle: hrNeedleStyle, hrRoundScores: hrRoundScores, hrReaderPts: String((HR && HR.readerPts) || 0),
+      hrHasScores: (pIsHouse && pPhase==='reveal' && !!P.scoring && usualScores.length>0),
+      hrCanGuess: (pIsHouse && pPhase==='answer' && !amReader),
+      onClueSubmit: () => this.parlourClueSubmit(), onOpenHouseread: () => this.parlourOpenGame('houseread'),
+      addTwoField: (pIsFork || pIsHouse), addOneField: !(pIsFork || pIsHouse),
+      addTwoLabel: pIsHouse ? 'Give the two ends of the spectrum:' : 'Give the two things to choose between:',
     };
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
