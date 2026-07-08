@@ -1135,18 +1135,25 @@
 
           <sc-if value="{{ pv.live }}" hint-placeholder-val="">
             <div style="margin-top:22px;border-top:1px solid var(--card-border,#2D3422);padding-top:14px">
-              <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--ink-faint,#827E6D);margin-bottom:7px">Add one to the pool</div>
-              <sc-if value="{{ pv.isFork }}" hint-placeholder-val="">
-                <div style="font-size:11px;color:var(--ink-faint,#827E6D);margin-bottom:6px">Give the two things to choose between:</div>
-                <input type="text" value="{{ parlourDraft }}" onChange="{{ onParlourDraft }}" placeholder="Option one — “this”" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:7px">
-                <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-bottom:7px">or</div>
-                <input type="text" value="{{ parlourDraftB }}" onChange="{{ onParlourDraftB }}" placeholder="Option two — “that”" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:8px">
+              <button type="button" onClick="{{ pv.onToggleAdd }}" style="display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:none;padding:0;cursor:pointer">
+                <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--ink-faint,#827E6D)">Add one to the pool</span>
+                <span style="font-size:11px;color:var(--ink-faint,#827E6D)">{{ pv.addChevron }}</span>
+              </button>
+              <sc-if value="{{ pv.addOpen }}" hint-placeholder-val="">
+                <div style="margin-top:12px">
+                  <sc-if value="{{ pv.isFork }}" hint-placeholder-val="">
+                    <div style="font-size:11px;color:var(--ink-faint,#827E6D);margin-bottom:6px">Give the two things to choose between:</div>
+                    <input type="text" value="{{ parlourDraft }}" onChange="{{ onParlourDraft }}" placeholder="Option one — “this”" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:7px">
+                    <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-bottom:7px">or</div>
+                    <input type="text" value="{{ parlourDraftB }}" onChange="{{ onParlourDraftB }}" placeholder="Option two — “that”" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:8px">
+                  </sc-if>
+                  <sc-if value="{{ pv.notFork }}" hint-placeholder-val="{{ true }}">
+                    <input type="text" value="{{ parlourDraft }}" onChange="{{ onParlourDraft }}" placeholder="{{ pv.promptPlaceholder }}" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:8px">
+                  </sc-if>
+                  <button type="button" onClick="{{ pv.onAddPrompt }}" style="{{ pv.dropBtnStyle }}">Drop it in the pool</button>
+                  <div style="font-size:11px;color:var(--ink-faint,#827E6D);margin-top:7px;line-height:1.4;text-align:center">It’ll come up tonight for the room to vote to keep.</div>
+                </div>
               </sc-if>
-              <sc-if value="{{ pv.notFork }}" hint-placeholder-val="{{ true }}">
-                <input type="text" value="{{ parlourDraft }}" onChange="{{ onParlourDraft }}" placeholder="{{ pv.promptPlaceholder }}" style="width:100%;box-sizing:border-box;font-size:14px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:10px 12px;outline:none;margin-bottom:8px">
-              </sc-if>
-              <button type="button" onClick="{{ pv.onAddPrompt }}" style="display:block;width:100%;box-sizing:border-box;font-size:13.5px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent2,#CFA267);border:none;border-radius:11px;padding:11px;cursor:pointer">Drop it in the pool</button>
-              <div style="font-size:11px;color:var(--ink-faint,#827E6D);margin-top:7px;line-height:1.4;text-align:center">It’ll come up tonight for the room to vote to keep.</div>
             </div>
           </sc-if>
 
@@ -1249,7 +1256,7 @@ class Component extends DCLogic {
       bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false, verdictDrink: null, peekDrink: null,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
       bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
-      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourDraft: '', parlourDraftB: '', parlourUsualDraft: '', parlourGate: '', parlourGateErr: false,
+      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourAddOpen: false, parlourDraft: '', parlourDraftB: '', parlourUsualDraft: '', parlourGate: '', parlourGateErr: false,
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -1653,6 +1660,7 @@ class Component extends DCLogic {
   parlourSubmitUsual(){ const t = (this.state.parlourUsualDraft||'').trim(); if (t) this.parlourAnswer(t); }
   parlourEnd(){ this.api('POST','/api/parlour/end',{ code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>{}); }
   parlourSet(patch){ this.api('POST','/api/parlour/settings', Object.assign({ code: this._parlourCode() }, patch||{})).then(()=>this.refreshState()).catch(()=>{}); }
+  toggleParlourAdd(){ this.setState({ parlourAddOpen: !this.state.parlourAddOpen }); }
   onParlourDraft(e){ this.setState({ parlourDraft: (e.target.value||'').slice(0,160) }); }
   onParlourDraftB(e){ this.setState({ parlourDraftB: (e.target.value||'').slice(0,120) }); }
   parlourAddPrompt(){
@@ -1845,6 +1853,8 @@ class Component extends DCLogic {
       border:'1px solid '+(on ? (kind==='up'?'var(--accent,#A6BB8E)':'#C56A44') : 'var(--card-border,#2D3422)'),
       background: on ? (kind==='up'?'rgba(166,187,142,.18)':'rgba(197,106,68,.16)') : 'var(--field,#161A11)', filter: on?'none':'grayscale(.3) opacity(.85)' });
     const _tierBtn = (c) => ({ flex:'1', textAlign:'center', fontSize:'12px', fontWeight:700, borderRadius:'10px', padding:'9px 6px', cursor:'pointer', color:'#13160F', background:c, border:'none' });
+    // "Drop it in the pool" is only active once every field is filled (Fork needs both options).
+    const _canDrop = pIsFork ? (!!(st.parlourDraft||'').trim() && !!(st.parlourDraftB||'').trim()) : !!(st.parlourDraft||'').trim();
     const pv = {
       live: pLive, game: pGame, gameName: pGameName,
       spicePips: spicePips, spiceLabel: _spiceNames[_spice], spiceHint: _spiceHints[_spice], spiceColor: _heatRamp[_spice],
@@ -1888,6 +1898,9 @@ class Component extends DCLogic {
       onOpenConfession: () => this.parlourOpenGame('confession'), dealLabel: pPhase==='lobby' ? 'Deal the first prompt' : 'Next round',
       advHostStyle: _pSeg(!pAdvanceAnyone), advAnyoneStyle: _pSeg(pAdvanceAnyone), onAdvHost: () => this.parlourSet({ advance:'host' }), onAdvAnyone: () => this.parlourSet({ advance:'anyone' }),
       onAddPrompt: () => this.parlourAddPrompt(), gateErr: st.parlourGateErr,
+      onToggleAdd: () => this.toggleParlourAdd(), addOpen: !!st.parlourAddOpen, addChevron: st.parlourAddOpen ? '▾' : '▸',
+      dropBtnStyle: { display:'block', width:'100%', boxSizing:'border-box', fontSize:'13.5px', fontWeight:700, color:'var(--accent-ink,#13160F)', background:'var(--accent2,#CFA267)', border:'none', borderRadius:'11px', padding:'11px',
+        cursor: _canDrop?'pointer':'not-allowed', opacity: _canDrop?1:0.4, pointerEvents: _canDrop?'auto':'none' },
       addedCount: String(P.added||0), hasAdded: (P.added||0) > 0, onClearPrompts: () => this.parlourClearPrompts(),
     };
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }

@@ -303,23 +303,25 @@ function lastResetUTC(now) {
 const PARLOUR_FALLBACK = {
   confession: { tame: ["Never have I ever fallen asleep at a party."], spicy: ["Never have I ever texted an ex after midnight."], raunchy: ["Never have I ever sent a spicy text to the wrong chat."] },
   fork: { tame: ["Coast | Mountains"], spicy: ["Truth | Dare"], raunchy: ["Skinny dip | Streak"] },
+  usual: { tame: ["Describe tonight as a cocktail."], spicy: ["What's your biggest ick?"], raunchy: ["What's your worst-kept secret about your love life?"] },
 };
 const PARLOUR_TIERS = ["tame", "spicy", "raunchy"];
+const PARLOUR_GAMES = ["confession", "fork", "usual"];
 function loadParlourPrompts() {
-  const out = { confession: { tame: [], spicy: [], raunchy: [] }, fork: { tame: [], spicy: [], raunchy: [] } };
+  const out = { confession: { tame: [], spicy: [], raunchy: [] }, fork: { tame: [], spicy: [], raunchy: [] }, usual: { tame: [], spicy: [], raunchy: [] } };
   try {
     const raw = JSON.parse(fs.readFileSync(path.join(__dirname, "parlour-prompts.json"), "utf8"));
-    for (const g of ["confession", "fork"]) {
+    for (const g of PARLOUR_GAMES) {
       for (const e of (raw[g] || [])) {
         if (!e || e.blank) continue;                                 // fill-in cards aren't playable yet
-        const text = g === "confession" ? e.t : ((e.a && e.b) ? (e.a + " | " + e.b) : null);
+        const text = g === "fork" ? ((e.a && e.b) ? (e.a + " | " + e.b) : null) : e.t;   // fork = "A | B", others use .t
         if (!text || text.includes("___")) continue;   // never deal an unfilled blank
         const tier = e.cat === "raunchy" ? "raunchy" : (e.cat === "spicy" ? "spicy" : "tame");
         out[g][tier].push(text);
       }
     }
   } catch (err) { console.warn("parlour-prompts.json not loaded (" + err.message + ") \u2014 using fallback"); }
-  for (const g of ["confession", "fork"]) {
+  for (const g of PARLOUR_GAMES) {
     if (!out[g].tame.length && !out[g].spicy.length && !out[g].raunchy.length) out[g] = { tame: PARLOUR_FALLBACK[g].tame.slice(), spicy: PARLOUR_FALLBACK[g].spicy.slice(), raunchy: PARLOUR_FALLBACK[g].raunchy.slice() };
   }
   return out;
