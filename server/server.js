@@ -296,10 +296,10 @@ function lastResetUTC(now) {
 }
 
 /* ---- The Parlour (live party games) ---- */
-// Bundled game prompts live in server/parlour-prompts.json (categorized, with fill-in
-// "blank" cards labeled by bucket for a future fill mechanism). Build the tame/spicy
-// play pools from it at startup; "blank" cards are excluded from play until a fill UI
-// exists. The small fallback keeps the games working if the file is ever missing.
+// Bundled game prompts live in server/parlour-prompts.json (categorized). Fill-in "blank"
+// cards are labeled by bucket ("food", "animal", ...) and enter the pools as objects; the
+// "fill" phase collects the word(s) from a player before the round is played ("The Blanks").
+// The small fallback keeps the games working if the file is ever missing.
 const PARLOUR_FALLBACK = {
   confession: { tame: ["Never have I ever fallen asleep at a party."], spicy: ["Never have I ever texted an ex after midnight."], raunchy: ["Never have I ever sent a spicy text to the wrong chat."] },
   fork: { tame: ["Coast | Mountains"], spicy: ["Truth | Dare"], raunchy: ["Skinny dip | Streak"] },
@@ -307,16 +307,40 @@ const PARLOUR_FALLBACK = {
 };
 const PARLOUR_TIERS = ["tame", "spicy", "raunchy"];
 const PARLOUR_GAMES = ["confession", "fork", "usual"];
+// Fallback words for the fill phase — used when the host taps "fill it for them" or the room
+// is empty. Entries run through the same injector as player words, so they may carry their
+// own determiner ("the dishes") or be multi-word phrases ("a load of laundry").
+const FILL_FALLBACK = {
+  people: ["my ex", "your landlord", "a mall Santa", "the neighbors", "a retired clown", "my dentist", "a nosy coworker", "your mother-in-law", "the mailman", "a wedding DJ", "my old gym teacher", "a fortune teller", "the babysitter", "a conspiracy theorist", "my barber", "a mime", "the HOA president", "a substitute teacher", "an off-duty cop", "a street magician"],
+  object: ["traffic cone", "lava lamp", "garden gnome", "waffle iron", "fanny pack", "inflatable flamingo", "ouija board", "unicycle", "bean bag chair", "accordion", "disco ball", "foam sword", "tax form", "karaoke machine", "snow globe", "extension cord", "novelty mug", "leaf blower", "air fryer", "umbrella"],
+  food: ["lasagna", "rotisserie chicken", "family-size bag of chips", "birthday cake", "burrito", "jar of pickles", "charcuterie board", "sleeve of cookies", "pot of mac and cheese", "watermelon", "meatloaf", "onion", "block of cheese", "sheet cake", "tub of frosting", "casserole", "loaf of garlic bread", "pumpkin pie", "bucket of fried chicken", "quesadilla"],
+  place: ["Waffle House", "the DMV", "a haunted house", "the airport", "a Renaissance fair", "the gym parking lot", "a cruise ship", "the break room", "a petting zoo", "IKEA", "a karaoke bar", "the laundromat", "a corn maze", "the dentist's office", "a bowling alley", "Costco", "a rooftop bar", "the county fair", "a rest stop", "grandma's house"],
+  activity: ["hot yoga", "karaoke", "speed dating", "axe throwing", "a road trip", "line dancing", "trivia night", "a silent retreat", "couples therapy", "jury duty", "a spin class", "birdwatching", "a garage sale", "improv class", "a pub crawl", "goat yoga", "a book club", "paintball", "a magic show", "water aerobics"],
+  drink: ["espresso martini", "warm gas station coffee", "protein shake", "boxed wine", "energy drink", "kombucha", "pickle juice", "hot toddy", "gallon of sweet tea", "smoothie", "flat soda", "oat milk latte", "root beer float", "green juice", "double IPA", "juice box", "mimosa", "glass of tap water", "milkshake", "iced coffee"],
+  animal: ["raccoon", "emu", "possum", "alpaca", "ferret", "peacock", "iguana", "goose", "miniature horse", "hedgehog", "parrot", "armadillo", "hamster", "flamingo", "goat", "snapping turtle", "chihuahua", "capybara", "rooster", "seagull"],
+  chore: ["the dishes", "a load of laundry", "vacuuming", "cleaning the gutters", "mowing the lawn", "the taxes", "scrubbing the tub", "dusting", "taking out the trash", "meal prep", "weeding", "washing the car", "ironing", "organizing the garage", "defrosting the freezer", "folding laundry", "the grocery run", "walking the dog", "cleaning the litter box", "unloading the dishwasher"],
+};
+// Pool entries are strings (regular cards) or objects (blank cards). Content-derived keys keep
+// the persisted no-repeat memory (p.dealt) valid across restarts.
+const parlourKey = (e) => typeof e === "string" ? e : (e.t || (e.a + " | " + e.b));
 function loadParlourPrompts() {
   const out = { confession: { tame: [], spicy: [], raunchy: [] }, fork: { tame: [], spicy: [], raunchy: [] }, usual: { tame: [], spicy: [], raunchy: [] } };
   try {
     const raw = JSON.parse(fs.readFileSync(path.join(__dirname, "parlour-prompts.json"), "utf8"));
     for (const g of PARLOUR_GAMES) {
       for (const e of (raw[g] || [])) {
-        if (!e || e.blank) continue;                                 // fill-in cards aren't playable yet
+        if (!e) continue;
+        const tier = e.cat === "raunchy" ? "raunchy" : (e.cat === "spicy" ? "spicy" : "tame");
+        if (e.blank) {
+          // Blank card → pool it as an object; the fill phase supplies the word(s) at deal time.
+          if (g === "usual" || !FILL_FALLBACK[e.blank]) continue;   // no blanks for The Usual; unknown buckets stay out
+          const sides = g === "fork" ? [e.a, e.b] : [e.t];
+          if (sides.some((f) => !f || (f.match(/___/g) || []).length !== 1)) continue;   // exactly one ___ per side
+          out[g][tier].push(g === "fork" ? { blank: e.blank, a: e.a, b: e.b } : { blank: e.blank, t: e.t });
+          continue;
+        }
         const text = g === "fork" ? ((e.a && e.b) ? (e.a + " | " + e.b) : null) : e.t;   // fork = "A | B", others use .t
         if (!text || text.includes("___")) continue;   // never deal an unfilled blank
-        const tier = e.cat === "raunchy" ? "raunchy" : (e.cat === "spicy" ? "spicy" : "tame");
         out[g][tier].push(text);
       }
     }
@@ -338,7 +362,7 @@ const SPICE_WEIGHTS = [
   { tame: 0,   spicy: 35, raunchy: 65 },   // 4 All The Spice
 ];
 function spiceLevel(p) { const n = Math.round(Number(p && p.spice)); return (n >= 0 && n <= 4) ? n : 1; }
-const PARLOUR_DEFAULT = { game: null, phase: "ended", round: 0, prompt: "", promptHeat: "tame", promptFresh: false, pendingPromptId: null, dealt: [], spice: 1, advance: "host", showWho: true, scoring: true, startedAt: "" };
+const PARLOUR_DEFAULT = { game: null, phase: "ended", round: 0, prompt: "", promptHeat: "tame", promptFresh: false, pendingPromptId: null, dealt: [], spice: 1, advance: "host", showWho: true, scoring: true, startedAt: "", fillTemplate: null, fillerCid: "", fillerName: "", lastFillerCid: "", filledBy: "", showFillSentence: false };
 function getParlour() {
   const row = Q.getSetting.get("parlour");
   if (!row || !row.value) return { ...PARLOUR_DEFAULT };
@@ -356,7 +380,7 @@ function resetParlour() { Q.parlourClearPlayers.run(); Q.parlourClearAnswers.run
 function dealParlourPrompt(p) {
   const bundled = PARLOUR_PROMPTS[p.game] || { tame: [], spicy: [], raunchy: [] };
   p.dealt = Array.isArray(p.dealt) ? p.dealt : [];
-  const unused = (arr) => (arr || []).filter((t) => p.dealt.indexOf(t) === -1);
+  const unused = (arr) => (arr || []).filter((t) => p.dealt.indexOf(parlourKey(t)) === -1);
   // 1) Tonight's drop-ins get priority — shown so the room can vote to keep them. No tier gating.
   const pending = Q.parlourPendingList.all(p.game);
   if (pending.length) {
@@ -381,14 +405,72 @@ function dealParlourPrompt(p) {
   if (!tier) return null;
   const avail = unused(pool[tier]);
   const pick = avail[Math.floor(Math.random() * avail.length)];
-  p.dealt.push(pick);
+  p.dealt.push(parlourKey(pick));
+  if (typeof pick !== "string") return { blankCard: pick, heat: tier, fresh: false, promptId: null };   // blank card → fill phase first
   return { text: pick, heat: tier, fresh: false, promptId: null };
 }
 function canAdvance(body) { const p = getParlour(); return p.advance === "anyone" || String(body.code) === CODE; }
+// ---- The Blanks (fill phase) ----
+// lastFillerCid survives clearFill on purpose — it's the rotation memory across rounds.
+function clearFill(p) { p.fillTemplate = null; p.fillerCid = ""; p.fillerName = ""; }
+function cleanFillWord(w) {
+  // "|" would corrupt the client's "A | B" fork split; "_" blocks smuggling a literal "___" back in.
+  const s = String(w == null ? "" : w).replace(/[|_]/g, " ");
+  return s.replace(/\s+/g, " ").trim().slice(0, 40).trim();
+}
+function injectBlank(template, word) {
+  const idx = template.indexOf("___");
+  if (idx === -1) return null;
+  let before = template.slice(0, idx);
+  const after = template.slice(idx + 3);
+  // Fix the article only when it's the token immediately before the blank ("eaten an entire ___" stays untouched).
+  const m = before.match(/(^|[\s("“—])([Aa]n?|[Tt]he)(\s+)$/);
+  if (m) {
+    if (/^(a|an|the|my|your|his|her|its|our|their|some)\s/i.test(word)) {
+      before = before.slice(0, m.index + m[1].length);   // the word brings its own determiner ("a load of laundry") — drop the template's
+    } else if (m[2].toLowerCase() !== "the") {
+      // Vowel-letter heuristic; "an hour" / "a university" misfires are accepted at a party.
+      const art = /^[aeiou]/i.test(word) ? (m[2][0] === "A" ? "An" : "an") : (m[2][0] === "A" ? "A" : "a");
+      before = before.slice(0, m.index + m[1].length) + art + m[3];
+    }
+  }
+  return before + word + after;   // slice-concat, not String.replace — a word may contain "$&"
+}
+function pickFiller(pivotCid, excludeCid) {
+  let list = Q.parlourActivePlayers.all();   // ORDER BY joined_at, cid — deterministic rotation
+  if (excludeCid) list = list.filter((x) => x.cid !== excludeCid);
+  if (!list.length) return null;
+  const i = list.findIndex((x) => x.cid === pivotCid);   // -1 (pivot left or aged out) wraps to list[0]
+  return list[(i + 1) % list.length];
+}
+function applyFill(p, words, who) {
+  const t = p.fillTemplate;
+  if (!t) return false;
+  const a = injectBlank(t.a || t.t, words[0]);
+  const b = t.a ? injectBlank(t.b, words[1]) : "";
+  const prompt = t.a ? ((a && b) ? (a + " | " + b) : null) : a;
+  if (!prompt || prompt.includes("___")) return false;   // hard guard: a "___" never reaches the answer phase
+  p.prompt = prompt; p.filledBy = who; clearFill(p); p.phase = "answer";
+  return true;
+}
+function autoFill(p) {
+  const bucket = (p.fillTemplate && p.fillTemplate.blank) || "";
+  const words = FILL_FALLBACK[bucket] || ["mystery"];
+  const rand = () => words[Math.floor(Math.random() * words.length)];
+  return applyFill(p, (p.fillTemplate && p.fillTemplate.a) ? [rand(), rand()] : [rand()], "the house");
+}
 function parlourState() {
   const p = getParlour();
   const players = Q.parlourActivePlayers.all();   // only recently-seen devices count as "in the room"
-  const out = { game: p.game, phase: p.phase, round: p.round || 0, prompt: p.prompt || "", heat: p.promptHeat || "tame", fresh: !!p.promptFresh, spice: spiceLevel(p), spiceLabel: SPICE_LEVELS[spiceLevel(p)], advance: p.advance || "host", showWho: !!p.showWho, scoring: !!p.scoring, added: Q.parlourPendingCount.get().n, saved: Q.parlourSavedCount.get().n, players, present: players.length };
+  const out = { game: p.game, phase: p.phase, round: p.round || 0, prompt: p.prompt || "", heat: p.promptHeat || "tame", fresh: !!p.promptFresh, spice: spiceLevel(p), spiceLabel: SPICE_LEVELS[spiceLevel(p)], advance: p.advance || "host", showWho: !!p.showWho, scoring: !!p.scoring, filledBy: p.filledBy || "", showFillSentence: !!p.showFillSentence, added: Q.parlourPendingCount.get().n, saved: Q.parlourSavedCount.get().n, players, present: players.length };
+  if (p.game && p.phase === "fill" && p.fillTemplate) {
+    // The template stays server-side while blind (the default). With "filler sees the card" on,
+    // the sentence rides the shared broadcast — every device technically receives it; only the
+    // filler's UI renders it. Fine for a LAN party.
+    const t = p.fillTemplate;
+    out.fill = { fillerCid: p.fillerCid || "", fillerName: p.fillerName || "Someone", bucket: t.blank || "", blanks: t.a ? 2 : 1 };
+    if (p.showFillSentence) out.fill.sentence = t.a ? (t.a + " | " + t.b) : t.t;
+  }
   if (p.game && (p.phase === "answer" || p.phase === "guess" || p.phase === "reveal")) {
     out.answered = Q.parlourRoundCount.get(p.round).n;
     const atReveal = p.phase === "reveal";
@@ -752,6 +834,13 @@ const server = http.createServer(async (req, res) => {
       Q.parlourRemovePlayer.run(cid);
       if (p.phase === "answer") Q.parlourRemoveAnswer.run(p.round, cid);   // not yet shuffled — safe to drop
       Q.parlourRemoveGuesses.run(p.round, cid);
+      if (p.phase === "fill" && cid === p.fillerCid) {
+        // The filler walked out — hand the card to the next present player, or let the house fill an empty room.
+        const next = pickFiller(cid, cid);
+        if (next) { p.fillerCid = next.cid; p.fillerName = (next.name && String(next.name).trim()) || "Someone"; p.lastFillerCid = next.cid; }
+        else autoFill(p);
+        saveParlour(p);
+      }
       broadcast();
       return sendJSON(res, 200, { ok: true });
     }
@@ -763,6 +852,7 @@ const server = http.createServer(async (req, res) => {
       if (b.advance != null) p.advance = b.advance === "anyone" ? "anyone" : "host";
       if (b.showWho != null) p.showWho = !!b.showWho;
       if (b.scoring != null) p.scoring = !!b.scoring;
+      if (b.showFillSentence != null) p.showFillSentence = !!b.showFillSentence;
       saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
     }
@@ -774,6 +864,7 @@ const server = http.createServer(async (req, res) => {
       Q.parlourClearAnswers.run(); Q.parlourClearGuesses.run(); Q.parlourClearScores.run();
       const p = getParlour();
       p.game = game; p.phase = "lobby"; p.round = 0; p.prompt = ""; p.promptHeat = "tame"; p.promptFresh = false; p.pendingPromptId = null; p.dealt = []; p.startedAt = Q.nowStr.get().t;
+      clearFill(p); p.filledBy = ""; p.lastFillerCid = "";
       Q.parlourClearKeepVotes.run();
       saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
@@ -790,7 +881,18 @@ const server = http.createServer(async (req, res) => {
       const pr = dealParlourPrompt(p);
       if (!pr) return sendJSON(res, 400, { error: "out of prompts" });
       Q.parlourClearAnswers.run(); Q.parlourClearGuesses.run();
-      p.prompt = pr.text; p.promptHeat = pr.heat; p.promptFresh = !!pr.fresh; p.pendingPromptId = pr.promptId || null; p.round = (p.round || 0) + 1; p.phase = "answer";
+      clearFill(p); p.filledBy = "";   // re-dealing during a fill abandons that card (it stays in p.dealt)
+      p.promptHeat = pr.heat; p.promptFresh = !!pr.fresh; p.pendingPromptId = pr.promptId || null; p.round = (p.round || 0) + 1;
+      if (pr.blankCard) {
+        // Blank card → collect the word(s) first. The filler rotates through present players.
+        p.prompt = "";
+        p.fillTemplate = pr.blankCard.a ? { blank: pr.blankCard.blank, a: pr.blankCard.a, b: pr.blankCard.b } : { blank: pr.blankCard.blank, t: pr.blankCard.t };
+        const filler = pickFiller(p.lastFillerCid);
+        if (filler) { p.fillerCid = filler.cid; p.fillerName = (filler.name && String(filler.name).trim()) || "Someone"; p.lastFillerCid = filler.cid; p.phase = "fill"; }
+        else autoFill(p);   // empty room → the house fills it and play proceeds
+      } else {
+        p.prompt = pr.text; p.phase = "answer";
+      }
       saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
     }
@@ -887,6 +989,7 @@ const server = http.createServer(async (req, res) => {
       if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
       const p = getParlour();
       p.game = null; p.phase = "ended"; p.prompt = ""; p.round = 0; p.dealt = []; p.promptFresh = false; p.pendingPromptId = null;
+      clearFill(p); p.filledBy = ""; p.lastFillerCid = "";
       Q.parlourClearAnswers.run(); Q.parlourClearGuesses.run(); Q.parlourClearScores.run(); Q.parlourClearPlayers.run(); Q.parlourClearKeepVotes.run();
       saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
@@ -899,6 +1002,7 @@ const server = http.createServer(async (req, res) => {
       const text = str(b.text, 160);
       if (!PARLOUR_PROMPTS[game]) return sendJSON(res, 400, { error: "unknown game" });
       if (!text) return sendJSON(res, 400, { error: "text required" });
+      if (text.includes("___")) return sendJSON(res, 400, { error: "no blanks in drop-ins" });   // drop-ins skip the fill phase — a ___ must never reach play
       Q.parlourAddPrompt.run(game, text, 0, currentNightStart(), str(b.cid, 40));
       broadcast();
       return sendJSON(res, 201, { ok: true });
@@ -911,6 +1015,36 @@ const server = http.createServer(async (req, res) => {
       const p = getParlour();
       if (p.promptFresh) { p.promptFresh = false; p.pendingPromptId = null; saveParlour(p); }
       broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+    // The Blanks: the filler submits the word(s) for the current blank card
+    if (pathname === "/api/parlour/fill" && method === "POST") {
+      const b = await readBody(req);
+      const p = getParlour();
+      if (!p.game || p.phase !== "fill" || !p.fillTemplate) return sendJSON(res, 409, { error: "nothing to fill" });
+      const cid = str(b.cid, 40);
+      if (!cid || cid !== p.fillerCid) return sendJSON(res, 403, { error: "not your card to fill" });
+      const need = p.fillTemplate.a ? 2 : 1;
+      const words = (Array.isArray(b.words) ? b.words : []).slice(0, need).map(cleanFillWord);
+      if (words.length !== need || words.some((w) => !w)) return sendJSON(res, 400, { error: need === 2 ? "two words required" : "a word is required" });
+      if (!applyFill(p, words, p.fillerName)) return sendJSON(res, 500, { error: "fill failed" });
+      saveParlour(p); broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+    // The Blanks host valves: pass the card to the next player, or let the house fill it
+    if (pathname === "/api/parlour/fill-skip" && method === "POST") {
+      const b = await readBody(req);
+      if (!canAdvance(b)) return sendJSON(res, 403, { error: "bad code" });
+      const p = getParlour();
+      if (p.phase !== "fill" || !p.fillTemplate) return sendJSON(res, 409, { error: "nothing to skip" });
+      if (b.mode === "auto") {
+        autoFill(p);
+      } else {
+        const next = pickFiller(p.fillerCid);
+        if (!next || next.cid === p.fillerCid) return sendJSON(res, 409, { error: "no one else to pass to" });
+        p.fillerCid = next.cid; p.fillerName = (next.name && String(next.name).trim()) || "Someone"; p.lastFillerCid = next.cid;
+      }
+      saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
     }
 

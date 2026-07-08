@@ -1049,6 +1049,36 @@
             </sc-if>
           </sc-if>
 
+          <sc-if value="{{ pv.isFill }}" hint-placeholder-val="">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
+              <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">{{ pv.gameName }} · {{ pv.roundLabel }}</span>
+              <sc-if value="{{ pv.heatBadge }}" hint-placeholder-val=""><span style="{{ pv.heatBadgeStyle }}">{{ pv.heatBadge }}</span></sc-if>
+            </div>
+            <sc-if value="{{ pv.amFiller }}" hint-placeholder-val="">
+              <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:23px;line-height:1.3;color:var(--ink,#ECE7D7);margin-bottom:8px">You’re up — give {{ pv.fillBucketLabel }}.</div>
+              <sc-if value="{{ pv.fillBlind }}" hint-placeholder-val=""><div style="font-size:12.5px;color:var(--ink-faint,#827E6D);line-height:1.5;margin-bottom:14px">You can’t see the card — that’s the point. It gets funnier.</div></sc-if>
+              <sc-if value="{{ pv.hasFillSentence }}" hint-placeholder-val=""><div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;line-height:1.45;color:var(--ink-soft,#B7B3A1);margin-bottom:14px">“{{ pv.fillSentence }}”</div></sc-if>
+              <input type="text" value="{{ parlourFillDraft }}" onChange="{{ onParlourFillDraft }}" placeholder="{{ pv.fillHint }}" style="width:100%;box-sizing:border-box;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px 13px;outline:none;margin-bottom:9px">
+              <sc-if value="{{ pv.fillTwo }}" hint-placeholder-val="">
+                <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-bottom:9px">and one more</div>
+                <input type="text" value="{{ parlourFillDraftB }}" onChange="{{ onParlourFillDraftB }}" placeholder="{{ pv.fillHint }}" style="width:100%;box-sizing:border-box;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px 13px;outline:none;margin-bottom:9px">
+              </sc-if>
+              <button type="button" onClick="{{ pv.onFillSubmit }}" style="display:block;width:100%;box-sizing:border-box;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:12px;cursor:pointer">Fill it in</button>
+            </sc-if>
+            <sc-if value="{{ pv.notFiller }}" hint-placeholder-val="">
+              <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:18px 16px;text-align:center">
+                <div style="font-size:22px;margin-bottom:8px">✍️</div>
+                <div style="font-size:13.5px;color:var(--ink-soft,#B7B3A1);line-height:1.5">{{ pv.fillWaitLabel }}</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="">
+              <div style="display:flex;gap:8px;margin-top:18px">
+                <button type="button" onClick="{{ pv.onFillPass }}" style="flex:1;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Pass to next</button>
+                <button type="button" onClick="{{ pv.onFillAuto }}" style="flex:1;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Fill it for them</button>
+              </div>
+            </sc-if>
+          </sc-if>
+
           <sc-if value="{{ pv.isGuess }}" hint-placeholder-val="">
             <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:10px">The Usual · who wrote what</div>
             <sc-if value="{{ pv.amSpectator }}" hint-placeholder-val=""><div style="font-size:13px;color:var(--ink-soft,#B7B3A1);line-height:1.5;margin-bottom:12px">You sat this one out — enjoy watching the room guess.</div></sc-if>
@@ -1107,6 +1137,7 @@
                 </div>
               </sc-if>
             </sc-if>
+            <sc-if value="{{ pv.hasFilledBy }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--accent2,#CFA267);margin-top:14px">✍️ Filled by {{ pv.filledBy }}</div></sc-if>
             <sc-if value="{{ pv.keepVoting }}" hint-placeholder-val="">
               <div style="margin-top:18px;border-top:1px solid var(--card-border,#2D3422);padding-top:14px">
                 <div style="text-align:center;font-size:12.5px;color:var(--ink-soft,#B7B3A1);margin-bottom:10px">Add this one to the pool for next time?</div>
@@ -1184,6 +1215,13 @@
                   <button type="button" onClick="{{ pv.onShowWhoOff }}" style="{{ pv.showWhoOffStyle }}">Anon</button>
                 </div>
               </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
+                <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Filler sees the card <span style="color:var(--ink-faint,#827E6D)">(The Blanks)</span></span>
+                <div style="display:flex;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:2px;width:150px">
+                  <button type="button" onClick="{{ pv.onFillShowOn }}" style="{{ pv.fillShowOnStyle }}">Show</button>
+                  <button type="button" onClick="{{ pv.onFillShowOff }}" style="{{ pv.fillShowOffStyle }}">Blind</button>
+                </div>
+              </div>
               <sc-if value="{{ pv.hasAdded }}" hint-placeholder-val="">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
                   <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Tonight’s drop-ins <span style="color:var(--ink-faint,#827E6D)">({{ pv.addedCount }} waiting to vote)</span></span>
@@ -1256,7 +1294,7 @@ class Component extends DCLogic {
       bartenderMode: false, bartenderAlert: null, bmBannerDismissed: false, verdictDrink: null, peekDrink: null,
       wallOpen: false, wallPosts: [], wallNightStart: '', wallScope: 'tonight', wallDraft: '',
       bookOpen: false, bookTab: 'wall', bookScope: 'tonight',
-      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourAddOpen: false, parlourDraft: '', parlourDraftB: '', parlourUsualDraft: '', parlourGate: '', parlourGateErr: false,
+      parlour: { game: null, phase: 'ended', players: [], present: 0 }, parlourOpen: false, parlourBannerDismissed: false, parlourAddOpen: false, parlourDraft: '', parlourDraftB: '', parlourUsualDraft: '', parlourFillDraft: '', parlourFillDraftB: '', parlourGate: '', parlourGateErr: false,
     };
     this.GROUPS = [
       { key:'spirit',   label:'Spirit',   mode:'or',  order:['Gin','Bourbon','Rye','Tequila','Rum','Vodka','Cognac','Aperitivo','THC'] },
@@ -1382,7 +1420,7 @@ class Component extends DCLogic {
     const _ns = (d && d.nightStart) || '';
     try { const _rxNight = localStorage.getItem('hollow_reactions_night') || ''; if (_ns && _rxNight !== _ns) { localStorage.setItem('hollow_reactions', '{}'); localStorage.setItem('hollow_reactions_night', _ns); } } catch(e){}
     this.setState({ orders: orders, batches: batches, eightySix: (d && Array.isArray(d.eightySix)) ? d.eightySix : [], serverTheme: theme, direction: this.resolveTheme(theme), reactions: (d && d.reactions) || {}, reactionsAll: (d && d.reactionsAll) || {}, serverNightStart: (d && d.nightStart) || '', parlour: (d && d.parlour) || { game: null, phase: 'ended', players: [], present: 0 } });
-    try { const _pr = (d && d.parlour) ? d.parlour.round : 0; if (_pr !== this._pLastRound) { this._pLastRound = _pr; if (this.state.parlourUsualDraft) this.setState({ parlourUsualDraft: '' }); } } catch(e){}
+    try { const _pr = (d && d.parlour) ? d.parlour.round : 0; if (_pr !== this._pLastRound) { this._pLastRound = _pr; if (this.state.parlourUsualDraft || this.state.parlourFillDraft || this.state.parlourFillDraftB) this.setState({ parlourUsualDraft: '', parlourFillDraft: '', parlourFillDraftB: '' }); } } catch(e){}
     if (this.state.bookOpen){ if (this.state.bookTab === 'wall') this.fetchWall(); else this.fetchHistory(); }
   }
 
@@ -1658,6 +1696,16 @@ class Component extends DCLogic {
   parlourMyGuesses(){ try { const m = JSON.parse(localStorage.getItem('hollow_parlour_guesses')||'null'); const round = (this.state.parlour||{}).round; if (m && m.round === round) return m.g || {}; } catch(e){} return {}; }
   onParlourUsualDraft(e){ this.setState({ parlourUsualDraft: (e.target.value||'').slice(0,120) }); }
   parlourSubmitUsual(){ const t = (this.state.parlourUsualDraft||'').trim(); if (t) this.parlourAnswer(t); }
+  onParlourFillDraft(e){ this.setState({ parlourFillDraft: (e.target.value||'').slice(0,40) }); }
+  onParlourFillDraftB(e){ this.setState({ parlourFillDraftB: (e.target.value||'').slice(0,40) }); }
+  parlourFillSubmit(){
+    const f = (this.state.parlour || {}).fill || {};
+    const words = [(this.state.parlourFillDraft||'').trim()];
+    if (f.blanks === 2) words.push((this.state.parlourFillDraftB||'').trim());
+    if (words.some(w => !w)){ this.flashToast(f.blanks === 2 ? 'Fill in both words' : 'Give it a word first', 1600); return; }
+    this.api('POST','/api/parlour/fill',{ cid: this._cid(), words: words }).then(()=>{ this.setState({ parlourFillDraft:'', parlourFillDraftB:'' }); this.refreshState(); }).catch((e)=>this.flashToast((e && e.error) || 'Not your card to fill', 1800));
+  }
+  parlourFillSkip(mode){ this.api('POST','/api/parlour/fill-skip',{ code: this._parlourCode(), mode: mode }).then(()=>this.refreshState()).catch((e)=>this.flashToast((e && e.error) || 'Only the host can do that', 1800)); }
   parlourEnd(){ this.api('POST','/api/parlour/end',{ code: this._parlourCode() }).then(()=>this.refreshState()).catch(()=>{}); }
   parlourSet(patch){ this.api('POST','/api/parlour/settings', Object.assign({ code: this._parlourCode() }, patch||{})).then(()=>this.refreshState()).catch(()=>{}); }
   toggleParlourAdd(){ this.setState({ parlourAddOpen: !this.state.parlourAddOpen }); }
@@ -1855,6 +1903,12 @@ class Component extends DCLogic {
     const _tierBtn = (c) => ({ flex:'1', textAlign:'center', fontSize:'12px', fontWeight:700, borderRadius:'10px', padding:'9px 6px', cursor:'pointer', color:'#13160F', background:c, border:'none' });
     // "Drop it in the pool" is only active once every field is filled (Fork needs both options).
     const _canDrop = pIsFork ? (!!(st.parlourDraft||'').trim() && !!(st.parlourDraftB||'').trim()) : !!(st.parlourDraft||'').trim();
+    // ---- The Blanks (fill phase) ----
+    const pFill = (pPhase==='fill' && P.fill) ? P.fill : null;
+    const _fillBucketLabels = { people:'a person', object:'an object', food:'a food', place:'a place', activity:'an activity', drink:'a drink', animal:'an animal', chore:'a chore' };
+    // Hints double as the multi-word nudge for the gerund buckets (activity/chore) — "a road trip" reads right after "a ___".
+    const _fillHints = { people:'e.g. my ex, a mall Santa…', object:'e.g. a lava lamp, a traffic cone…', food:'e.g. lasagna, a sheet cake…', place:'e.g. the DMV, a corn maze…', activity:'e.g. hot yoga, a road trip…', drink:'e.g. boxed wine, pickle juice…', animal:'e.g. a raccoon, an emu…', chore:'e.g. the dishes, a load of laundry…' };
+    const _amFiller = !!(pFill && pFill.fillerCid === this._cid());
     const pv = {
       live: pLive, game: pGame, gameName: pGameName,
       spicePips: spicePips, spiceLabel: _spiceNames[_spice], spiceHint: _spiceHints[_spice], spiceColor: _heatRamp[_spice],
@@ -1902,6 +1956,16 @@ class Component extends DCLogic {
       dropBtnStyle: { display:'block', width:'100%', boxSizing:'border-box', fontSize:'13.5px', fontWeight:700, color:'var(--accent-ink,#13160F)', background:'var(--accent2,#CFA267)', border:'none', borderRadius:'11px', padding:'11px',
         cursor: _canDrop?'pointer':'not-allowed', opacity: _canDrop?1:0.4, pointerEvents: _canDrop?'auto':'none' },
       addedCount: String(P.added||0), hasAdded: (P.added||0) > 0, onClearPrompts: () => this.parlourClearPrompts(),
+      isFill: pPhase==='fill', amFiller: _amFiller, notFiller: !!(pFill && !_amFiller),
+      fillBucketLabel: pFill ? (_fillBucketLabels[pFill.bucket] || 'a word') : '',
+      fillHint: pFill ? (_fillHints[pFill.bucket] || 'Your word…') : '',
+      fillTwo: !!(pFill && pFill.blanks === 2),
+      fillWaitLabel: pFill ? ('Waiting for ' + (pFill.fillerName || 'someone') + ' to fill in ' + (_fillBucketLabels[pFill.bucket] || 'a word') + '…') : '',
+      fillSentence: (pFill && pFill.sentence) || '', hasFillSentence: !!(_amFiller && pFill && pFill.sentence),
+      fillBlind: !!(_amFiller && !(pFill && pFill.sentence)),
+      onFillSubmit: () => this.parlourFillSubmit(), onFillPass: () => this.parlourFillSkip('pass'), onFillAuto: () => this.parlourFillSkip('auto'),
+      hasFilledBy: (pPhase==='reveal' && !!P.filledBy), filledBy: P.filledBy || '',
+      fillShowOnStyle: _pSeg(!!P.showFillSentence), fillShowOffStyle: _pSeg(!P.showFillSentence), onFillShowOn: () => this.parlourSet({ showFillSentence:true }), onFillShowOff: () => this.parlourSet({ showFillSentence:false }),
     };
     if (_overlay && !this._overlayLocked) { this._overlayLocked = true; this.lockScroll(); }
     else if (!_overlay && this._overlayLocked) { this._overlayLocked = false; this.unlockScroll(); }
@@ -2346,7 +2410,7 @@ class Component extends DCLogic {
       bookOpen: st.bookOpen, onOpenBook: () => this.openBook(), onCloseBook: () => this.closeBook(),
       pv: pv, parlourLive: pLive, parlourOpen: st.parlourOpen, onOpenParlour: () => this.openParlour(), onCloseParlour: () => this.closeParlour(),
       parlourBannerOpen: (pLive && !st.parlourOpen && !st.parlourBannerDismissed), onDismissParlourBanner: () => this.dismissParlourBanner(),
-      parlourDraft: st.parlourDraft, onParlourDraft: (e) => this.onParlourDraft(e), parlourDraftB: st.parlourDraftB, onParlourDraftB: (e) => this.onParlourDraftB(e), parlourUsualDraft: st.parlourUsualDraft, onParlourUsualDraft: (e) => this.onParlourUsualDraft(e), parlourGate: st.parlourGate, onParlourGate: (e) => this.onParlourGate(e), onParlourUnlock: () => this.parlourUnlock(),
+      parlourDraft: st.parlourDraft, onParlourDraft: (e) => this.onParlourDraft(e), parlourDraftB: st.parlourDraftB, onParlourDraftB: (e) => this.onParlourDraftB(e), parlourUsualDraft: st.parlourUsualDraft, onParlourUsualDraft: (e) => this.onParlourUsualDraft(e), parlourFillDraft: st.parlourFillDraft, onParlourFillDraft: (e) => this.onParlourFillDraft(e), parlourFillDraftB: st.parlourFillDraftB, onParlourFillDraftB: (e) => this.onParlourFillDraftB(e), parlourGate: st.parlourGate, onParlourGate: (e) => this.onParlourGate(e), onParlourUnlock: () => this.parlourUnlock(),
       bookTabWall: st.bookTab==='wall', bookTabLedger: st.bookTab==='ledger',
       bookWallTabStyle: bookTabStyle(st.bookTab==='wall'), bookLedgerTabStyle: bookTabStyle(st.bookTab==='ledger'), bookIndStyle: slideInd(st.bookTab==='ledger'?1:0, 2),
       onBookWall: () => this.setBookTab('wall'), onBookLedger: () => this.setBookTab('ledger'),
