@@ -1051,19 +1051,27 @@
 
           <sc-if value="{{ pv.isFill }}" hint-placeholder-val="">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
-              <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">{{ pv.gameName }} · {{ pv.roundLabel }}</span>
+              <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">{{ pv.gameName }} · fill-in</span>
               <sc-if value="{{ pv.heatBadge }}" hint-placeholder-val=""><span style="{{ pv.heatBadgeStyle }}">{{ pv.heatBadge }}</span></sc-if>
             </div>
             <sc-if value="{{ pv.amFiller }}" hint-placeholder-val="">
-              <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:23px;line-height:1.3;color:var(--ink,#ECE7D7);margin-bottom:8px">You’re up — give {{ pv.fillBucketLabel }}.</div>
-              <sc-if value="{{ pv.fillBlind }}" hint-placeholder-val=""><div style="font-size:12.5px;color:var(--ink-faint,#827E6D);line-height:1.5;margin-bottom:14px">You can’t see the card — that’s the point. It gets funnier.</div></sc-if>
+              <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;color:var(--ink,#ECE7D7);margin-bottom:8px">Name {{ pv.fillBucketLabel }}.</div>
+              <sc-if value="{{ pv.fillBlind }}" hint-placeholder-val="">
+                <div style="font-size:12.5px;color:var(--ink-faint,#827E6D);line-height:1.5;margin-bottom:11px">It fills this blank in a sentence you can’t see yet — you’ll get the whole line at the reveal.</div>
+                <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:12px;padding:16px 12px;text-align:center;margin-bottom:14px">
+                  <span style="color:var(--ink-faint,#827E6D);font-size:16px">…</span>
+                  <span style="display:inline-block;min-width:96px;border-bottom:2px solid var(--accent2,#CFA267);height:15px;vertical-align:-3px;margin:0 6px"></span>
+                  <span style="color:var(--ink-faint,#827E6D);font-size:16px">…</span>
+                  <div style="font-size:11px;color:var(--ink-faint,#827E6D);margin-top:9px">({{ pv.fillBucketLabel }})</div>
+                </div>
+              </sc-if>
               <sc-if value="{{ pv.hasFillSentence }}" hint-placeholder-val=""><div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;line-height:1.45;color:var(--ink-soft,#B7B3A1);margin-bottom:14px">“{{ pv.fillSentence }}”</div></sc-if>
               <input type="text" value="{{ parlourFillDraft }}" onChange="{{ onParlourFillDraft }}" placeholder="{{ pv.fillHint }}" style="width:100%;box-sizing:border-box;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px 13px;outline:none;margin-bottom:9px">
               <sc-if value="{{ pv.fillTwo }}" hint-placeholder-val="">
                 <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-bottom:9px">and one more</div>
                 <input type="text" value="{{ parlourFillDraftB }}" onChange="{{ onParlourFillDraftB }}" placeholder="{{ pv.fillHint }}" style="width:100%;box-sizing:border-box;font-size:15px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--line,#2D3422);border-radius:11px;padding:12px 13px;outline:none;margin-bottom:9px">
               </sc-if>
-              <button type="button" onClick="{{ pv.onFillSubmit }}" style="display:block;width:100%;box-sizing:border-box;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:12px;cursor:pointer">Fill it in</button>
+              <button type="button" onClick="{{ pv.onFillSubmit }}" style="display:block;width:100%;box-sizing:border-box;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:12px;cursor:pointer">Drop it in</button>
             </sc-if>
             <sc-if value="{{ pv.notFiller }}" hint-placeholder-val="">
               <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:18px 16px;text-align:center">
@@ -1072,9 +1080,12 @@
               </div>
             </sc-if>
             <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="">
-              <div style="display:flex;gap:8px;margin-top:18px">
-                <button type="button" onClick="{{ pv.onFillPass }}" style="flex:1;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Pass to next</button>
-                <button type="button" onClick="{{ pv.onFillAuto }}" style="flex:1;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Fill it for them</button>
+              <div style="margin-top:18px;border-top:1px solid var(--card-border,#2D3422);padding-top:12px">
+                <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--ink-faint,#827E6D);margin-bottom:8px">Host</div>
+                <div style="display:flex;gap:8px">
+                  <button type="button" onClick="{{ pv.onFillPass }}" style="flex:1;font-size:12.5px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Hand to someone else</button>
+                  <button type="button" onClick="{{ pv.onFillAuto }}" style="flex:1;font-size:12.5px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Skip — pick one</button>
+                </div>
               </div>
             </sc-if>
           </sc-if>
@@ -1216,7 +1227,7 @@
                 </div>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
-                <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Filler sees the card <span style="color:var(--ink-faint,#827E6D)">(The Blanks)</span></span>
+                <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Filler sees the sentence <span style="color:var(--ink-faint,#827E6D)">(The Blanks)</span></span>
                 <div style="display:flex;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:2px;width:150px">
                   <button type="button" onClick="{{ pv.onFillShowOn }}" style="{{ pv.fillShowOnStyle }}">Show</button>
                   <button type="button" onClick="{{ pv.onFillShowOff }}" style="{{ pv.fillShowOffStyle }}">Blind</button>
@@ -1960,7 +1971,7 @@ class Component extends DCLogic {
       fillBucketLabel: pFill ? (_fillBucketLabels[pFill.bucket] || 'a word') : '',
       fillHint: pFill ? (_fillHints[pFill.bucket] || 'Your word…') : '',
       fillTwo: !!(pFill && pFill.blanks === 2),
-      fillWaitLabel: pFill ? ('Waiting for ' + (pFill.fillerName || 'someone') + ' to fill in ' + (_fillBucketLabels[pFill.bucket] || 'a word') + '…') : '',
+      fillWaitLabel: pFill ? ('Waiting for ' + (pFill.fillerName || 'someone') + ' to name ' + (_fillBucketLabels[pFill.bucket] || 'a word') + '…') : '',
       fillSentence: (pFill && pFill.sentence) || '', hasFillSentence: !!(_amFiller && pFill && pFill.sentence),
       fillBlind: !!(_amFiller && !(pFill && pFill.sentence)),
       onFillSubmit: () => this.parlourFillSubmit(), onFillPass: () => this.parlourFillSkip('pass'), onFillAuto: () => this.parlourFillSkip('auto'),
