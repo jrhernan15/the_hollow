@@ -998,9 +998,13 @@
                 <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Signature</div>
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">Everyone answers a prompt, then the room guesses who wrote what.</div>
               </button>
-              <button type="button" onClick="{{ pv.onOpenHouseread }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer">
+              <button type="button" onClick="{{ pv.onOpenHouseread }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer;margin-bottom:9px">
                 <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The House Read</div>
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">One player gets a secret spot on a spectrum and gives a clue — everyone else reads the room.</div>
+              </button>
+              <button type="button" onClick="{{ pv.onOpenUsualSuspect }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer">
+                <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Ballot</div>
+                <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">Most likely to… — vote a name, only the tally shows. Best with 3+.</div>
               </button>
             </sc-if>
             <sc-if value="{{ pv.notStaff }}" hint-placeholder-val="">
@@ -1022,6 +1026,7 @@
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
               <sc-for list="{{ pv.players }}" as="pl" hint-placeholder-count="3"><span style="font-size:12.5px;color:var(--ink,#ECE7D7);background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:5px 11px">{{ pl.name }}</span></sc-for>
             </div>
+            <sc-if value="{{ pv.suspectLobbyNote }}" hint-placeholder-val=""><div style="font-size:12px;color:var(--ink-faint,#827E6D);margin-top:10px;line-height:1.4">Best with 3 or more — it still works small, the accusations just land faster.</div></sc-if>
             <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ pv.onDeal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:13px;cursor:pointer">{{ pv.dealLabel }}</button></sc-if>
             <sc-if value="{{ pv.waiting }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--ink-faint,#827E6D);margin-top:16px">Waiting for the host to deal…</div></sc-if>
           </sc-if>
@@ -1063,6 +1068,13 @@
               <sc-if value="{{ pv.amReader }}" hint-placeholder-val="">
                 <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:16px;text-align:center;font-size:13px;color:var(--ink-soft,#B7B3A1);line-height:1.5">Your clue is out — sit back and watch them squint.</div>
               </sc-if>
+            </sc-if>
+            <sc-if value="{{ pv.isSuspect }}" hint-placeholder-val="">
+              <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:23px;line-height:1.3;color:var(--ink,#ECE7D7);margin-bottom:6px">{{ pv.prompt }}</div>
+              <div style="font-size:12px;color:var(--ink-faint,#827E6D);margin-bottom:14px">Tap a name — votes stay anonymous. Voting for yourself is allowed.</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <sc-for list="{{ pv.suspectChips }}" as="sp" hint-placeholder-count="3"><button type="button" onClick="{{ sp.onPick }}" style="{{ sp.style }}">{{ sp.name }}</button></sc-for>
+              </div>
             </sc-if>
             <div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);letter-spacing:.06em;margin-top:10px">{{ pv.answeredLabel }}</div>
             <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="">
@@ -1224,6 +1236,20 @@
                   <sc-for list="{{ pv.usualScores }}" as="s" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink,#ECE7D7);padding:3px 0"><span>{{ s.rank }}. {{ s.name }}</span><span style="color:var(--accent2,#CFA267);font-weight:600">{{ s.points }}</span></div></sc-for>
                 </div>
               </sc-if>
+            </sc-if>
+            <sc-if value="{{ pv.isSuspect }}" hint-placeholder-val="">
+              <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:16px;line-height:1.35;color:var(--ink-soft,#B7B3A1);margin-bottom:16px">{{ pv.prompt }}</div>
+              <sc-for list="{{ pv.suspectRows }}" as="sr" hint-placeholder-count="3">
+                <div style="margin-bottom:11px">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px">
+                    <span style="{{ sr.nameStyle }}">{{ sr.label }}</span>
+                    <span style="font-size:12.5px;color:var(--ink-faint,#827E6D);font-weight:600">{{ sr.count }}</span>
+                  </div>
+                  <div style="height:12px;border-radius:999px;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);overflow:hidden"><div style="{{ sr.fillStyle }}"></div></div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ pv.suspectEmpty }}" hint-placeholder-val=""><div style="text-align:center;font-size:13px;color:var(--ink-faint,#827E6D);margin:8px 0">No votes came in.</div></sc-if>
+              <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;color:var(--accent2,#CFA267);text-align:center;margin-top:12px">{{ pv.wry }}</div>
             </sc-if>
             <sc-if value="{{ pv.hasFilledBy }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--accent2,#CFA267);margin-top:14px">✍️ Filled by {{ pv.filledBy }}</div></sc-if>
             <sc-if value="{{ pv.keepVoting }}" hint-placeholder-val="">
@@ -1943,8 +1969,8 @@ class Component extends DCLogic {
     const pCanAdvance = pStaff || pAdvanceAnyone;
     const pMy = this.parlourMyAnswer();
     const pPresent = P.present || 0, pAnswered = P.answered || 0;
-    const pGameName = ({ confession:'The Confession', fork:'The Fork', usual:'The Signature', houseread:'The House Read' })[pGame] || 'The Parlor';
-    const pIsFork = pGame==='fork', pIsConfession = pGame==='confession';
+    const pGameName = ({ confession:'The Confession', fork:'The Fork', usual:'The Signature', houseread:'The House Read', usualsuspect:'The Ballot' })[pGame] || 'The Parlor';
+    const pIsFork = pGame==='fork', pIsConfession = pGame==='confession', pIsSuspect = pGame==='usualsuspect';
     let forkA='', forkB='';
     if (pIsFork && P.prompt){ const _pp = String(P.prompt).split('|'); forkA = (_pp[0]||'').trim(); forkB = ((_pp[1]||'').trim()) || '…'; }
     const _spl = P.split || { a:0, b:0, total:0 };
@@ -2006,6 +2032,27 @@ class Component extends DCLogic {
         pWry = r===0 ? 'A room of saints, apparently.' : r<0.25 ? 'Mostly angels.' : r<0.5 ? 'A few skeletons, then.' : r<0.75 ? 'The room has stories.' : r<1 ? 'Nearly unanimous — bold crowd.' : 'Every last one of you.';
       }
     }
+    // ---- The Usual Suspect ----
+    let suspectChips=[], suspectRows=[];
+    if (pIsSuspect && pPhase==='answer'){
+      const _spChip = (on) => ({ fontSize:'14px', fontWeight:600, borderRadius:'999px', padding:'10px 16px', cursor:'pointer', border:'1px solid '+(on?'var(--accent2)':'var(--pill-line)'), background: on?'rgba(207,162,103,.14)':'var(--field)', color: on?'var(--ink)':'var(--ink-soft)', transition:'background .15s ease, border-color .15s ease' });
+      suspectChips = (P.players||[]).map(pl => ({ name:(pl.name && String(pl.name).trim())||'Someone', style:_spChip(pMy===pl.cid), onPick: () => this.parlourAnswer(pl.cid) }));   // self included on purpose
+    }
+    if (pIsSuspect && pPhase==='reveal' && P.suspects){
+      const S = P.suspects, topN = S.rows.length ? S.rows[0].n : 0;
+      suspectRows = S.rows.map(r => { const win = r.n===topN && topN>0; return {
+        label: (win?'👑 ':'') + r.name,
+        count: r.n + (r.n===1?' vote':' votes'),
+        nameStyle: { fontFamily:"'Fraunces',Georgia,serif", fontWeight:500, fontSize: win?'17px':'15px', color: win?'var(--ink)':'var(--ink-soft)' },
+        fillStyle: { width:(topN?Math.round(r.n/topN*100):0)+'%', height:'100%', background: win?'var(--accent2,#CFA267)':'var(--accent,#A6BB8E)', borderRadius:'999px', opacity: win?'1':'.7', transition:'width .5s cubic-bezier(.4,0,.2,1)' } }; });
+      const total=S.total||0, second=S.rows[1]?S.rows[1].n:0;
+      pWry = total===0 ? 'The room pleads the fifth.'
+        : S.tie ? 'A dead heat — clearly in it together.'
+        : (topN===total && total>=2) ? 'Unanimous. Not even a deliberation.'
+        : (topN/total>=2/3) ? 'The room barely hesitated.'
+        : (topN-second===1) ? 'Convicted by a single vote.'
+        : 'Suspicion, generously shared.';
+    }
     // ---- The Spice (host heat meter) + per-card heat badge ----
     const _spiceNames = ['No Spice','Mild','Medium','Hot','All The Spice'];
     const _spiceHints = ['All tame — nothing racy.','Mostly tame, a little spicy.','A spicy mix, the occasional raunchy one.','Mostly spicy and raunchy.','Spicy and raunchy only.'];
@@ -2059,9 +2106,13 @@ class Component extends DCLogic {
       onSaveTame: () => this.parlourSavePrompt('tame'), onSaveSpicy: () => this.parlourSavePrompt('spicy'), onSaveRaunchy: () => this.parlourSavePrompt('raunchy'),
       isNone: (!pGame || pPhase==='ended'), isLobby: pPhase==='lobby', isAnswer: pPhase==='answer', isReveal: pPhase==='reveal',
       isConfession: pIsConfession, isFork: pIsFork, isUsual: pIsUsual, notUsual: !pIsUsual, isGuess: pPhase==='guess',
+      isSuspect: pIsSuspect,
+      suspectChips: suspectChips, suspectRows: suspectRows,
+      suspectEmpty: (pIsSuspect && pPhase==='reveal' && suspectRows.length===0),
+      suspectLobbyNote: (pIsSuspect && pPhase==='lobby' && pPresent<3),
       staff: pStaff, notStaff: !pStaff, canAdvance: pCanAdvance, waiting: (pLive && !pCanAdvance),
-      promptPlaceholder: pIsFork ? 'This | that' : pIsHouse ? 'Underrated | Overrated' : pIsUsual ? 'A question everyone answers…' : 'Never have I ever…',
-      onOpenFork: () => this.parlourOpenGame('fork'), onOpenUsual: () => this.parlourOpenGame('usual'),
+      promptPlaceholder: pIsFork ? 'This | that' : pIsHouse ? 'Underrated | Overrated' : pIsUsual ? 'A question everyone answers…' : pIsSuspect ? 'Most likely to…' : 'Never have I ever…',
+      onOpenFork: () => this.parlourOpenGame('fork'), onOpenUsual: () => this.parlourOpenGame('usual'), onOpenUsualSuspect: () => this.parlourOpenGame('usualsuspect'),
       onClose: () => this.parlourClose(), onSubmitUsual: () => this.parlourSubmitUsual(),
       mySubmitted: (pIsUsual && pMy!=null), mySubmittedText: pMy || '', showMyAnswer: (pMy!=null && !pIsUsual && !pIsHouse),
       guessCards: guessCards, amSpectator: amSpectator, guessProgress: guessProgress,
@@ -2076,13 +2127,13 @@ class Component extends DCLogic {
       namesA: (P.namesA||[]).map(n => ({ name:n })), namesB: (P.namesB||[]).map(n => ({ name:n })),
       showWhoOnStyle: _pSeg(!!P.showWho), showWhoOffStyle: _pSeg(!P.showWho), onShowWhoOn: () => this.parlourSet({ showWho:true }), onShowWhoOff: () => this.parlourSet({ showWho:false }),
       prompt: P.prompt || '', roundLabel: 'Round ' + (P.round||0),
-      answeredLabel: pIsHouse ? (pAnswered + ' of ' + Math.max(0, pPresent - ((P.players||[]).some(x => HR && x.cid===HR.reader) ? 1 : 0)) + ' locked in') : (pAnswered + ' of ' + pPresent + ' in'), present: String(pPresent), hasPlayers: pPresent>0,
+      answeredLabel: pIsHouse ? (pAnswered + ' of ' + Math.max(0, pPresent - ((P.players||[]).some(x => HR && x.cid===HR.reader) ? 1 : 0)) + ' locked in') : (pAnswered + ' of ' + pPresent + (pIsSuspect ? ' voted' : ' in')), present: String(pPresent), hasPlayers: pPresent>0,
       players: (P.players||[]).map(x => ({ name: (x.name && String(x.name).trim()) || 'Someone' })),
       onAnswerHave: () => this.parlourAnswer('have'), onAnswerNever: () => this.parlourAnswer('never'),
       haveStyle: _pAns(pMy==='have'), neverStyle: _pAns(pMy==='never'),
       revealBig: pRevealBig, revealSub: pRevealSub, wry: pWry,
       barStyle: { width: pBarPct, height:'100%', background:'var(--accent)', borderRadius:'999px', transition:'width .5s cubic-bezier(.4,0,.2,1)' },
-      myAnswerLabel: pMy ? ('you said · ' + (pIsFork ? (pMy==='a'?forkA:forkB) : (pMy==='have'?'I have':'Never have I'))) : '', hasMyAnswer: pMy!=null,
+      myAnswerLabel: pMy ? ((pIsSuspect?'your vote · ':'you said · ') + (pIsFork ? (pMy==='a'?forkA:forkB) : pIsSuspect ? ((((P.players||[]).find(x=>x.cid===pMy))||{}).name || 'Someone') : (pMy==='have'?'I have':'Never have I'))) : '', hasMyAnswer: pMy!=null,
       onDeal: () => this.parlourDeal(), onReveal: () => this.parlourReveal(), onEnd: () => this.parlourEnd(), onLeave: () => this.parlourLeave(),
       onOpenConfession: () => this.parlourOpenGame('confession'), dealLabel: pPhase==='lobby' ? 'Deal the first prompt' : 'Next round',
       advHostStyle: _pSeg(!pAdvanceAnyone), advAnyoneStyle: _pSeg(pAdvanceAnyone), onAdvHost: () => this.parlourSet({ advance:'host' }), onAdvAnyone: () => this.parlourSet({ advance:'anyone' }),

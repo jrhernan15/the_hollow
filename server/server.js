@@ -305,9 +305,10 @@ const PARLOUR_FALLBACK = {
   fork: { tame: ["Coast | Mountains"], spicy: ["Truth | Dare"], raunchy: ["Skinny dip | Streak"] },
   usual: { tame: ["Describe tonight as a cocktail."], spicy: ["What's your biggest ick?"], raunchy: ["What's your worst-kept secret about your love life?"] },
   houseread: { tame: ["Underrated | Overrated", "Weeknight drink | Weekend drink", "Chaotic | Organized"], spicy: ["Red flag | Green flag", "Innocent | Guilty"], raunchy: ["PG | Definitely not PG", "First-date material | Third-date material"] },
+  usualsuspect: { tame: ["Most likely to befriend the bartender in one night."], spicy: ["Most likely to text an ex at 2am."], raunchy: ["Most likely to kiss a stranger before last call."] },
 };
 const PARLOUR_TIERS = ["tame", "spicy", "raunchy"];
-const PARLOUR_GAMES = ["confession", "fork", "usual", "houseread"];
+const PARLOUR_GAMES = ["confession", "fork", "usual", "houseread", "usualsuspect"];
 // Fallback words for the fill phase — used when the host taps "fill it for them" or the room
 // is empty. Entries run through the same injector as player words, so they may carry their
 // own determiner ("the dishes") or be multi-word phrases ("a load of laundry").
@@ -325,7 +326,7 @@ const FILL_FALLBACK = {
 // the persisted no-repeat memory (p.dealt) valid across restarts.
 const parlourKey = (e) => typeof e === "string" ? e : (e.t || (e.a + " | " + e.b));
 function loadParlourPrompts() {
-  const out = { confession: { tame: [], spicy: [], raunchy: [] }, fork: { tame: [], spicy: [], raunchy: [] }, usual: { tame: [], spicy: [], raunchy: [] }, houseread: { tame: [], spicy: [], raunchy: [] } };
+  const out = { confession: { tame: [], spicy: [], raunchy: [] }, fork: { tame: [], spicy: [], raunchy: [] }, usual: { tame: [], spicy: [], raunchy: [] }, houseread: { tame: [], spicy: [], raunchy: [] }, usualsuspect: { tame: [], spicy: [], raunchy: [] } };
   try {
     const raw = JSON.parse(fs.readFileSync(path.join(__dirname, "parlour-prompts.json"), "utf8"));
     for (const g of PARLOUR_GAMES) {
@@ -542,6 +543,20 @@ function parlourState() {
         });
         if (p.scoring) out.scores = Q.parlourScores.all().map((s) => ({ name: (s.name && String(s.name).trim()) || "Someone", points: s.points }));
       }
+    }
+    if (p.game === "usualsuspect" && atReveal) {
+      // Aggregate tally only — voter→candidate pairs never leave the server.
+      const names = {}; for (const pl of Q.parlourPlayers.all()) names[pl.cid] = (pl.name && String(pl.name).trim()) || "Someone";
+      const rows = Q.parlourRoundSplit.all(p.round)
+        .map((r) => ({ cid: r.value, name: names[r.value] || "Someone", n: r.n }))
+        .sort((x, y) => (y.n - x.n) || x.name.localeCompare(y.name));
+      const top = rows.length ? rows[0].n : 0;
+      out.suspects = {
+        rows: rows,
+        total: rows.reduce((s, r) => s + r.n, 0),
+        winners: rows.filter((r) => r.n === top && top > 0).map((r) => r.name),
+        tie: top > 0 && rows.filter((r) => r.n === top).length > 1,
+      };
     }
   }
   return out;
