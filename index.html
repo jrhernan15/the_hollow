@@ -1184,6 +1184,10 @@
               <span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267)">{{ pv.gameName }} · reveal</span>
               <sc-if value="{{ pv.heatBadge }}" hint-placeholder-val=""><span style="{{ pv.heatBadgeStyle }}">{{ pv.heatBadge }}</span></sc-if>
             </div>
+            <sc-if value="{{ pv.revealGuard }}" hint-placeholder-val="">
+              <div style="text-align:center;padding:22px 10px 8px"><div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:18px;color:var(--accent2,#CFA267);line-height:1.45">{{ pv.revealGuardMsg }}</div></div>
+            </sc-if>
+            <sc-if value="{{ pv.revealShow }}" hint-placeholder-val="{{ true }}">
             <sc-if value="{{ pv.isConfession }}" hint-placeholder-val="{{ true }}">
               <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:16px;line-height:1.35;color:var(--ink-soft,#B7B3A1);margin-bottom:16px">{{ pv.prompt }}</div>
               <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:46px;text-align:center;color:var(--ink,#ECE7D7);line-height:1">{{ pv.revealBig }}</div>
@@ -1259,6 +1263,7 @@
               </sc-for>
               <sc-if value="{{ pv.suspectEmpty }}" hint-placeholder-val=""><div style="text-align:center;font-size:13px;color:var(--ink-faint,#827E6D);margin:8px 0">No votes came in.</div></sc-if>
               <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;color:var(--accent2,#CFA267);text-align:center;margin-top:12px">{{ pv.wry }}</div>
+            </sc-if>
             </sc-if>
             <sc-if value="{{ pv.hasFilledBy }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--accent2,#CFA267);margin-top:14px">✍️ Filled by {{ pv.filledBy }}</div></sc-if>
             <sc-if value="{{ pv.keepVoting }}" hint-placeholder-val="">
@@ -2142,6 +2147,8 @@ class Component extends DCLogic {
       onAnswerHave: () => this.parlourAnswer('have'), onAnswerNever: () => this.parlourAnswer('never'),
       haveStyle: _pAns(pMy==='have'), neverStyle: _pAns(pMy==='never'),
       revealBig: pRevealBig, revealSub: pRevealSub, wry: pWry,
+      revealShow: (pPhase==='reveal' && pAnswered>=2), revealGuard: (pPhase==='reveal' && pAnswered<=1),
+      revealGuardMsg: (pAnswered===0 ? 'Crickets — nobody weighed in this round.' : 'Just one brave soul answered — that one stays between us.'),
       barStyle: { width: pBarPct, height:'100%', background:'var(--accent)', borderRadius:'999px', transition:'width .5s cubic-bezier(.4,0,.2,1)' },
       myAnswerLabel: pMy ? ((pIsSuspect?'your vote · ':'you said · ') + (pIsFork ? (pMy==='a'?forkA:forkB) : pIsSuspect ? ((((P.players||[]).find(x=>x.cid===pMy))||{}).name || 'Someone') : (pMy==='have'?'I have':'Never have I'))) : '', hasMyAnswer: pMy!=null,
       onDeal: () => this.parlourDeal(), onReveal: () => this.parlourReveal(), onEnd: () => this.parlourEnd(), onLeave: () => this.parlourLeave(),
