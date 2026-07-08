@@ -149,7 +149,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS parlour_keepvotes (
   round INTEGER NOT NULL, cid TEXT NOT NULL, vote TEXT NOT NULL,
   PRIMARY KEY (round, cid)
 );`);
-// The Usual: guesses (who each player thinks wrote each shuffled answer) + cumulative scores.
+// The Signature: guesses (who each player thinks wrote each shuffled answer) + cumulative scores.
 db.exec(`CREATE TABLE IF NOT EXISTS parlour_guesses (
   round INTEGER NOT NULL, guesser_cid TEXT NOT NULL, answer_id INTEGER NOT NULL, guess_cid TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -210,7 +210,7 @@ const Q = {
   parlourKeepVote:     db.prepare("INSERT INTO parlour_keepvotes (round, cid, vote) VALUES (?, ?, ?) ON CONFLICT(round, cid) DO UPDATE SET vote = excluded.vote"),
   parlourKeepTally:    db.prepare("SELECT vote, COUNT(*) AS n FROM parlour_keepvotes WHERE round = ? GROUP BY vote"),
   parlourClearKeepVotes: db.prepare("DELETE FROM parlour_keepvotes"),
-  // The Usual
+  // The Signature
   parlourRoundAnswers: db.prepare("SELECT cid, value, answer_id FROM parlour_answers WHERE round = ? ORDER BY answer_id"),
   parlourSetAnswerId:  db.prepare("UPDATE parlour_answers SET answer_id = ? WHERE round = ? AND cid = ?"),
   parlourInsertGuess:  db.prepare("INSERT INTO parlour_guesses (round, guesser_cid, answer_id, guess_cid) VALUES (?, ?, ?, ?) ON CONFLICT(round, guesser_cid, answer_id) DO UPDATE SET guess_cid = excluded.guess_cid"),
@@ -333,7 +333,7 @@ function loadParlourPrompts() {
         const tier = e.cat === "raunchy" ? "raunchy" : (e.cat === "spicy" ? "spicy" : "tame");
         if (e.blank) {
           // Blank card → pool it as an object; the fill phase supplies the word(s) at deal time.
-          if (g === "usual" || !FILL_FALLBACK[e.blank]) continue;   // no blanks for The Usual; unknown buckets stay out
+          if (g === "usual" || !FILL_FALLBACK[e.blank]) continue;   // no blanks for The Signature; unknown buckets stay out
           const sides = g === "fork" ? [e.a, e.b] : [e.t];
           if (sides.some((f) => !f || (f.match(/___/g) || []).length !== 1)) continue;   // exactly one ___ per side
           out[g][tier].push(g === "fork" ? { blank: e.blank, a: e.a, b: e.b } : { blank: e.blank, t: e.t });
@@ -960,7 +960,7 @@ const server = http.createServer(async (req, res) => {
       p.phase = "reveal"; saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
     }
-    // The Usual: host closes answers -> shuffle + assign shuffled ids -> guessing
+    // The Signature: host closes answers -> shuffle + assign shuffled ids -> guessing
     if (pathname === "/api/parlour/close" && method === "POST") {
       const b = await readBody(req);
       if (!canAdvance(b)) return sendJSON(res, 403, { error: "bad code" });

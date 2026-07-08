@@ -994,7 +994,7 @@
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">This or that — the room splits live, then the reveal names each side.</div>
               </button>
               <button type="button" onClick="{{ pv.onOpenUsual }}" style="display:block;width:100%;box-sizing:border-box;text-align:left;background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:14px 15px;cursor:pointer">
-                <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Usual</div>
+                <div style="font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;color:var(--ink,#ECE7D7)">The Signature</div>
                 <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin-top:2px">Everyone answers a prompt, then the room guesses who wrote what.</div>
               </button>
             </sc-if>
@@ -1091,7 +1091,7 @@
           </sc-if>
 
           <sc-if value="{{ pv.isGuess }}" hint-placeholder-val="">
-            <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:10px">The Usual · who wrote what</div>
+            <div style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--accent2,#CFA267);margin-bottom:10px">The Signature · who wrote what</div>
             <sc-if value="{{ pv.amSpectator }}" hint-placeholder-val=""><div style="font-size:13px;color:var(--ink-soft,#B7B3A1);line-height:1.5;margin-bottom:12px">You sat this one out — enjoy watching the room guess.</div></sc-if>
             <sc-for list="{{ pv.guessCards }}" as="gc" hint-placeholder-count="2">
               <div style="background:var(--card,#1D2217);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:13px 14px;margin-bottom:10px">
@@ -1844,7 +1844,7 @@ class Component extends DCLogic {
     const pCanAdvance = pStaff || pAdvanceAnyone;
     const pMy = this.parlourMyAnswer();
     const pPresent = P.present || 0, pAnswered = P.answered || 0;
-    const pGameName = ({ confession:'The Confession', fork:'The Fork', usual:'The Usual' })[pGame] || 'The Parlor';
+    const pGameName = ({ confession:'The Confession', fork:'The Fork', usual:'The Signature' })[pGame] || 'The Parlor';
     const pIsFork = pGame==='fork', pIsConfession = pGame==='confession';
     let forkA='', forkB='';
     if (pIsFork && P.prompt){ const _pp = String(P.prompt).split('|'); forkA = (_pp[0]||'').trim(); forkB = ((_pp[1]||'').trim()) || '…'; }
@@ -1853,7 +1853,7 @@ class Component extends DCLogic {
     const _forkCard = (on) => ({ display:'block', width:'100%', boxSizing:'border-box', textAlign:'center', fontFamily:"'Fraunces',Georgia,serif", fontSize:'17px', fontWeight:500, lineHeight:'1.25', borderRadius:'14px', padding:'18px 12px', marginBottom:'10px', cursor:'pointer', color: on?'var(--ink)':'var(--ink-soft)', border:'1px solid '+(on?'var(--accent2)':'var(--card-border)'), background: on?'rgba(207,162,103,.13)':'var(--field)', transition:'background .15s ease, border-color .15s ease' });
     let forkMinority='';
     if (pIsFork && pPhase==='reveal'){ forkMinority = (_spl.a<_spl.b) ? ('The brave '+_spl.a) : (_spl.b<_spl.a) ? ('The brave '+_spl.b) : 'A dead heat, somehow.'; }
-    // The Usual
+    // The Signature
     const pIsUsual = pGame==='usual';
     const _guessChip = (on) => ({ fontSize:'12.5px', fontWeight:600, borderRadius:'999px', padding:'5px 11px', cursor:'pointer', border:'1px solid '+(on?'var(--accent2)':'var(--pill-line)'), background: on?'rgba(207,162,103,.14)':'var(--field)', color: on?'var(--ink)':'var(--ink-soft)' });
     let guessCards=[], amSpectator=false, guessProgress='', revealCards=[], usualScores=[];
