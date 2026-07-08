@@ -1336,6 +1336,7 @@
                   <button type="button" onClick="{{ pv.onAdvAnyone }}" style="{{ pv.advAnyoneStyle }}">Anyone</button>
                 </div>
               </div>
+              <sc-if value="{{ pv.isFork }}" hint-placeholder-val="">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
                 <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Show names <span style="color:var(--ink-faint,#827E6D)">(The Fork)</span></span>
                 <div style="display:flex;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:2px;width:150px">
@@ -1343,6 +1344,8 @@
                   <button type="button" onClick="{{ pv.onShowWhoOff }}" style="{{ pv.showWhoOffStyle }}">Anon</button>
                 </div>
               </div>
+              </sc-if>
+              <sc-if value="{{ pv.canBlank }}" hint-placeholder-val="">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
                 <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Filler sees the sentence <span style="color:var(--ink-faint,#827E6D)">(The Blanks)</span></span>
                 <div style="display:flex;background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:2px;width:150px">
@@ -1350,6 +1353,7 @@
                   <button type="button" onClick="{{ pv.onFillShowOff }}" style="{{ pv.fillShowOffStyle }}">Blind</button>
                 </div>
               </div>
+              </sc-if>
               <sc-if value="{{ pv.hasAdded }}" hint-placeholder-val="">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
                   <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Tonight’s drop-ins <span style="color:var(--ink-faint,#827E6D)">({{ pv.addedCount }} waiting to vote)</span></span>
@@ -2121,6 +2125,7 @@ class Component extends DCLogic {
       onSaveTame: () => this.parlourSavePrompt('tame'), onSaveSpicy: () => this.parlourSavePrompt('spicy'), onSaveRaunchy: () => this.parlourSavePrompt('raunchy'),
       isNone: (!pGame || pPhase==='ended'), isLobby: pPhase==='lobby', isAnswer: pPhase==='answer', isReveal: pPhase==='reveal',
       isConfession: pIsConfession, isFork: pIsFork, isUsual: pIsUsual, notUsual: !pIsUsual, isGuess: pPhase==='guess',
+      canBlank: (pIsConfession || pIsFork),   // only Confession/Fork have blank cards (The Blanks)
       isSuspect: pIsSuspect,
       suspectChips: suspectChips, suspectRows: suspectRows,
       suspectEmpty: (pIsSuspect && pPhase==='reveal' && suspectRows.length===0),
