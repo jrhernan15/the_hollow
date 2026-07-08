@@ -304,9 +304,10 @@ const PARLOUR_FALLBACK = {
   confession: { tame: ["Never have I ever fallen asleep at a party."], spicy: ["Never have I ever texted an ex after midnight."], raunchy: ["Never have I ever sent a spicy text to the wrong chat."] },
   fork: { tame: ["Coast | Mountains"], spicy: ["Truth | Dare"], raunchy: ["Skinny dip | Streak"] },
   usual: { tame: ["Describe tonight as a cocktail."], spicy: ["What's your biggest ick?"], raunchy: ["What's your worst-kept secret about your love life?"] },
+  houseread: { tame: ["Underrated | Overrated", "Weeknight drink | Weekend drink", "Chaotic | Organized"], spicy: ["Red flag | Green flag", "Innocent | Guilty"], raunchy: ["PG | Definitely not PG", "First-date material | Third-date material"] },
 };
 const PARLOUR_TIERS = ["tame", "spicy", "raunchy"];
-const PARLOUR_GAMES = ["confession", "fork", "usual"];
+const PARLOUR_GAMES = ["confession", "fork", "usual", "houseread"];
 // Fallback words for the fill phase — used when the host taps "fill it for them" or the room
 // is empty. Entries run through the same injector as player words, so they may carry their
 // own determiner ("the dishes") or be multi-word phrases ("a load of laundry").
@@ -324,7 +325,7 @@ const FILL_FALLBACK = {
 // the persisted no-repeat memory (p.dealt) valid across restarts.
 const parlourKey = (e) => typeof e === "string" ? e : (e.t || (e.a + " | " + e.b));
 function loadParlourPrompts() {
-  const out = { confession: { tame: [], spicy: [], raunchy: [] }, fork: { tame: [], spicy: [], raunchy: [] }, usual: { tame: [], spicy: [], raunchy: [] } };
+  const out = { confession: { tame: [], spicy: [], raunchy: [] }, fork: { tame: [], spicy: [], raunchy: [] }, usual: { tame: [], spicy: [], raunchy: [] }, houseread: { tame: [], spicy: [], raunchy: [] } };
   try {
     const raw = JSON.parse(fs.readFileSync(path.join(__dirname, "parlour-prompts.json"), "utf8"));
     for (const g of PARLOUR_GAMES) {
@@ -333,13 +334,13 @@ function loadParlourPrompts() {
         const tier = e.cat === "raunchy" ? "raunchy" : (e.cat === "spicy" ? "spicy" : "tame");
         if (e.blank) {
           // Blank card → pool it as an object; the fill phase supplies the word(s) at deal time.
-          if (g === "usual" || !FILL_FALLBACK[e.blank]) continue;   // no blanks for The Signature; unknown buckets stay out
+          if (g === "usual" || g === "houseread" || !FILL_FALLBACK[e.blank]) continue;   // no blanks for The Signature or The House Read; unknown buckets stay out
           const sides = g === "fork" ? [e.a, e.b] : [e.t];
           if (sides.some((f) => !f || (f.match(/___/g) || []).length !== 1)) continue;   // exactly one ___ per side
           out[g][tier].push(g === "fork" ? { blank: e.blank, a: e.a, b: e.b } : { blank: e.blank, t: e.t });
           continue;
         }
-        const text = g === "fork" ? ((e.a && e.b) ? (e.a + " | " + e.b) : null) : e.t;   // fork = "A | B", others use .t
+        const text = (g === "fork" || g === "houseread") ? ((e.a && e.b) ? (e.a + " | " + e.b) : null) : e.t;   // fork/houseread = "A | B", others use .t
         if (!text || text.includes("___")) continue;   // never deal an unfilled blank
         out[g][tier].push(text);
       }
@@ -362,7 +363,7 @@ const SPICE_WEIGHTS = [
   { tame: 0,   spicy: 35, raunchy: 65 },   // 4 All The Spice
 ];
 function spiceLevel(p) { const n = Math.round(Number(p && p.spice)); return (n >= 0 && n <= 4) ? n : 1; }
-const PARLOUR_DEFAULT = { game: null, phase: "ended", round: 0, prompt: "", promptHeat: "tame", promptFresh: false, pendingPromptId: null, dealt: [], spice: 1, advance: "host", showWho: true, scoring: true, startedAt: "", fillTemplate: null, fillerCid: "", fillerName: "", lastFillerCid: "", filledBy: "", showFillSentence: false };
+const PARLOUR_DEFAULT = { game: null, phase: "ended", round: 0, prompt: "", promptHeat: "tame", promptFresh: false, pendingPromptId: null, dealt: [], spice: 1, advance: "host", showWho: true, scoring: true, startedAt: "", fillTemplate: null, fillerCid: "", fillerName: "", lastFillerCid: "", filledBy: "", showFillSentence: false, reader: "", readerName: "", lastReader: "", target: null, clue: "" };
 function getParlour() {
   const row = Q.getSetting.get("parlour");
   if (!row || !row.value) return { ...PARLOUR_DEFAULT };
@@ -413,6 +414,9 @@ function canAdvance(body) { const p = getParlour(); return p.advance === "anyone
 // ---- The Blanks (fill phase) ----
 // lastFillerCid survives clearFill on purpose — it's the rotation memory across rounds.
 function clearFill(p) { p.fillTemplate = null; p.fillerCid = ""; p.fillerName = ""; }
+// ---- The House Read ----
+// lastReader survives on purpose — it's the reader-rotation memory across rounds.
+function clearHouseread(p) { p.reader = ""; p.readerName = ""; p.clue = ""; p.target = null; }
 function cleanFillWord(w) {
   // "|" would corrupt the client's "A | B" fork split; "_" blocks smuggling a literal "___" back in.
   const s = String(w == null ? "" : w).replace(/[|_]/g, " ");
@@ -437,6 +441,7 @@ function injectBlank(template, word) {
   return before + word + after;   // slice-concat, not String.replace — a word may contain "$&"
 }
 function pickFiller(pivotCid, excludeCid) {
+  // Also rotates The House Read's reader — same "next present player after pivot" walk.
   let list = Q.parlourActivePlayers.all();   // ORDER BY joined_at, cid — deterministic rotation
   if (excludeCid) list = list.filter((x) => x.cid !== excludeCid);
   if (!list.length) return null;
@@ -470,6 +475,25 @@ function parlourState() {
     const t = p.fillTemplate;
     out.fill = { fillerCid: p.fillerCid || "", fillerName: p.fillerName || "Someone", bucket: t.blank || "", blanks: t.a ? 2 : 1 };
     if (p.showFillSentence) out.fill.sentence = t.a ? (t.a + " | " + t.b) : t.t;
+  }
+  if (p.game === "houseread" && (p.phase === "clue" || p.phase === "answer" || p.phase === "reveal")) {
+    // The target NEVER rides the shared broadcast before reveal — the Reader fetches it
+    // privately via GET /api/parlour/target. The clue goes public once guessing opens.
+    const _pp = String(p.prompt || "").split("|");
+    const hr = { zones: 7, poles: { a: (_pp[0] || "").trim(), b: ((_pp[1] || "").trim()) }, reader: p.reader || "", readerName: p.readerName || "Someone" };   // reader cid is not secret
+    if (p.phase !== "clue") hr.clue = p.clue || "";
+    if (p.phase === "reveal") {
+      hr.target = p.target;
+      const t2 = Number(p.target);
+      hr.pins = Q.parlourRoundVotes.all(p.round)
+        .filter((v) => v.cid !== p.reader)
+        .map((v) => ({ name: (v.name && String(v.name).trim()) || "Someone", zone: parseInt(v.value, 10) }))
+        .filter((x) => x.zone >= 0 && x.zone <= 6)
+        .map((x) => ({ name: x.name, zone: x.zone, pts: Math.abs(x.zone - t2) === 0 ? 3 : (Math.abs(x.zone - t2) === 1 ? 1 : 0) }));
+      hr.readerPts = hr.pins.filter((x) => Math.abs(x.zone - t2) <= 1).length;
+      if (p.scoring) out.scores = Q.parlourScores.all().map((s) => ({ name: (s.name && String(s.name).trim()) || "Someone", points: s.points }));
+    }
+    out.houseread = hr;
   }
   if (p.game && (p.phase === "answer" || p.phase === "guess" || p.phase === "reveal")) {
     out.answered = Q.parlourRoundCount.get(p.round).n;
@@ -566,7 +590,7 @@ function readBody(req) {
 const str = (v, max) => (v == null ? null : String(v).trim().slice(0, max) || null);
 
 const server = http.createServer(async (req, res) => {
-  const { pathname } = new URL(req.url, `http://${req.headers.host}`);
+  const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host}`);
   const method = req.method;
 
   if (method === "OPTIONS") {
@@ -841,6 +865,13 @@ const server = http.createServer(async (req, res) => {
         else autoFill(p);
         saveParlour(p);
       }
+      if (p.game === "houseread" && p.phase === "clue" && cid === p.reader) {
+        // The Reader walked out mid-clue — hand the card to the next present player.
+        // If the room emptied, the round waits: the host's "deal" always works (no phase gate).
+        const next = pickFiller(cid, cid);
+        if (next) { p.reader = next.cid; p.readerName = (next.name && String(next.name).trim()) || "Someone"; p.lastReader = next.cid; }
+        saveParlour(p);
+      }
       broadcast();
       return sendJSON(res, 200, { ok: true });
     }
@@ -865,6 +896,7 @@ const server = http.createServer(async (req, res) => {
       const p = getParlour();
       p.game = game; p.phase = "lobby"; p.round = 0; p.prompt = ""; p.promptHeat = "tame"; p.promptFresh = false; p.pendingPromptId = null; p.dealt = []; p.startedAt = Q.nowStr.get().t;
       clearFill(p); p.filledBy = ""; p.lastFillerCid = "";
+      clearHouseread(p); p.lastReader = "";
       Q.parlourClearKeepVotes.run();
       saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
@@ -875,6 +907,8 @@ const server = http.createServer(async (req, res) => {
       if (!canAdvance(b)) return sendJSON(res, 403, { error: "bad code" });
       const p = getParlour();
       if (!p.game) return sendJSON(res, 400, { error: "no game" });
+      // The House Read needs a present player to be the Reader — fail before any side effects.
+      if (p.game === "houseread" && !Q.parlourActivePlayers.all().length) return sendJSON(res, 409, { error: "no one in the room to read" });
       // If the previous round showed a drop-in the host never saved, the room passed on it → discard.
       if (p.pendingPromptId) { Q.parlourDiscardPrompt.run(p.pendingPromptId); p.pendingPromptId = null; }
       Q.parlourClearKeepVotes.run();
@@ -882,6 +916,7 @@ const server = http.createServer(async (req, res) => {
       if (!pr) return sendJSON(res, 400, { error: "out of prompts" });
       Q.parlourClearAnswers.run(); Q.parlourClearGuesses.run();
       clearFill(p); p.filledBy = "";   // re-dealing during a fill abandons that card (it stays in p.dealt)
+      clearHouseread(p);               // re-dealing mid-clue abandons that round the same way
       p.promptHeat = pr.heat; p.promptFresh = !!pr.fresh; p.pendingPromptId = pr.promptId || null; p.round = (p.round || 0) + 1;
       if (pr.blankCard) {
         // Blank card → collect the word(s) first. The filler rotates through present players.
@@ -890,9 +925,40 @@ const server = http.createServer(async (req, res) => {
         const filler = pickFiller(p.lastFillerCid);
         if (filler) { p.fillerCid = filler.cid; p.fillerName = (filler.name && String(filler.name).trim()) || "Someone"; p.lastFillerCid = filler.cid; p.phase = "fill"; }
         else autoFill(p);   // empty room → the house fills it and play proceeds
+      } else if (p.game === "houseread") {
+        // Hidden target + rotating Reader; the round opens on the clue phase.
+        p.prompt = pr.text;
+        p.target = Math.floor(Math.random() * 7);
+        const reader = pickFiller(p.lastReader);   // non-null: empty room rejected above
+        p.reader = reader.cid;
+        p.readerName = (reader.name && String(reader.name).trim()) || "Someone";
+        p.lastReader = reader.cid;
+        p.phase = "clue";
       } else {
         p.prompt = pr.text; p.phase = "answer";
       }
+      saveParlour(p); broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+    // The House Read: private peek at the hidden target — only the Reader, only while the clue
+    // is being written. Deliberately NOT part of /api/state or the SSE broadcast: the shared
+    // payload goes to every phone, and a network peek must not spoil the round.
+    if (pathname === "/api/parlour/target" && method === "GET") {
+      const cid = str(searchParams.get("cid"), 40);
+      const p = getParlour();
+      if (!cid || p.game !== "houseread" || p.phase !== "clue" || cid !== p.reader || p.target == null) return sendJSON(res, 403, { error: "not for your eyes" });
+      return sendJSON(res, 200, { zone: p.target, round: p.round });
+    }
+    // The House Read: the Reader submits the one-line clue → opens guessing
+    if (pathname === "/api/parlour/clue" && method === "POST") {
+      const b = await readBody(req);
+      const cid = str(b.cid, 40), text = str(b.text, 80);
+      if (!cid || !text) return sendJSON(res, 400, { error: "cid, text required" });
+      const p = getParlour();
+      if (p.game !== "houseread" || p.phase !== "clue") return sendJSON(res, 409, { error: "not taking clues" });
+      if (cid !== p.reader) return sendJSON(res, 403, { error: "not your clue to give" });
+      Q.parlourUpsertPlayer.run(cid, str(b.name, 60));
+      p.clue = text; p.phase = "answer";
       saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
     }
@@ -935,6 +1001,10 @@ const server = http.createServer(async (req, res) => {
       if (!cid || !value) return sendJSON(res, 400, { error: "cid, value required" });
       const p = getParlour();
       if (p.phase !== "answer") return sendJSON(res, 409, { error: "not accepting answers" });
+      if (p.game === "houseread") {
+        if (cid === p.reader) return sendJSON(res, 403, { error: "the reader sits this one out" });
+        if (!/^[0-6]$/.test(value)) return sendJSON(res, 400, { error: "zone 0-6 required" });
+      }
       Q.parlourUpsertPlayer.run(cid, str(b.name, 60));
       Q.parlourSetAnswer.run(p.round, cid, value);
       broadcast();
@@ -954,6 +1024,25 @@ const server = http.createServer(async (req, res) => {
           const author = authorByAns[g.answer_id]; if (!author || g.guesser_cid === author) continue;
           if (g.guess_cid === author) pts[g.guesser_cid] = (pts[g.guesser_cid] || 0) + 1;   // nailed it
           else pts[author] = (pts[author] || 0) + 1;                                          // author fooled them
+        }
+        for (const c of Object.keys(pts)) Q.parlourAddScore.run(c, pts[c]);
+      }
+      if (p.game === "houseread" && p.scoring && p.phase === "answer") {
+        // Proximity: bullseye 3, one zone off 1. The Reader earns +1 per guesser within one zone
+        // (a clue that landed). Same formula echoes in parlourState()'s per-pin pts at reveal.
+        const t = Number(p.target);
+        const pts = {}; let near = 0;
+        if (t >= 0 && t <= 6) {
+          for (const a of Q.parlourRoundAnswers.all(p.round)) {
+            if (a.cid === p.reader) continue;                 // belt-and-braces; answer endpoint already blocks
+            const z = parseInt(a.value, 10);
+            if (!(z >= 0 && z <= 6)) continue;                // stale/foreign values never score
+            const d = Math.abs(z - t);
+            if (d === 0) pts[a.cid] = (pts[a.cid] || 0) + 3;
+            else if (d === 1) pts[a.cid] = (pts[a.cid] || 0) + 1;
+            if (d <= 1) near++;
+          }
+          if (p.reader && near) pts[p.reader] = (pts[p.reader] || 0) + near;
         }
         for (const c of Object.keys(pts)) Q.parlourAddScore.run(c, pts[c]);
       }
@@ -990,6 +1079,7 @@ const server = http.createServer(async (req, res) => {
       const p = getParlour();
       p.game = null; p.phase = "ended"; p.prompt = ""; p.round = 0; p.dealt = []; p.promptFresh = false; p.pendingPromptId = null;
       clearFill(p); p.filledBy = ""; p.lastFillerCid = "";
+      clearHouseread(p); p.lastReader = "";
       Q.parlourClearAnswers.run(); Q.parlourClearGuesses.run(); Q.parlourClearScores.run(); Q.parlourClearPlayers.run(); Q.parlourClearKeepVotes.run();
       saveParlour(p); broadcast();
       return sendJSON(res, 200, { ok: true });
