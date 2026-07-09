@@ -552,6 +552,22 @@
         </div>
         <div style="flex:1;overflow:auto;overscroll-behavior:contain;padding:4px 16px 16px">
           <sc-if value="{{ tab86IsIng }}" hint-placeholder-val="{{ true }}">
+            <sc-if value="{{ hasShopping }}" hint-placeholder-val="">
+              <div style="margin:12px 0 4px;background:rgba(207,162,103,.08);border:1px solid var(--card-border,#2D3422);border-radius:14px;padding:12px 14px 6px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="var(--accent2,#CFA267)" aria-hidden="true" style="flex:none"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 15h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                  <span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--accent2,#CFA267)">Shopping list</span>
+                  <span style="margin-left:auto;font-size:11.5px;color:var(--ink-faint,#827E6D)">{{ shoppingCount }}</span>
+                </div>
+                <sc-for list="{{ shoppingList }}" as="s" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:11px;padding:8px 2px;border-top:1px solid var(--card-border,#2D3422)">
+                    <span style="flex:1;font-size:14.5px;color:var(--ink,#ECE7D7)">{{ s.name }}</span>
+                    <span style="font-size:11.5px;color:var(--ink-faint,#827E6D);font-variant-numeric:tabular-nums">{{ s.count }}</span>
+                    <button type="button" onClick="{{ s.onRestock }}" style="flex:none;font-size:11.5px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:999px;padding:5px 12px;cursor:pointer">Restock</button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
             <div style="font-size:12px;color:var(--ink-soft,#B7B3A1);margin:10px 0 2px;line-height:1.5">Uncheck anything you're out of — drinks that need it disappear from the menu for everyone. Optional items and garnishes don't count.</div>
             <sc-for list="{{ eightySixGroups }}" as="grp" hint-placeholder-count="1">
               <div style="margin-top:14px">
@@ -2503,6 +2519,10 @@ class Component extends DCLogic {
         boxStyle: box86(inStock), checkMark: inStock?'✓':'',
         onToggle: () => this.toggle86(n, inStock) }; }) }));
     const stockTotal = Object.keys(reqCount).length;
+    // Shopping list: every ingredient currently 86'd, in the same category order as the list below.
+    const shoppingList = [];
+    order86.filter(g=>gmap86[g]).forEach(g => gmap86[g].forEach(n => { if (outSet[n]) shoppingList.push({
+      name:n, count: reqCount[n]+' drink'+(reqCount[n]===1?'':'s'), onRestock: () => this.toggle86(n, false) }); }));
     const hiddenCount = st.cocktails.filter(c => !this.isAvailable(c)).length;
     const themeDir = this.THEMES[st.direction] || this.THEMES.herbarium;
     const logoSrc = themeDir.logo || 'assets/logo.png';
@@ -2734,6 +2754,7 @@ class Component extends DCLogic {
       onGateInput: (e) => this.onGateInput(e), onSubmitGate: () => this.submitGate(), onCloseGate: () => this.closeGate(),
       pantryOpen: st.pantryOpen, onClose86: () => this.close86(),
       eightySixGroups: eightySixGroups, has86: st.eightySix.length>0, onRestockAll: () => this.restockAll(),
+      shoppingList: shoppingList, hasShopping: shoppingList.length>0, shoppingCount: shoppingList.length + ' to restock',
       tab86IsIng: st.eightySixTab==='ingredients', tab86IsDrinks: st.eightySixTab==='drinks', tab86IsTheme: st.eightySixTab==='theme', tab86IsLedger: st.eightySixTab==='ledger',
       tab86IngStyle: tabStyle(st.eightySixTab==='ingredients'), tab86DrinkStyle: tabStyle(st.eightySixTab==='drinks'), tab86ThemeStyle: tabStyle(st.eightySixTab==='theme'), tab86LedgerStyle: tabStyle(st.eightySixTab==='ledger'), tab86IndStyle: slideInd(({ingredients:0,drinks:1,theme:2,ledger:3})[st.eightySixTab]||0, 4),
       on86TabIng: () => this.set86Tab('ingredients'), on86TabDrinks: () => this.set86Tab('drinks'), on86TabTheme: () => this.set86Tab('theme'), on86TabLedger: () => this.set86Tab('ledger'),
