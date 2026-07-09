@@ -156,6 +156,13 @@ db.exec(`CREATE TABLE IF NOT EXISTS parlour_guesses (
   PRIMARY KEY (round, guesser_cid, answer_id)
 );`);
 db.exec(`CREATE TABLE IF NOT EXISTS parlour_scores ( cid TEXT PRIMARY KEY, points INTEGER NOT NULL DEFAULT 0 );`);
+// Host curation: a 👍/👎 on a specific prompt (keyed by its exact text). Persists across nights —
+// a 👎'd prompt is pulled from rotation for good; 👍 is just a "keeper" flag the host can review.
+db.exec(`CREATE TABLE IF NOT EXISTS parlour_ratings (
+  game TEXT NOT NULL, ptext TEXT NOT NULL, rating TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (game, ptext)
+);`);
 
 const Q = {
   insertTicket:  db.prepare("INSERT INTO tickets (drink, guest_name, notes, qty) VALUES (?,?,?,?)"),
@@ -221,6 +228,13 @@ const Q = {
   parlourAddScore:     db.prepare("INSERT INTO parlour_scores (cid, points) VALUES (?, ?) ON CONFLICT(cid) DO UPDATE SET points = points + excluded.points"),
   parlourScores:       db.prepare("SELECT s.cid AS cid, s.points AS points, pl.name AS name FROM parlour_scores s LEFT JOIN parlour_players pl ON pl.cid = s.cid ORDER BY s.points DESC, name"),
   parlourClearScores:  db.prepare("DELETE FROM parlour_scores"),
+  // Host prompt ratings (curation)
+  ratingSet:    db.prepare("INSERT INTO parlour_ratings (game, ptext, rating) VALUES (?, ?, ?) ON CONFLICT(game, ptext) DO UPDATE SET rating = excluded.rating, created_at = datetime('now')"),
+  ratingDel:    db.prepare("DELETE FROM parlour_ratings WHERE game = ? AND ptext = ?"),
+  ratingGet:    db.prepare("SELECT rating FROM parlour_ratings WHERE game = ? AND ptext = ?"),
+  ratingDown:   db.prepare("SELECT ptext FROM parlour_ratings WHERE game = ? AND rating = 'down'"),
+  ratingAll:    db.prepare("SELECT game, ptext, rating FROM parlour_ratings ORDER BY created_at DESC"),
+  ratingCounts: db.prepare("SELECT rating, COUNT(*) AS n FROM parlour_ratings GROUP BY rating"),
   insertHistory: db.prepare("INSERT INTO history (drink, qty, guest, round_id) VALUES (?,?,?,?)"),
   historyRows:   db.prepare("SELECT drink, qty, guest, round_id, created_at FROM history ORDER BY created_at, id"),
   historyHasRoundDrink:    db.prepare("SELECT 1 FROM history WHERE round_id = ? AND drink = ? LIMIT 1"),
@@ -394,6 +408,9 @@ function dealParlourPrompt(p) {
   const allow = { tame: w.tame > 0, spicy: w.spicy > 0, raunchy: w.raunchy > 0 };
   const pool = { tame: (bundled.tame || []).slice(), spicy: (bundled.spicy || []).slice(), raunchy: (bundled.raunchy || []).slice() };
   for (const r of Q.parlourSavedList.all(p.game)) { const t = (r.tier === "raunchy" || r.tier === "spicy") ? r.tier : "tame"; pool[t].push(r.text); }
+  // Drop anything the host thumbed-down — it's out of rotation for good.
+  const downSet = new Set(Q.ratingDown.all(p.game).map((r) => r.ptext));
+  if (downSet.size) for (const t of PARLOUR_TIERS) pool[t] = pool[t].filter((e) => !downSet.has(parlourKey(e)));
   const pickTier = () => {
     const tiers = PARLOUR_TIERS.filter((t) => allow[t] && unused(pool[t]).length);
     if (!tiers.length) return null;
@@ -469,6 +486,9 @@ function parlourState() {
   const p = getParlour();
   const players = Q.parlourActivePlayers.all();   // only recently-seen devices count as "in the room"
   const out = { game: p.game, phase: p.phase, round: p.round || 0, prompt: p.prompt || "", heat: p.promptHeat || "tame", fresh: !!p.promptFresh, spice: spiceLevel(p), spiceLabel: SPICE_LEVELS[spiceLevel(p)], advance: p.advance || "host", showWho: !!p.showWho, scoring: !!p.scoring, filledBy: p.filledBy || "", showFillSentence: !!p.showFillSentence, added: Q.parlourPendingCount.get().n, saved: Q.parlourSavedCount.get().n, players, present: players.length };
+  // Host curation: this prompt's 👍/👎 (only for real pool prompts — not fresh drop-ins or filled blanks), plus running counts for the review list.
+  out.promptRating = (p.game && p.prompt && !p.promptFresh && !p.filledBy) ? ((Q.ratingGet.get(p.game, p.prompt) || {}).rating || "") : "";
+  { let ru = 0, rd = 0; for (const r of Q.ratingCounts.all()) { if (r.rating === "up") ru = r.n; else if (r.rating === "down") rd = r.n; } out.ratedUp = ru; out.ratedDown = rd; }
   if (p.game && p.phase === "fill" && p.fillTemplate) {
     // The template stays server-side while blind (the default). With "filler sees the card" on,
     // the sentence rides the shared broadcast — every device technically receives it; only the
@@ -1010,6 +1030,25 @@ const server = http.createServer(async (req, res) => {
       if (p.pendingPromptId) { Q.parlourDiscardPrompt.run(p.pendingPromptId); p.pendingPromptId = null; p.promptFresh = false; saveParlour(p); }
       broadcast();
       return sendJSON(res, 200, { ok: true });
+    }
+    // host rates a prompt 👍/👎 (curation). Tapping the same thumb again clears it. 👎 also pulls it from rotation (see dealParlourPrompt).
+    if (pathname === "/api/parlour/rate" && method === "POST") {
+      const b = await readBody(req);
+      if (String(b.code) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      const game = str(b.game, 20), text = str(b.text, 400);
+      const rating = b.rating === "up" ? "up" : (b.rating === "down" ? "down" : "clear");
+      if (!game || !text || PARLOUR_GAMES.indexOf(game) === -1) return sendJSON(res, 400, { error: "game, text required" });
+      if (rating === "clear") { Q.ratingDel.run(game, text); }
+      else { const cur = (Q.ratingGet.get(game, text) || {}).rating || ""; if (cur === rating) Q.ratingDel.run(game, text); else Q.ratingSet.run(game, text, rating); }
+      broadcast();
+      return sendJSON(res, 200, { ok: true });
+    }
+    // host review: every rated prompt, grouped into keepers (👍) and hidden (👎)
+    if (pathname === "/api/parlour/ratings" && method === "GET") {
+      if (str(searchParams.get("code"), 10) !== CODE) return sendJSON(res, 403, { error: "bad code" });
+      const up = [], down = [];
+      for (const r of Q.ratingAll.all()) (r.rating === "up" ? up : down).push({ game: r.game, text: r.ptext });
+      return sendJSON(res, 200, { up, down });
     }
     if (pathname === "/api/parlour/answer" && method === "POST") {
       const b = await readBody(req);

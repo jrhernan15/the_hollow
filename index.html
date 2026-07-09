@@ -1086,6 +1086,14 @@
               </div>
             </sc-if>
             <div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);letter-spacing:.06em;margin-top:10px">{{ pv.answeredLabel }}</div>
+            <sc-if value="{{ pv.canRate }}" hint-placeholder-val="">
+              <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:14px;padding-top:13px;border-top:1px solid var(--line,#2D3422)">
+                <span style="font-size:11px;letter-spacing:.05em;color:var(--ink-faint,#827E6D)">Rate this one</span>
+                <button type="button" onClick="{{ pv.onRateUp }}" style="{{ pv.rateUpStyle }}">👍</button>
+                <button type="button" onClick="{{ pv.onRateDown }}" style="{{ pv.rateDownStyle }}">👎</button>
+                <sc-if value="{{ pv.rateHint }}" hint-placeholder-val=""><span style="width:100%;text-align:center;font-size:11px;color:var(--ink-faint,#827E6D)">{{ pv.rateHint }}</span></sc-if>
+              </div>
+            </sc-if>
             <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="">
               <sc-if value="{{ pv.isUsual }}" hint-placeholder-val=""><button type="button" onClick="{{ pv.onClose }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Lock answers → guessing</button></sc-if>
               <sc-if value="{{ pv.notUsual }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ pv.onReveal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:18px;font-size:13px;font-weight:600;color:var(--accent2,#CFA267);background:transparent;border:1px solid var(--accent2,#CFA267);border-radius:12px;padding:11px;cursor:pointer">Reveal the room</button></sc-if>
@@ -1288,6 +1296,14 @@
               </div>
             </sc-if>
             <sc-if value="{{ pv.showMyAnswer }}" hint-placeholder-val=""><div style="text-align:center;font-size:11.5px;color:var(--ink-faint,#827E6D);margin-top:12px">{{ pv.myAnswerLabel }}</div></sc-if>
+            <sc-if value="{{ pv.canRate }}" hint-placeholder-val="">
+              <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line,#2D3422)">
+                <span style="font-size:11px;letter-spacing:.05em;color:var(--ink-faint,#827E6D)">Rate this one</span>
+                <button type="button" onClick="{{ pv.onRateUp }}" style="{{ pv.rateUpStyle }}">👍</button>
+                <button type="button" onClick="{{ pv.onRateDown }}" style="{{ pv.rateDownStyle }}">👎</button>
+                <sc-if value="{{ pv.rateHint }}" hint-placeholder-val=""><span style="width:100%;text-align:center;font-size:11px;color:var(--ink-faint,#827E6D)">{{ pv.rateHint }}</span></sc-if>
+              </div>
+            </sc-if>
             <sc-if value="{{ pv.canAdvance }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ pv.onDeal }}" style="display:block;width:100%;box-sizing:border-box;margin-top:20px;font-size:14px;font-weight:700;color:var(--accent-ink,#13160F);background:var(--accent,#A6BB8E);border:none;border-radius:12px;padding:13px;cursor:pointer">Next round</button></sc-if>
             <sc-if value="{{ pv.waiting }}" hint-placeholder-val=""><div style="text-align:center;font-size:12.5px;color:var(--ink-faint,#827E6D);margin-top:16px">Waiting for the host…</div></sc-if>
           </sc-if>
@@ -1358,6 +1374,33 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
                   <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Tonight’s drop-ins <span style="color:var(--ink-faint,#827E6D)">({{ pv.addedCount }} waiting to vote)</span></span>
                   <button type="button" onClick="{{ pv.onClearPrompts }}" style="flex:none;font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:7px 14px;cursor:pointer">Clear</button>
+                </div>
+              </sc-if>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
+                <span style="font-size:13px;color:var(--ink-soft,#B7B3A1)">Rated prompts <span style="color:var(--ink-faint,#827E6D)">({{ pv.ratedUp }} 👍 · {{ pv.ratedDown }} 👎)</span></span>
+                <button type="button" onClick="{{ pv.onToggleRatings }}" style="flex:none;font-size:12.5px;font-weight:600;color:var(--ink-soft,#B7B3A1);background:var(--field,#161A11);border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:7px 14px;cursor:pointer">{{ pv.ratingsChevron }} Review</button>
+              </div>
+              <sc-if value="{{ pv.ratingsOpen }}" hint-placeholder-val="">
+                <div style="margin:-4px 0 16px">
+                  <sc-if value="{{ pv.hasHidden }}" hint-placeholder-val="">
+                    <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:#C7745F;margin-bottom:6px">Hidden 👎</div>
+                    <sc-for list="{{ pv.ratedHidden }}" as="r" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line,#2D3422)">
+                        <div style="min-width:0"><div style="font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-bottom:2px">{{ r.gameLabel }}</div><div style="font-size:12.5px;color:var(--ink-soft,#B7B3A1);line-height:1.35">{{ r.text }}</div></div>
+                        <button type="button" onClick="{{ r.onRestore }}" style="flex:none;font-size:11.5px;font-weight:600;color:var(--accent,#A6BB8E);background:transparent;border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:5px 11px;cursor:pointer">Restore</button>
+                      </div>
+                    </sc-for>
+                  </sc-if>
+                  <sc-if value="{{ pv.hasKeepers }}" hint-placeholder-val="">
+                    <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--accent,#A6BB8E);margin:14px 0 6px">Keepers 👍</div>
+                    <sc-for list="{{ pv.ratedKeepers }}" as="r" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line,#2D3422)">
+                        <div style="min-width:0"><div style="font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint,#827E6D);margin-bottom:2px">{{ r.gameLabel }}</div><div style="font-size:12.5px;color:var(--ink-soft,#B7B3A1);line-height:1.35">{{ r.text }}</div></div>
+                        <button type="button" onClick="{{ r.onRestore }}" style="flex:none;font-size:11.5px;font-weight:600;color:var(--ink-faint,#827E6D);background:transparent;border:1px solid var(--card-border,#2D3422);border-radius:999px;padding:5px 11px;cursor:pointer">Clear</button>
+                      </div>
+                    </sc-for>
+                  </sc-if>
+                  <sc-if value="{{ pv.noRatings }}" hint-placeholder-val=""><div style="font-size:12px;color:var(--ink-faint,#827E6D);text-align:center;padding:6px 0 2px;line-height:1.45">Nothing rated yet. Use 👍 / 👎 on a prompt during a round.</div></sc-if>
                 </div>
               </sc-if>
               <sc-if value="{{ pv.live }}" hint-placeholder-val=""><button type="button" onClick="{{ pv.onEnd }}" style="display:block;width:100%;box-sizing:border-box;font-size:13px;font-weight:600;color:#CC7A6A;background:transparent;border:1px solid #6E4A44;border-radius:12px;padding:11px;cursor:pointer">End the game</button></sc-if>
@@ -1876,6 +1919,10 @@ class Component extends DCLogic {
     this.api('POST','/api/parlour/prompt',{ game: game, text: text, cid: this._cid() }).then(()=>{ this.setState({ parlourDraft: '', parlourDraftB: '' }); this.flashToast('Dropped in — the room votes to keep it ✓',2000); }).catch(()=>{});
   }
   parlourClearPrompts(){ this.api('POST','/api/parlour/clear-prompts',{ code: this._parlourCode() }).then(()=>{ this.refreshState(); this.flashToast('Tonight’s drop-ins cleared ✓',1600); }).catch(()=>this.flashToast('Only the host can clear',1800)); }
+  toggleParlourRatings(){ const open = !this.state.parlourRatingsOpen; this.setState({ parlourRatingsOpen: open }); if (open) this.parlourLoadRatings(); }
+  parlourLoadRatings(){ this.api('GET','/api/parlour/ratings?code=' + encodeURIComponent(this._parlourCode())).then(d => this.setState({ parlourRatings: (d && d.up) ? d : { up:[], down:[] } })).catch(() => this.setState({ parlourRatings: { up:[], down:[] } })); }
+  parlourRateText(game, text, rating){ return this.api('POST','/api/parlour/rate',{ code: this._parlourCode(), game: game, text: text, rating: rating }).then(()=>{ this.refreshState(); if (this.state.parlourRatingsOpen) this.parlourLoadRatings(); if (rating==='down') this.flashToast('Hidden — it won’t come up again',1800); }).catch(()=>this.flashToast('Only the host can rate',1800)); }
+  parlourRate(rating){ const P = this.state.parlour || {}; if (P.game && P.prompt) this.parlourRateText(P.game, P.prompt, rating); }
   parlourKeepVote(vote){ const p = this.state.parlour || {}; try { localStorage.setItem('hollow_parlour_keep', JSON.stringify({ round: p.round, vote: vote })); } catch(e){} this.forceUpdate(); this.api('POST','/api/parlour/keepvote',{ cid: this._cid(), vote: vote, name: this._myNameNow() }).then(()=>this.refreshState()).catch(()=>{}); }
   parlourMyKeep(){ const p = this.state.parlour || {}; try { const k = JSON.parse(localStorage.getItem('hollow_parlour_keep')||'null'); if (k && k.round === p.round) return k.vote; } catch(e){} return null; }
   parlourSavePrompt(tier){ this.api('POST','/api/parlour/save-prompt',{ code: this._parlourCode(), tier: tier }).then(()=>{ this.refreshState(); this.flashToast('Saved to the pool ✓',1600); }).catch(()=>this.flashToast('Only the host can save',1800)); }
@@ -2110,6 +2157,14 @@ class Component extends DCLogic {
     // Hints double as the multi-word nudge for the gerund buckets (activity/chore) — "a road trip" reads right after "a ___".
     const _fillHints = { people:'e.g. my ex, a mall Santa…', object:'e.g. a lava lamp, a traffic cone…', food:'e.g. lasagna, a sheet cake…', place:'e.g. the DMV, a corn maze…', activity:'e.g. hot yoga, a road trip…', drink:'e.g. boxed wine, pickle juice…', animal:'e.g. a raccoon, an emu…', chore:'e.g. the dishes, a load of laundry…' };
     const _amFiller = !!(pFill && pFill.fillerCid === this._cid());
+    // ---- Host prompt curation: 👍 keeper / 👎 hide-from-rotation ----
+    const _rr = P.promptRating || '';
+    const _canRate = !!(pStaff && P.prompt && !P.fresh && !P.filledBy);   // real pool prompts only — not fresh drop-ins or filled blanks
+    const _rateBtn = (on, kind) => { const bd = kind==='up' ? 'var(--accent,#A6BB8E)' : '#C7745F', bg = kind==='up' ? 'rgba(166,187,142,.18)' : 'rgba(199,116,95,.18)';
+      return { fontSize:'17px', lineHeight:1, padding:'6px 13px', borderRadius:'10px', cursor:'pointer', border:'1px solid '+(on?bd:'var(--card-border,#2D3422)'), background:on?bg:'var(--field,#161A11)', filter:on?'none':'grayscale(.4)', opacity:on?1:.7 }; };
+    const _gnameMap = { confession:'The Confession', fork:'The Fork', usual:'The Signature', houseread:'The House Read', usualsuspect:'The Ballot' };
+    const _ratings = st.parlourRatings || { up:[], down:[] };
+    const _rateItem = (it) => ({ text: it.text, gameLabel: (_gnameMap[it.game] || it.game), onRestore: () => this.parlourRateText(it.game, it.text, 'clear') });
     const pv = {
       live: pLive, game: pGame, gameName: pGameName,
       spicePips: spicePips, spiceLabel: _spiceNames[_spice], spiceHint: _spiceHints[_spice], spiceColor: _heatRamp[_spice],
@@ -2126,6 +2181,14 @@ class Component extends DCLogic {
       isNone: (!pGame || pPhase==='ended'), isLobby: pPhase==='lobby', isAnswer: pPhase==='answer', isReveal: pPhase==='reveal',
       isConfession: pIsConfession, isFork: pIsFork, isUsual: pIsUsual, notUsual: !pIsUsual, isGuess: pPhase==='guess',
       canBlank: (pIsConfession || pIsFork),   // only Confession/Fork have blank cards (The Blanks)
+      canRate: _canRate, rateUpStyle: _rateBtn(_rr==='up','up'), rateDownStyle: _rateBtn(_rr==='down','down'),
+      onRateUp: () => this.parlourRate('up'), onRateDown: () => this.parlourRate('down'),
+      rateHint: _rr==='down' ? 'Hidden — won’t come up again' : (_rr==='up' ? 'Saved as a keeper' : ''),
+      ratedUp: String(P.ratedUp||0), ratedDown: String(P.ratedDown||0), hasRatings: ((P.ratedUp||0)+(P.ratedDown||0))>0,
+      ratingsOpen: !!st.parlourRatingsOpen, ratingsChevron: st.parlourRatingsOpen ? '▾' : '▸', onToggleRatings: () => this.toggleParlourRatings(),
+      ratedHidden: (_ratings.down||[]).map(_rateItem), ratedKeepers: (_ratings.up||[]).map(_rateItem),
+      hasHidden: (_ratings.down||[]).length>0, hasKeepers: (_ratings.up||[]).length>0,
+      noRatings: !((_ratings.down||[]).length>0 || (_ratings.up||[]).length>0),
       isSuspect: pIsSuspect,
       suspectChips: suspectChips, suspectRows: suspectRows,
       suspectEmpty: (pIsSuspect && pPhase==='reveal' && suspectRows.length===0),
